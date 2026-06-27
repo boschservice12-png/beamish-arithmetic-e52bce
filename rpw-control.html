@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23dc2626'/><circle cx='50' cy='50' r='18' fill='%23fff'/></svg>" type="image/svg+xml">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>RedAssistance — Control Final</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f5f5f3;--w:#fff;--r:#dc2626;--r50:#fef2f2;--r100:#fee2e2;--g:#16a34a;--gl:#dcfce7;--y:#ca8a04;--yl:#fef9c3;--bl:#2563eb;--bll:#dbeafe;--tl:#0d9488;--tll:#ccfbf1;--or:#ea580c;--orl:#fff7ed;--t:#1a1a1a;--t2:#555;--t3:#999;--b:#e5e5e5;--b2:#d0d0d0;--rd:10px}
+html,body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);min-height:100dvh;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
+.mono{font-family:'JetBrains Mono',monospace}
+.hdr{background:var(--w);border-bottom:1px solid var(--b);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.hdr-left{display:flex;align-items:center;gap:8px}
+.back{width:32px;height:32px;border-radius:8px;border:1px solid var(--b);background:var(--w);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.back svg{width:18px;height:18px;stroke:var(--t2);fill:none;stroke-width:2}
+.hdr-title{font-size:14px;font-weight:800}.hdr-title span{color:var(--tl)}
+.hdr-right{display:flex;align-items:center;gap:8px}
+.hdr-job{text-align:right;font-size:11px;line-height:1.3}.hdr-job b{font-size:12px}
+.lsw{display:flex;border:1px solid var(--b);border-radius:6px;overflow:hidden}
+.lb{padding:4px 8px;font-size:9px;font-weight:700;cursor:pointer;border:none;background:var(--w);color:var(--t3);font-family:inherit}.lb.on{background:var(--tl);color:#fff}.lb:not(:last-child){border-right:1px solid var(--b)}
+.btn{border:none;border-radius:var(--rd);padding:10px 16px;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;width:100%}
+.btn-g{background:var(--g);color:#fff}.btn-o{background:var(--w);color:var(--t2);border:1px solid var(--b2)}
+.company{padding:10px 16px;font-size:10px;color:var(--t3);text-align:center;font-weight:600;letter-spacing:.5px}
+.sec{margin:8px 16px 0;background:var(--w);border:1px solid var(--b);border-radius:var(--rd);overflow:hidden}
+.sec-h{padding:12px 14px;display:flex;justify-content:space-between;align-items:center}
+.sec-t{font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px}
+.sec-bd{padding:0 14px 14px}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.info-f{background:var(--bg);border:1px solid var(--b);border-radius:6px;padding:6px 8px}
+.info-l{font-size:8px;color:var(--t3);letter-spacing:.8px;text-transform:uppercase;font-weight:600;margin-bottom:1px}
+.info-v{font-size:13px;font-weight:700;color:var(--t)}
+.progress-bar{margin:8px 16px;padding:14px;background:var(--tl);color:#fff;border-radius:var(--rd);display:flex;justify-content:space-between;align-items:center}
+.prog-label{font-size:10px;font-weight:600;opacity:.85}.prog-val{font-size:24px;font-weight:800}
+.prog-track{flex:1;height:8px;background:rgba(255,255,255,.2);border-radius:4px;margin:0 16px;overflow:hidden}
+.prog-fill{height:100%;background:#fff;border-radius:4px;transition:width .3s}
+.chk-cat{margin:8px 16px 0;background:var(--w);border:1px solid var(--b);border-radius:var(--rd);overflow:hidden}
+.chk-cat-h{padding:12px 14px;font-size:12px;font-weight:800;color:var(--tl);display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--b)}
+.chk-cat-badge{font-size:10px;font-weight:700;padding:3px 10px;border-radius:12px}
+.cb-ok{background:var(--gl);color:var(--g)}.cb-nd{background:var(--r100);color:var(--r)}.cb-pt{background:var(--yl);color:var(--y)}
+.chk-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--bg);cursor:pointer}
+.chk-item:last-child{border:none}
+.chk-item:active{background:var(--bg)}
+.chk-box{width:24px;height:24px;border-radius:6px;border:2px solid var(--b2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.chk-box.on{background:var(--g);border-color:var(--g)}
+.chk-box svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:3;opacity:0}.chk-box.on svg{opacity:1}
+.chk-box.fail{background:var(--r);border-color:var(--r)}
+.chk-box.fail svg{opacity:1}
+.chk-text{flex:1;font-size:12px;font-weight:600}
+.chk-note{width:100%;border:1px solid var(--b);border-radius:6px;padding:6px 8px;font-size:11px;font-family:inherit;outline:none;resize:none;min-height:30px;margin-top:4px}.chk-note:focus{border-color:var(--tl)}
+.chk-3btn{display:flex;gap:3px}
+.c3{padding:4px 8px;border-radius:4px;font-size:9px;font-weight:700;cursor:pointer;border:1.5px solid var(--b);background:var(--w)}
+.c3-ok.on{background:var(--gl);border-color:var(--g);color:var(--g)}
+.c3-nok.on{background:var(--r100);border-color:var(--r);color:var(--r)}
+.c3-na.on{background:var(--yl);border-color:var(--y);color:var(--y)}
+.toast{position:fixed;bottom:20px;left:16px;right:16px;background:var(--w);padding:11px 14px;border-radius:var(--rd);font-size:12px;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,.12);border-left:4px solid var(--g);z-index:250}.toast.err{border-left-color:var(--r)}
+.bpad{height:24px}.loading{text-align:center;padding:60px;color:var(--t3);font-size:14px}
+@media print{.hdr,.btn,.lsw{display:none!important}.chk-cat,.sec,.progress-bar{margin:4px 0;break-inside:avoid}body{background:#fff}}
+</style>
+</head>
+<body>
+<div id="app"><div class="loading">Se incarca...</div></div>
+<script>
+var SB_URL='https://pxypbbvqinbwesfikkdb.supabase.co';
+var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB4eXBiYnZxaW5id2VzZmlra2RiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEwMjMwNzIsImV4cCI6MjA4NjU5OTA3Mn0.WZBdbr-YBxLq1ALnHY2weFQ7j2JhUUj6hOUGkuuErnQ';
+var sb=supabase.createClient(SB_URL,SB_KEY);
+var JOB=null,S={ts:null,te:0};
+
+function gJI(){return new URLSearchParams(location.search).get('job')}
+async function loadJob(){
+  var jid=gJI();if(!jid){render();return}
+  var cached=localStorage.getItem('rpw_job_'+jid);
+  if(cached){try{JOB=JSON.parse(cached);if(!JOB.phases)JOB.phases={};for(var p=1;p<=7;p++){if(!JOB.phases[p])JOB.phases[p]={status:"pending"}};if(!JOB.controlChecks)JOB.controlChecks={};render()}catch(e){}}
+  try{
+    var res=await sb.from('rpw_jobs').select('id,data,updated_at').eq('id',jid).single();
+    if(res.error)throw res.error;
+    var _lts=0,_sts=0;try{_lts=Date.parse(localStorage.getItem('rpw_job_ts_'+jid)||0)||0;_sts=Date.parse(res.data.updated_at||0)||0}catch(e){}
+    if(!(JOB&&_lts&&_sts<=_lts)){JOB=res.data.data;if(!JOB.phases)JOB.phases={};for(var p=1;p<=7;p++){if(!JOB.phases[p])JOB.phases[p]={status:"pending"}};if(!JOB.controlChecks)JOB.controlChecks={};
+    try{localStorage.setItem('rpw_job_'+jid,JSON.stringify(JOB));localStorage.setItem('rpw_job_ts_'+jid,res.data.updated_at||new Date().toISOString())}catch(e){}}
+    try{localStorage.setItem('rpw_job_'+jid,JSON.stringify(JOB))}catch(e){}
+    /* nincs auto-mentes betolteskor */
+  }catch(e){if(!JOB)JOB=null}
+  render();
+}
+var _saveTimer=null;
+async function saveJ(){
+  if(!JOB)return;
+  try{localStorage.setItem('rpw_job_'+JOB.id,JSON.stringify(JOB));localStorage.setItem('rpw_job_ts_'+JOB.id,new Date().toISOString())}catch(e){}
+  clearTimeout(_saveTimer);
+  _saveTimer=setTimeout(async function(){
+    try{await sb.from('rpw_jobs').upsert({id:JOB.id,data:JOB,updated_at:new Date().toISOString()})}
+    catch(e){console.error('Save:',e)}
+  },500);
+}
+function toast(m,e){S.ts=m;S.te=e?1:0;render();setTimeout(function(){S.ts=null;render()},3000)}
+
+// Checklist categories — placeholder, to be filled with real items
+var CHECKLIST=[
+  {cat:'Tinichigerie',catKey:'tin',items:[
+    {id:'tin_1',text:'Geometrie panouri — aliniament corect'},
+    {id:'tin_2',text:'Jocuri egale intre panouri'},
+    {id:'tin_3',text:'Suduri / lipiri — calitate'},
+    {id:'tin_4',text:'Elemente inlocuite — fixare corecta'},
+    {id:'tin_5',text:'Functionalitate usi / capote / portbagaj'}
+  ]},
+  {cat:'Vopsitorie',catKey:'vop',items:[
+    {id:'vop_1',text:'Culoare — concordanta cu originalul'},
+    {id:'vop_2',text:'Suprafata — fara incluziuni / scurgeri'},
+    {id:'vop_3',text:'Luciu — uniform pe toate panourile'},
+    {id:'vop_4',text:'Uniformizare — tranzitie invizibila'},
+    {id:'vop_5',text:'Protectie anticoroziva — aplicata'}
+  ]},
+  {cat:'Montaj / Finisare',catKey:'mon',items:[
+    {id:'mon_1',text:'Toate elementele remontate corect'},
+    {id:'mon_2',text:'Garnituri / etansari — pozitionate'},
+    {id:'mon_3',text:'Clipsuri / suruburi — complete'},
+    {id:'mon_4',text:'Faruri / stopuri — functionale'},
+    {id:'mon_5',text:'Senzori / camere — recalibrate'}
+  ]},
+  {cat:'Curatenie / Predare',catKey:'cur',items:[
+    {id:'cur_1',text:'Spalat exterior'},
+    {id:'cur_2',text:'Curatat interior — zona lucrata'},
+    {id:'cur_3',text:'Fara urme de vopsea / praf'},
+    {id:'cur_4',text:'Stickere protectie — indepartate'},
+    {id:'cur_5',text:'Inventar complet — verificat'}
+  ]}
+];
+
+var i={control:{ro:'Control Final',en:'Final Check',hu:'Vegso Kontrol'},vehicul:{ro:'DATE VEHICUL',en:'VEHICLE DATA',hu:'JARMU ADATOK'},plate:{ro:'Nr. inmatr.',en:'Plate',hu:'Rendszam'},proprietar:{ro:'Proprietar',en:'Owner',hu:'Tulajdonos'},brand:{ro:'Marca',en:'Brand',hu:'Marka'},year:{ro:'An',en:'Year',hu:'Ev'},
+progress:{ro:'PROGRES CONTROL',en:'CHECK PROGRESS',hu:'KONTROL HALADAS'},
+ok:{ro:'OK',en:'OK',hu:'OK'},nok:{ro:'NOK',en:'NOK',hu:'NOK'},na:{ro:'N/A',en:'N/A',hu:'N/A'},
+advance:{ro:'Avanseaza → Inchidere',en:'Advance → Close',hu:'Tovabb → Lezaras'},print:{ro:'Printeaza',en:'Print',hu:'Nyomtatas'},
+noJob:{ro:'Nu exista lucrare',en:'No job',hu:'Nincs munka'},openD:{ro:'Dashboard',en:'Dashboard',hu:'Dashboard'},saved:{ro:'Salvat',en:'Saved',hu:'Mentve'},
+incomplete:{ro:'Control incomplet',en:'Check incomplete',hu:'Kontrol hianyos'}};
+
+function gL(){return localStorage.getItem('rpw_lang')||'ro'}
+function sL(l){localStorage.setItem('rpw_lang',l);render()}
+function T(k){var e=i[k];return e?e[gL()]||e.ro||k:k}
+
+function render(){
+  var ln=gL(),job=JOB;
+  if(!job){document.getElementById('app').innerHTML='<div class="loading">'+T('noJob')+'<br><br><button class="btn btn-o" style="width:auto;padding:10px 24px;display:inline-flex" onclick="location.assign(\'index.html\')">'+T('openD')+'</button></div>';return}
+  var cc=job.controlChecks||{};
+
+  // Count progress
+  var totalItems=0,doneItems=0,okItems=0,nokItems=0;
+  CHECKLIST.forEach(function(cat){cat.items.forEach(function(it){totalItems++;var v=cc[it.id];if(v==='ok'){doneItems++;okItems++}else if(v==='nok'){doneItems++;nokItems++}else if(v==='na')doneItems++})});
+  var pct=totalItems?Math.round(doneItems/totalItems*100):0;
+  var allDone=doneItems===totalItems&&nokItems===0;
+
+  var h='<div class="hdr"><div class="hdr-left"><div class="back" onclick="location.assign(\'rpw-dosar.html?job='+job.id+'\')"><svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></div><div class="hdr-title"><span>Red</span> '+T('control')+'</div></div><div class="hdr-right"><div class="hdr-job"><b class="mono">'+(job.number||job.id)+'</b><br><span style="color:var(--t3)">'+(job.plate||'')+' · '+(job.auto||'')+'</span></div><div class="lsw"><button class="lb '+(ln==='ro'?'on':'')+'" onclick="sL(\'ro\')">RO</button><button class="lb '+(ln==='en'?'on':'')+'" onclick="sL(\'en\')">EN</button><button class="lb '+(ln==='hu'?'on':'')+'" onclick="sL(\'hu\')">HU</button></div></div></div>';
+
+  h+='<div class="company">SC SZKALICZKI SERVICE SRL · RO16250445 · Str. Petki David, Nr.27/A, Sangeorgiu de Mures · Tel: 0265318020</div>';
+
+  // Vehicle
+  h+='<div class="sec"><div class="sec-h"><div class="sec-t">'+T('vehicul')+'</div></div><div class="sec-bd"><div class="info-grid"><div class="info-f"><div class="info-l">'+T('plate')+'</div><div class="info-v mono" style="font-size:16px;font-weight:800">'+(job.plate||'—')+'</div></div><div class="info-f"><div class="info-l">'+T('proprietar')+'</div><div class="info-v">'+(job.proprietar||job.client||'—')+'</div></div></div><div class="info-grid" style="margin-top:6px"><div class="info-f"><div class="info-l">'+T('brand')+'</div><div class="info-v">'+(job.brand||job.auto||'—')+'</div></div><div class="info-f"><div class="info-l">'+T('year')+'</div><div class="info-v mono">'+(job.year||'—')+'</div></div></div></div></div>';
+
+  // Progress bar
+  h+='<div class="progress-bar"><div><div class="prog-label">'+T('progress')+'</div><div class="prog-val">'+pct+'%</div></div><div class="prog-track"><div class="prog-fill" style="width:'+pct+'%"></div></div><div style="font-size:11px;font-weight:700">'+doneItems+'/'+totalItems+(nokItems?' · <span style="color:var(--r100)">'+nokItems+' NOK</span>':'')+'</div></div>';
+
+  // Checklist categories
+  CHECKLIST.forEach(function(cat){
+    var catDone=0,catTotal=cat.items.length,catNok=0;
+    cat.items.forEach(function(it){var v=cc[it.id];if(v)catDone++;if(v==='nok')catNok++});
+    var badgeCls=catDone===catTotal&&catNok===0?'cb-ok':catDone>0?'cb-pt':'cb-nd';
+    h+='<div class="chk-cat"><div class="chk-cat-h">'+cat.cat+'<span class="chk-cat-badge '+badgeCls+'">'+catDone+'/'+catTotal+(catNok?' · '+catNok+' NOK':'')+'</span></div>';
+    cat.items.forEach(function(it){
+      var v=cc[it.id]||'';
+      h+='<div class="chk-item"><div class="chk-text">'+it.text+'</div><div class="chk-3btn"><div class="c3 c3-ok '+(v==='ok'?'on':'')+'" onclick="setChk(\''+it.id+'\',\'ok\')">'+T('ok')+'</div><div class="c3 c3-nok '+(v==='nok'?'on':'')+'" onclick="setChk(\''+it.id+'\',\'nok\')">'+T('nok')+'</div><div class="c3 c3-na '+(v==='na'?'on':'')+'" onclick="setChk(\''+it.id+'\',\'na\')">'+T('na')+'</div></div></div>';
+      if(v==='nok'){h+='<div style="padding:0 14px 8px"><textarea class="chk-note" placeholder="Observatii NOK..." onchange="setChkNote(\''+it.id+'\',this.value)">'+(cc[it.id+'_note']||'')+'</textarea></div>'}
+    });
+    h+='</div>';
+  });
+
+  // Actions
+  h+='<div style="padding:10px 16px;display:flex;gap:8px"><button class="btn btn-o" onclick="window.print()" style="flex:1">'+T('print')+'</button><button class="btn '+(allDone?'btn-g':'btn-o')+'" onclick="advPh()" style="flex:1;'+(allDone?'':'opacity:.5')+'">'+T('advance')+'</button></div>';
+
+  h+='<div class="bpad"></div>';
+  if(S.ts)h+='<div class="toast '+(S.te?'err':'')+'">'+S.ts+'</div>';
+  document.getElementById('app').innerHTML=h;
+}
+
+window.setChk=async function(id,val){
+  if(!JOB.controlChecks)JOB.controlChecks={};
+  JOB.controlChecks[id]=JOB.controlChecks[id]===val?'':val;
+  await saveJ();render();
+};
+window.setChkNote=async function(id,val){
+  if(!JOB.controlChecks)JOB.controlChecks={};
+  JOB.controlChecks[id+'_note']=val;
+  await saveJ();
+};
+window.advPh=async function(){
+  if(!JOB)return;
+  var cc=JOB.controlChecks||{},totalItems=0,doneItems=0,nokItems=0;
+  CHECKLIST.forEach(function(cat){cat.items.forEach(function(it){totalItems++;var v=cc[it.id];if(v)doneItems++;if(v==='nok')nokItems++})});
+  if(doneItems<totalItems||nokItems>0){toast(T('incomplete'),1);return}
+  JOB.phases[6].status='done';JOB.phases[6].finished=new Date().toISOString();
+  if(JOB.phase<=6){JOB.phase=7;JOB.phases[7].status='active';JOB.phases[7].started=new Date().toISOString()}
+  await saveJ();toast(T('saved'));
+  setTimeout(function(){location.assign('rpw-dosar.html?job='+JOB.id)},1500);
+};
+
+loadJob();
+</script>
+</body>
+</html>

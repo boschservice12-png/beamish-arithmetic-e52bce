@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RedAssistance — Recuperare date</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f5f5f3;color:#1a1a1a;padding:16px}
+h1{font-size:18px;margin-bottom:4px}h1 span{color:#dc2626}
+.sub{font-size:12px;color:#777;margin-bottom:16px}
+.card{background:#fff;border:1px solid #e5e5e5;border-radius:10px;padding:14px;margin-bottom:10px}
+.row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.jid{font-family:monospace;font-weight:800;font-size:14px}
+.meta{font-size:12px;color:#555;margin-top:4px;line-height:1.6}
+.cnt{display:inline-block;background:#f3f4f6;border-radius:6px;padding:1px 8px;margin-right:6px;font-size:11px;font-weight:700}
+.cnt.hi{background:#dcfce7;color:#16a34a}
+.srv{font-size:11px;margin-top:6px;padding:6px 8px;border-radius:6px;background:#fef9c3;color:#854d0e}
+.srv.ok{background:#dcfce7;color:#166534}.srv.bad{background:#fee2e2;color:#b91c1c}
+button{border:none;border-radius:8px;padding:9px 16px;font-size:12px;font-weight:800;cursor:pointer}
+.b-restore{background:#16a34a;color:#fff}
+.b-back{background:#fff;border:1px solid #d0d0d0;color:#555;margin-bottom:14px}
+.empty{text-align:center;color:#999;padding:40px;font-size:13px}
+.toast{position:fixed;bottom:16px;left:16px;right:16px;background:#fff;border-left:4px solid #16a34a;border-radius:8px;padding:12px;font-size:13px;font-weight:700;box-shadow:0 4px 16px rgba(0,0,0,.15)}
+</style>
+</head>
+<body>
+<button class="b-back" onclick="location.assign('index.html')">← Inapoi la panou</button>
+<h1><span>Red</span>Assistance — Recuperare date locale</h1>
+<div class="sub">Copiile locale ale lucrarilor de pe ACEST dispozitiv. Daca aici sunt date care lipsesc de pe server, apasa RESTAUREZ.</div>
+<div id="list"><div class="empty">Se incarca...</div></div>
+<script>
+var SB_URL='https://pxypbbvqinbwesfikkdb.supabase.co';
+var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB4eXBiYnZxaW5id2VzZmlra2RiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEwMjMwNzIsImV4cCI6MjA4NjU5OTA3Mn0.WZBdbr-YBxLq1ALnHY2weFQ7j2JhUUj6hOUGkuuErnQ';
+var sb=null;
+function toast(m){var t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(function(){t.remove()},3500)}
+function summarize(j){
+  var ph=(j.photos||[]).length, dc=(j.docs||[]).length, el=Object.keys(j.elements||{}).length;
+  var rc=(j.reconst&&j.reconst.rows)?j.reconst.rows.length:0;
+  var tal=(j.photos||[]).some(function(p){return p&&p.type==='talon'});
+  return {ph:ph,dc:dc,el:el,rc:rc,tal:tal};
+}
+function cntHtml(s){
+  return '<span class="cnt'+(s.tal?' hi':'')+'">talon: '+(s.tal?'DA':'—')+'</span>'
+    +'<span class="cnt'+(s.ph?' hi':'')+'">foto: '+s.ph+'</span>'
+    +'<span class="cnt'+(s.dc?' hi':'')+'">doc: '+s.dc+'</span>'
+    +'<span class="cnt'+(s.el?' hi':'')+'">elemente: '+s.el+'</span>'
+    +'<span class="cnt'+(s.rc?' hi':'')+'">reconst: '+s.rc+'</span>';
+}
+var LOCAL={};
+async function load(){
+  var keys=[];
+  for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('rpw_job_')===0&&k.indexOf('rpw_job_ts_')!==0)keys.push(k)}
+  if(!keys.length){document.getElementById('list').innerHTML='<div class="empty">Nu exista copii locale pe acest dispozitiv.</div>';return}
+  var h='';
+  keys.forEach(function(k){
+    try{
+      var j=JSON.parse(localStorage.getItem(k));if(!j||!j.id)return;
+      LOCAL[j.id]=j;
+      var s=summarize(j);
+      var ts=localStorage.getItem('rpw_job_ts_'+j.id)||'';
+      h+='<div class="card"><div class="row"><div><div class="jid">'+(j.number||j.id)+' <span style="color:#999;font-weight:400">'+(j.plate||'')+' '+(j.auto||'')+'</span></div>'
+        +'<div class="meta">LOCAL: '+cntHtml(s)+(ts?'<br>salvat local: '+new Date(ts).toLocaleString('ro-RO'):'')+'</div>'
+        +'<div class="srv" id="srv-'+j.id+'">Se compara cu serverul...</div></div>'
+        +'<button class="b-restore" onclick="restore(\''+j.id+'\')">⬆ RESTAUREZ PE SERVER</button></div></div>';
+    }catch(e){}
+  });
+  document.getElementById('list').innerHTML=h||'<div class="empty">Nu exista copii locale valide.</div>';
+  if(!sb)return;
+  Object.keys(LOCAL).forEach(async function(id){
+    var el=document.getElementById('srv-'+id);if(!el)return;
+    try{
+      var r=await sb.from('rpw_jobs').select('data,updated_at').eq('id',id).single();
+      if(r.error)throw r.error;
+      var ss=summarize(r.data.data||{});
+      var ls=summarize(LOCAL[id]);
+      var localMore=(ls.ph>ss.ph)||(ls.dc>ss.dc)||(ls.el>ss.el)||(ls.rc>ss.rc)||(ls.tal&&!ss.tal);
+      el.className='srv '+(localMore?'bad':'ok');
+      el.innerHTML='SERVER: '+cntHtml(ss)+(localMore?'<br><b>⚠ Copia locala are MAI MULTE date — recomandat RESTAUREZ!</b>':'<br>Serverul este la zi.');
+    }catch(e){el.className='srv bad';el.textContent='Server: lucrarea nu a fost gasita sau eroare — copia locala este singura sursa.'}
+  });
+}
+window.restore=async function(id){
+  var j=LOCAL[id];if(!j){toast('Nu exista copie locala');return}
+  if(!sb){toast('Lipseste cheia Supabase pe acest dispozitiv');return}
+  if(!confirm('Restaurez copia locala a lucrarii '+(j.number||id)+' pe server? Aceasta va deveni versiunea oficiala.'))return;
+  try{
+    var now=new Date().toISOString();
+    var r=await sb.from('rpw_jobs').upsert({id:j.id,data:j,updated_at:now});
+    if(r.error)throw r.error;
+    try{localStorage.setItem('rpw_job_ts_'+j.id,now)}catch(e){}
+    toast('✓ Restaurat: '+(j.number||id));
+    setTimeout(load,800);
+  }catch(e){toast('Eroare: '+(e.message||e))}
+};
+(function init(){sb=supabase.createClient(SB_URL,SB_KEY);load()})();
+</script>
+</body>
+</html>

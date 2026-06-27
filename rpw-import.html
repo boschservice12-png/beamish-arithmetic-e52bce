@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23dc2626'/><circle cx='50' cy='50' r='18' fill='%23fff'/></svg>" type="image/svg+xml">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#dc2626">
+<title>RedAssistance — Import</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f5f5f3;--w:#fff;--r:#dc2626;--r50:#fef2f2;--r100:#fee2e2;--g:#16a34a;--gl:#dcfce7;--y:#ca8a04;--yl:#fef9c3;--bl:#2563eb;--bll:#dbeafe;--p:#7c3aed;--pl:#ede9fe;--or:#ea580c;--orl:#fff7ed;--t:#1a1a1a;--t2:#555;--t3:#999;--b:#e5e5e5;--b2:#d0d0d0;--rd:10px}
+html,body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);min-height:100dvh}
+.mono{font-family:'JetBrains Mono',monospace}
+.hdr{background:var(--w);border-bottom:1px solid var(--b);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.hdr-left{display:flex;align-items:center;gap:8px}
+.back{width:32px;height:32px;border-radius:8px;border:1px solid var(--b);background:var(--w);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.back svg{width:18px;height:18px;stroke:var(--t2);fill:none;stroke-width:2}
+.hdr-title{font-size:14px;font-weight:800}.hdr-title span{color:var(--r)}
+.hdr-title small{font-size:10px;font-weight:500;color:var(--t3);margin-left:6px}
+
+.container{max-width:960px;margin:16px auto;padding:0 16px}
+
+.drop-zone{background:var(--w);border:2px dashed var(--b2);border-radius:var(--rd);padding:40px 20px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:16px}
+.drop-zone.dragover{border-color:var(--r);background:var(--r50)}
+.drop-zone.has-files{padding:20px;text-align:left;display:flex;justify-content:space-between;align-items:center}
+.dz-icon{font-size:40px;margin-bottom:10px}
+.dz-title{font-size:15px;font-weight:700;color:var(--t);margin-bottom:6px}
+.dz-sub{font-size:11px;color:var(--t3);margin-bottom:12px}
+.dz-btn{display:inline-block;padding:8px 16px;background:var(--r);color:#fff;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:inherit}
+.dz-hint{font-size:10px;color:var(--t3);margin-top:8px}
+.dz-summary{font-size:13px;font-weight:700}
+.dz-summary-count{color:var(--r);font-size:16px}
+.dz-add{padding:6px 14px;background:var(--w);border:1.5px solid var(--r);color:var(--r);border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
+
+.files-panel{background:var(--w);border:1px solid var(--b);border-radius:var(--rd);padding:16px;margin-bottom:16px}
+.fp-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.fp-title{font-size:13px;font-weight:700}
+.fp-status{font-size:11px;color:var(--t3);font-weight:600}
+.fp-status.working{color:var(--bl)}
+.fp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:10px}
+
+.fcard{background:var(--bg);border:2px solid var(--b);border-radius:8px;padding:8px;position:relative;cursor:pointer;transition:all .2s}
+.fcard:hover{border-color:var(--b2)}
+.fcard.type-talon{border-color:var(--r);background:var(--r50)}
+.fcard.type-buletin{border-color:var(--bl);background:var(--bll)}
+.fcard.type-constatare{border-color:var(--or);background:var(--orl)}
+.fcard.type-foto{border-color:var(--g);background:var(--gl)}
+.fcard.type-other{border-color:var(--p);background:var(--pl)}
+.fcard.working{opacity:.6}
+.fc-thumb{width:100%;aspect-ratio:4/3;background:var(--w);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:6px;overflow:hidden;position:relative}
+.fc-thumb img{width:100%;height:100%;object-fit:cover}
+.fc-type{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+.fc-label{font-size:10px;font-weight:600;color:var(--t2);line-height:1.2}
+.fc-name{font-size:9px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fc-del{position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:var(--w);color:var(--r);border:1px solid var(--b);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;z-index:2;opacity:0}
+.fcard:hover .fc-del{opacity:1}
+.fc-type-sel{position:absolute;bottom:4px;right:4px;background:var(--w);border:1px solid var(--b);border-radius:4px;font-size:9px;padding:2px 4px;font-family:inherit;cursor:pointer;z-index:2;display:none}
+.fcard:hover .fc-type-sel{display:block}
+
+.fc-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.7);border-radius:4px;font-size:18px}
+
+.data-panel{background:var(--w);border:1px solid var(--b);border-radius:var(--rd);padding:16px;margin-bottom:16px}
+.dp-title{font-size:13px;font-weight:700;margin-bottom:10px}
+.dp-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.dp-col{}
+.dp-lbl{font-size:9px;color:var(--t3);letter-spacing:1px;text-transform:uppercase;font-weight:700;margin-bottom:6px}
+.dp-row{display:flex;align-items:baseline;gap:6px;font-size:12px;padding:3px 0;border-bottom:1px dashed var(--b)}
+.dp-row:last-child{border:none}
+.dp-row-l{color:var(--t3);min-width:60px;font-size:11px}
+.dp-row-v{flex:1;font-weight:700;color:var(--t)}
+.dp-row-v input{width:100%;border:none;background:transparent;font-weight:700;font-size:12px;font-family:inherit;outline:none;color:var(--t);padding:2px 4px;border-radius:3px}
+.dp-row-v input:hover,.dp-row-v input:focus{background:var(--bg)}
+
+.type-tabs{display:flex;gap:8px;padding:10px 0;overflow-x:auto}
+.type-tab{padding:8px 14px;border:1.5px solid var(--b);background:var(--w);border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;color:var(--t2)}
+.type-tab.on-asig{border-color:var(--bl);background:var(--bll);color:var(--bl)}
+.type-tab.on-auto{border-color:var(--or);background:var(--orl);color:var(--or)}
+
+.actions{display:flex;gap:10px;justify-content:flex-end;padding:16px 0}
+.btn{padding:11px 20px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:inherit}
+.btn-c{background:var(--w);border:1px solid var(--b2);color:var(--t2)}
+.btn-g{background:var(--g);color:#fff}
+.btn-g:disabled{opacity:.5;cursor:not-allowed}
+
+.toast{position:fixed;bottom:20px;left:16px;right:16px;max-width:600px;margin:0 auto;background:var(--w);padding:11px 14px;border-radius:var(--rd);font-size:12px;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,.12);border-left:4px solid var(--g);z-index:250}.toast.err{border-left-color:var(--r)}
+.loading{text-align:center;padding:60px;color:var(--t3);font-size:14px}
+.empty-state{text-align:center;padding:30px;color:var(--t3);font-size:12px}
+
+@media(max-width:680px){
+  .dp-cols{grid-template-columns:1fr}
+  .drop-zone{padding:24px 14px}
+}
+</style>
+</head>
+<body>
+<div id="app"><div class="loading">Se incarca...</div></div>
+
+<script>
+var SB_URL='https://pxypbbvqinbwesfikkdb.supabase.co';
+var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB4eXBiYnZxaW5id2VzZmlra2RiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEwMjMwNzIsImV4cCI6MjA4NjU5OTA3Mn0.WZBdbr-YBxLq1ALnHY2weFQ7j2JhUUj6hOUGkuuErnQ';
+var sb=supabase.createClient(SB_URL,SB_KEY);
+
+// ───── STATE ────────────────────────
+var FILES=[];  // [{id, name, dataUrl, type:'talon'|'buletin'|..., label, processing, classified}]
+var EXTRACTED={
+  plate:null, vin:null, brand:null, model:null, year:null, capacitate:null, proprietar:null,
+  nume:null, address:null, cnp:null,
+  nrDosar:null, asigurator:null
+};
+var S={damageType:'asig',dragging:false,ts:null,te:0,creating:false};
+var LANG_KEY='rpw_lang';
+
+// ───── i18n ─────────────────────────
+var i={
+  title:{ro:'Import batch',en:'Batch Import',hu:'Tobbes import'},
+  subtitle:{ro:'Creeaza dosar din fisiere (WhatsApp, email)',en:'Create file from attachments',hu:'Dosszie letrehozas fajlokbol'},
+  dzTitle:{ro:'Trage si plaseaza fisierele aici',en:'Drag and drop files here',hu:'Huzd ide a fajlokat'},
+  dzSub:{ro:'sau click pentru a selecta (mai multe odata)',en:'or click to select multiple',hu:'vagy katt a tallozashoz'},
+  dzBtn:{ro:'Selecteaza fisiere',en:'Select files',hu:'Fajlok valasztasa'},
+  dzHint:{ro:'Acceptat: JPG, PNG, PDF · Max 20 fisiere',en:'Accepted: JPG, PNG, PDF · Max 20',hu:'JPG, PNG, PDF · Max 20'},
+  filesLoaded:{ro:'fisiere incarcate',en:'files loaded',hu:'fajl betoltve'},
+  adauga:{ro:'+ Adauga',en:'+ Add',hu:'+ Uj'},
+  statusAnalyzing:{ro:'AI analizeaza...',en:'AI analyzing...',hu:'AI elemez...'},
+  statusDone:{ro:'Analiza terminata',en:'Analysis done',hu:'Elemzes kesz'},
+  statusIdle:{ro:'Pregatit',en:'Ready',hu:'Keszen all'},
+  tTalon:{ro:'TALON',en:'REG CARD',hu:'TALON'},
+  tBuletin:{ro:'BULETIN',en:'ID CARD',hu:'BULETIN'},
+  tConstatare:{ro:'CONSTATARE',en:'REPORT',hu:'JKV'},
+  tFoto:{ro:'FOTO',en:'PHOTO',hu:'FOTO'},
+  tOther:{ro:'ALTCEVA',en:'OTHER',hu:'MAS'},
+  tUnknown:{ro:'NECLASIFICAT',en:'UNCLASSIFIED',hu:'ISMERETLEN'},
+  dataVehicle:{ro:'VEHICUL (din talon)',en:'VEHICLE (from talon)',hu:'JARMU (talonbol)'},
+  dataClient:{ro:'CLIENT (din buletin)',en:'CLIENT (from ID)',hu:'UGYFEL (buletinbol)'},
+  dataDosar:{ro:'DOSAR DAUNA (din constatare)',en:'CLAIM (from report)',hu:'KAR DOSSZIE (jkv-bol)'},
+  plate:{ro:'Nr. inmatr.',en:'Plate',hu:'Rendszam'},
+  vin:{ro:'VIN',en:'VIN',hu:'VIN'},
+  brand:{ro:'Marca',en:'Make',hu:'Marka'},
+  model:{ro:'Model',en:'Model',hu:'Model'},
+  year:{ro:'An',en:'Year',hu:'Ev'},
+  name:{ro:'Nume',en:'Name',hu:'Nev'},
+  address:{ro:'Adresa',en:'Address',hu:'Cim'},
+  cnp:{ro:'CNP',en:'CNP',hu:'CNP'},
+  nrDosar:{ro:'Nr. dosar',en:'File no.',hu:'Dosszie sz'},
+  asig:{ro:'Asigurator',en:'Insurer',hu:'Biztosito'},
+  damageType:{ro:'TIP DAUNA',en:'DAMAGE TYPE',hu:'KAR TIPUS'},
+  dtAsig:{ro:'Dauna asigurare',en:'Insurance',hu:'Biztositasi kar'},
+  dtAuto:{ro:'Dauna auto (particular)',en:'Private',hu:'Magankar'},
+  btnCancel:{ro:'Anuleaza',en:'Cancel',hu:'Megsem'},
+  btnCreate:{ro:'Creeaza dosar →',en:'Create file →',hu:'Dosszie letrehozas →'},
+  creating:{ro:'Se creeaza...',en:'Creating...',hu:'Letrehozas...'},
+  emptyFiles:{ro:'Niciun fisier incarcat inca',en:'No files yet',hu:'Meg nincs fajl'},
+  errNoTalon:{ro:'Nu s-a incarcat niciun talon. Se poate crea dosar dar datele vehiculului vor fi goale.',en:'No talon loaded.',hu:'Nincs talon.'},
+  jobCreated:{ro:'Dosar creat!',en:'File created!',hu:'Dosszie letrehozva!'}
+};
+function gL(){return localStorage.getItem(LANG_KEY)||'ro'}
+function T(k){var e=i[k];return e?e[gL()]||e.ro:k}
+
+// ───── HELPERS ─────────────────────
+function uid(){return 'f_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7)}
+function esc(s){if(s==null)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function genJobId(){
+  var d=new Date(),y=(d.getFullYear()+'').slice(-2);
+  var rand=Math.floor(Math.random()*900000)+100000;
+  return 'RPW-'+rand;
+}
+function genJobNumber(){
+  var d=new Date(),y=(d.getFullYear()+'').slice(-2);
+  var n=Math.floor(Math.random()*900)+100;
+  return 'MS-'+y+'-'+n;
+}
+
+function resizeImage(file,maxW,cb){
+  var r=new FileReader();
+  r.onload=function(e){
+    if(file.type.indexOf('image')!==0){cb(e.target.result);return}
+    var img=new Image();
+    img.onload=function(){
+      var sc=img.width>maxW?maxW/img.width:1;
+      var c=document.createElement('canvas');
+      c.width=img.width*sc;c.height=img.height*sc;
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+      cb(c.toDataURL('image/jpeg',.82));
+    };
+    img.src=e.target.result;
+  };
+  r.readAsDataURL(file);
+}
+
+function toast(m,err){S.ts=m;S.te=err?1:0;render();setTimeout(function(){S.ts=null;render()},3500)}
+
+// ───── AI CLASSIFY ─────────────────
+async function classifyFile(fileObj){
+  if(fileObj.classified||fileObj.processing)return;
+  fileObj.processing=true;render();
+
+  // Ha nem kep, nem classify - auto "other"
+  if(fileObj.mime && fileObj.mime.indexOf('image')!==0){
+    fileObj.type='altceva';fileObj.label=fileObj.name;fileObj.classified=true;fileObj.processing=false;render();return;
+  }
+
+  try{
+    var base64=fileObj.dataUrl.replace(/^data:image\/\w+;base64,/,'');
+    var res=await fetch('/.netlify/functions/classify',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({image:base64})
+    });
+    var data=await res.json();
+    fileObj.type=data.type||'altceva';
+    fileObj.label=data.label||'';
+    fileObj.confidence=data.confidence||0;
+  }catch(e){
+    console.error('classify',e);
+    fileObj.type='altceva';fileObj.label='Eroare';
+  }
+  fileObj.classified=true;fileObj.processing=false;
+  render();
+
+  // Ha talon/buletin/constatare, futtatsd OCR-t is
+  if(fileObj.type==='talon'||fileObj.type==='buletin'||fileObj.type==='constatare'){
+    await ocrFile(fileObj);
+  }
+}
+
+async function ocrFile(fileObj){
+  try{
+    var base64=fileObj.dataUrl.replace(/^data:image\/\w+;base64,/,'');
+    var res=await fetch('/.netlify/functions/ocr',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({image:base64,type:fileObj.type})
+    });
+    var data=await res.json();
+    var parsed;try{parsed=JSON.parse(data.result)}catch(e){parsed=null}
+    if(parsed){
+      fileObj.ocrData=parsed;
+      mergeToExtracted(fileObj.type,parsed);
+      render();
+    }
+  }catch(e){console.error('ocr',e)}
+}
+
+function mergeToExtracted(type,parsed){
+  if(type==='talon'){
+    if(parsed.plate)EXTRACTED.plate=parsed.plate;
+    if(parsed.vin)EXTRACTED.vin=parsed.vin;
+    if(parsed.brand)EXTRACTED.brand=parsed.brand;
+    if(parsed.model)EXTRACTED.model=parsed.model;
+    if(parsed.year)EXTRACTED.year=parsed.year;
+    if(parsed.capacitate)EXTRACTED.capacitate=parsed.capacitate;
+    if(parsed.owner&&!EXTRACTED.proprietar)EXTRACTED.proprietar=parsed.owner;
+  }
+  if(type==='buletin'){
+    if(parsed.name)EXTRACTED.nume=parsed.name;
+    if(parsed.address)EXTRACTED.address=parsed.address;
+    if(parsed.cnp)EXTRACTED.cnp=parsed.cnp;
+  }
+  if(type==='constatare'){
+    if(parsed.nrDosar)EXTRACTED.nrDosar=parsed.nrDosar;
+    if(parsed.asigurator)EXTRACTED.asigurator=parsed.asigurator;
+    if(parsed.proprietar&&!EXTRACTED.proprietar)EXTRACTED.proprietar=parsed.proprietar;
+  }
+}
+
+// ───── FILE HANDLING ───────────────
+function handleFiles(fileList){
+  if(!fileList||!fileList.length)return;
+  var files=Array.from(fileList).slice(0,20-FILES.length);
+  files.forEach(function(f){
+    resizeImage(f,1400,function(dataUrl){
+      var obj={
+        id:uid(),name:f.name,mime:f.type,size:f.size,
+        dataUrl:dataUrl,type:null,label:'',classified:false,processing:false,confidence:0
+      };
+      FILES.push(obj);
+      render();
+      classifyFile(obj);
+    });
+  });
+}
+
+// ───── JOB CREATION ────────────────
+async function createJob(){
+  if(S.creating)return;
+  S.creating=true;render();
+
+  var jid=genJobId();
+  var jobNumber=genJobNumber();
+
+  // Epitsd fel a JOB objektumot
+  var job={
+    id:jid,
+    number:jobNumber,
+    created:new Date().toISOString(),
+    damageType:S.damageType,
+    phase:1,
+    phases:{1:{status:'active',started:new Date().toISOString()},2:{status:'pending'},3:{status:'pending'},4:{status:'pending'},5:{status:'pending'},6:{status:'pending'},7:{status:'pending'}},
+    // Adatok a talonbol
+    plate:EXTRACTED.plate,
+    vin:EXTRACTED.vin,
+    brand:EXTRACTED.brand,
+    auto:EXTRACTED.brand,
+    model:EXTRACTED.model,
+    year:EXTRACTED.year,
+    capacitate:EXTRACTED.capacitate,
+    proprietar:EXTRACTED.proprietar,
+    // Ugyfel adatok a buletinbol
+    client:EXTRACTED.nume||EXTRACTED.proprietar,
+    nume:EXTRACTED.nume,
+    adresa:EXTRACTED.address,
+    cnp:EXTRACTED.cnp,
+    // Constatare adatok
+    nrDosar:EXTRACTED.nrDosar,
+    asigurator:EXTRACTED.asigurator,
+    // Fajl referenciak
+    photoKeys:{},
+    photoUrls:{},
+    customDocs:[],
+    elements:{},
+    importedFiles:[]
+  };
+
+  // Minden fajlt fel kell toltsunk a Supabase Storage-ba
+  try{
+    for(var i=0;i<FILES.length;i++){
+      var f=FILES[i];
+      var key=null;
+      if(f.type==='talon')key='photo_talon';
+      else if(f.type==='buletin')key='doc_buletin';
+      else if(f.type==='constatare')key='doc_constatare';
+      else if(f.type==='foto_fata')key='ov_front';
+      else if(f.type==='foto_spate')key='ov_back';
+      else if(f.type==='foto_lateral_stg')key='ov_left';
+      else if(f.type==='foto_lateral_dr')key='ov_right';
+      else{
+        var customId='imp_'+Date.now().toString(36)+'_'+i;
+        job.customDocs.push({id:customId,name:f.name||'Import '+(i+1),ts:new Date().toISOString()});
+        key='custdoc_'+customId;
+      }
+
+      var storageKey=jid+'/'+key+'_'+Date.now()+'_'+i+'.jpg';
+      var blob=await (await fetch(f.dataUrl)).blob();
+      var upRes=await sb.storage.from('rpw-photos').upload(storageKey,blob,{contentType:'image/jpeg',upsert:true});
+      if(upRes.error)throw upRes.error;
+      var publicUrl=sb.storage.from('rpw-photos').getPublicUrl(storageKey).data.publicUrl;
+      job.photoKeys[key]=storageKey;
+      job.photoUrls[key]=publicUrl;
+      job.importedFiles.push({key:key,storageKey:storageKey,publicUrl:publicUrl,type:f.type,name:f.name});
+    }
+
+    // Dosszie mentes
+    var insertRes=await sb.from('rpw_jobs').insert({id:jid,data:job,updated_at:new Date().toISOString()});
+    if(insertRes.error)throw insertRes.error;
+
+    // localStorage cache
+    try{localStorage.setItem('rpw_job_'+jid,JSON.stringify(job))}catch(e){}
+
+    toast(T('jobCreated'));
+    setTimeout(function(){location.assign('rpw-recepcio.html?job='+jid)},800);
+  }catch(err){
+    console.error('Create job',err);
+    S.creating=false;
+    toast('Eroare: '+(err.message||err),1);
+  }
+}
+
+// ───── RENDER ──────────────────────
+function render(){
+  var ln=gL();
+  var h='';
+
+  // Header
+  h+='<div class="hdr"><div class="hdr-left"><div class="back" onclick="location.assign(\'index.html\')"><svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></div><div class="hdr-title"><span>Red</span> '+T('title')+'<small>'+T('subtitle')+'</small></div></div></div>';
+
+  h+='<div class="container">';
+
+  // Drop zone
+  if(FILES.length===0){
+    h+='<div class="drop-zone'+(S.dragging?' dragover':'')+'" id="dz" onclick="document.getElementById(\'fi\').click()">';
+    h+='<div class="dz-icon">📎</div>';
+    h+='<div class="dz-title">'+T('dzTitle')+'</div>';
+    h+='<div class="dz-sub">'+T('dzSub')+'</div>';
+    h+='<button class="dz-btn">'+T('dzBtn')+'</button>';
+    h+='<div class="dz-hint">'+T('dzHint')+'</div>';
+    h+='</div>';
+  }else{
+    h+='<div class="drop-zone has-files" id="dz" onclick="document.getElementById(\'fi\').click()">';
+    h+='<div class="dz-summary"><span class="dz-summary-count">'+FILES.length+'</span> '+T('filesLoaded')+'</div>';
+    h+='<button class="dz-add" onclick="event.stopPropagation();document.getElementById(\'fi\').click()">'+T('adauga')+'</button>';
+    h+='</div>';
+  }
+
+  h+='<input type="file" id="fi" multiple accept="image/*,.pdf" style="display:none" onchange="onFilePick(event)">';
+
+  // Files panel
+  if(FILES.length>0){
+    var working=FILES.filter(function(f){return f.processing}).length;
+    var allDone=working===0 && FILES.every(function(f){return f.classified});
+    h+='<div class="files-panel">';
+    h+='<div class="fp-hdr"><div class="fp-title">Fisiere</div>';
+    h+='<div class="fp-status '+(working?'working':'')+'">'+(working?T('statusAnalyzing')+' ('+working+')':(allDone?T('statusDone'):T('statusIdle')))+'</div>';
+    h+='</div>';
+    h+='<div class="fp-grid">';
+    FILES.forEach(function(f,idx){
+      var typeCls='';
+      if(f.type==='talon')typeCls='type-talon';
+      else if(f.type==='buletin')typeCls='type-buletin';
+      else if(f.type==='constatare')typeCls='type-constatare';
+      else if(f.type&&f.type.indexOf('foto')===0)typeCls='type-foto';
+      else if(f.type==='altceva')typeCls='type-other';
+      var typeLbl=T('tUnknown');
+      if(f.type==='talon')typeLbl='✓ '+T('tTalon');
+      else if(f.type==='buletin')typeLbl='✓ '+T('tBuletin');
+      else if(f.type==='constatare')typeLbl='✓ '+T('tConstatare');
+      else if(f.type&&f.type.indexOf('foto')===0)typeLbl='✓ '+T('tFoto')+' '+f.type.replace('foto_','').toUpperCase();
+      else if(f.type==='altceva')typeLbl=T('tOther');
+      h+='<div class="fcard '+typeCls+(f.processing?' working':'')+'">';
+      h+='<button class="fc-del" onclick="event.stopPropagation();delFile(\''+f.id+'\')">×</button>';
+      h+='<div class="fc-thumb">';
+      if(f.mime&&f.mime.indexOf('image')===0)h+='<img src="'+f.dataUrl+'"/>';
+      else h+='📄';
+      if(f.processing)h+='<div class="fc-loading">⚙️</div>';
+      h+='</div>';
+      h+='<div class="fc-type">'+typeLbl+'</div>';
+      if(f.label)h+='<div class="fc-label">'+esc(f.label)+'</div>';
+      h+='<div class="fc-name">'+esc(f.name||'')+'</div>';
+      // Manual type override
+      h+='<select class="fc-type-sel" onchange="setFType(\''+f.id+'\',this.value)" onclick="event.stopPropagation()">';
+      ['talon','buletin','constatare','foto_fata','foto_spate','foto_lateral_stg','foto_lateral_dr','foto_elem','altceva'].forEach(function(tp){
+        h+='<option value="'+tp+'" '+(f.type===tp?'selected':'')+'>'+tp+'</option>';
+      });
+      h+='</select>';
+      h+='</div>';
+    });
+    h+='</div></div>';
+
+    // Extracted data panel
+    var hasData=EXTRACTED.plate||EXTRACTED.nume||EXTRACTED.nrDosar;
+    if(hasData){
+      h+='<div class="data-panel">';
+      h+='<div class="dp-title">Date extrase automat (AI)</div>';
+      h+='<div class="dp-cols">';
+      // VEHICULATE
+      if(EXTRACTED.plate||EXTRACTED.vin||EXTRACTED.brand){
+        h+='<div class="dp-col"><div class="dp-lbl">'+T('dataVehicle')+'</div>';
+        h+='<div class="dp-row"><div class="dp-row-l">'+T('plate')+':</div><div class="dp-row-v"><input value="'+esc(EXTRACTED.plate||'')+'" onchange="setExtracted(\'plate\',this.value)"/></div></div>';
+        h+='<div class="dp-row"><div class="dp-row-l">'+T('vin')+':</div><div class="dp-row-v"><input class="mono" value="'+esc(EXTRACTED.vin||'')+'" onchange="setExtracted(\'vin\',this.value)"/></div></div>';
+        h+='<div class="dp-row"><div class="dp-row-l">'+T('brand')+':</div><div class="dp-row-v"><input value="'+esc((EXTRACTED.brand||'')+(EXTRACTED.model?' '+EXTRACTED.model:''))+'" onchange="setExtracted(\'brand\',this.value)"/></div></div>';
+        h+='<div class="dp-row"><div class="dp-row-l">'+T('year')+':</div><div class="dp-row-v"><input value="'+esc(EXTRACTED.year||'')+'" onchange="setExtracted(\'year\',this.value)"/></div></div>';
+        h+='</div>';
+      }
+      // CLIENT
+      if(EXTRACTED.nume||EXTRACTED.proprietar||EXTRACTED.cnp){
+        h+='<div class="dp-col"><div class="dp-lbl">'+T('dataClient')+'</div>';
+        h+='<div class="dp-row"><div class="dp-row-l">'+T('name')+':</div><div class="dp-row-v"><input value="'+esc(EXTRACTED.nume||EXTRACTED.proprietar||'')+'" onchange="setExtracted(\'nume\',this.value)"/></div></div>';
+        h+='<div class="dp-row"><div class="dp-row-l">'+T('cnp')+':</div><div class="dp-row-v"><input value="'+esc(EXTRACTED.cnp||'')+'" onchange="setExtracted(\'cnp\',this.value)"/></div></div>';
+        h+='<div class="dp-row"><div class="dp-row-l">'+T('address')+':</div><div class="dp-row-v"><input value="'+esc(EXTRACTED.address||'')+'" onchange="setExtracted(\'address\',this.value)"/></div></div>';
+        h+='</div>';
+      }
+      h+='</div>';
+      // DOSAR
+      if(EXTRACTED.nrDosar||EXTRACTED.asigurator){
+        h+='<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--b)"><div class="dp-lbl">'+T('dataDosar')+'</div>';
+        h+='<div class="dp-cols">';
+        h+='<div class="dp-row"><div class="dp-row-l">'+T('nrDosar')+':</div><div class="dp-row-v"><input value="'+esc(EXTRACTED.nrDosar||'')+'" onchange="setExtracted(\'nrDosar\',this.value)"/></div></div>';
+        h+='<div class="dp-row"><div class="dp-row-l">'+T('asig')+':</div><div class="dp-row-v"><input value="'+esc(EXTRACTED.asigurator||'')+'" onchange="setExtracted(\'asigurator\',this.value)"/></div></div>';
+        h+='</div></div>';
+      }
+      h+='</div>';
+    }
+
+    // Damage type
+    h+='<div class="data-panel"><div class="dp-title">'+T('damageType')+'</div>';
+    h+='<div class="type-tabs">';
+    h+='<button class="type-tab '+(S.damageType==='asig'?'on-asig':'')+'" onclick="setDamageType(\'asig\')">🛡️ '+T('dtAsig')+'</button>';
+    h+='<button class="type-tab '+(S.damageType==='auto'?'on-auto':'')+'" onclick="setDamageType(\'auto\')">🚗 '+T('dtAuto')+'</button>';
+    h+='</div></div>';
+  }else{
+    h+='<div class="empty-state">'+T('emptyFiles')+'</div>';
+  }
+
+  // Actions
+  h+='<div class="actions">';
+  h+='<button class="btn btn-c" onclick="cancelImport()">'+T('btnCancel')+'</button>';
+  var canCreate=FILES.length>0 && !S.creating;
+  h+='<button class="btn btn-g" onclick="createJob()" '+(canCreate?'':'disabled')+'>'+(S.creating?T('creating'):T('btnCreate'))+'</button>';
+  h+='</div>';
+
+  h+='</div>';  // container
+
+  if(S.ts)h+='<div class="toast '+(S.te?'err':'')+'">'+esc(S.ts)+'</div>';
+
+  document.getElementById('app').innerHTML=h;
+
+  // Drag-drop events
+  var dz=document.getElementById('dz');
+  if(dz){
+    dz.ondragover=function(e){e.preventDefault();if(!S.dragging){S.dragging=true;render()}};
+    dz.ondragleave=function(){S.dragging=false;render()};
+    dz.ondrop=function(e){e.preventDefault();S.dragging=false;handleFiles(e.dataTransfer.files);render()};
+  }
+}
+
+// ───── HANDLERS ────────────────────
+window.onFilePick=function(ev){handleFiles(ev.target.files);ev.target.value=''};
+window.delFile=function(id){FILES=FILES.filter(function(f){return f.id!==id});recomputeExtracted();render()};
+window.setFType=function(id,tp){var f=FILES.find(function(x){return x.id===id});if(!f)return;f.type=tp;f.classified=true;render();if(tp==='talon'||tp==='buletin'||tp==='constatare')ocrFile(f)};
+window.setExtracted=function(k,v){EXTRACTED[k]=v;render()};
+window.setDamageType=function(t){S.damageType=t;render()};
+window.cancelImport=function(){if(confirm('Anulezi importul?'))location.assign('index.html')};
+window.createJob=createJob;
+
+function recomputeExtracted(){
+  // Reset and recompute from remaining files
+  EXTRACTED={plate:null,vin:null,brand:null,model:null,year:null,capacitate:null,proprietar:null,nume:null,address:null,cnp:null,nrDosar:null,asigurator:null};
+  FILES.forEach(function(f){
+    if(f.ocrData){
+      if(f.type==='talon')mergeToExtracted('talon',f.ocrData);
+      if(f.type==='buletin')mergeToExtracted('buletin',f.ocrData);
+      if(f.type==='constatare')mergeToExtracted('constatare',f.ocrData);
+    }
+  });
+}
+
+render();
+</script>
+</body>
+</html>

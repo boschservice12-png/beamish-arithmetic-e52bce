@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23dc2626'/><circle cx='50' cy='50' r='18' fill='%23fff'/></svg>" type="image/svg+xml">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>RedAssistance — Deviz Upsell</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f5f5f3;--w:#fff;--r:#dc2626;--r50:#fef2f2;--r100:#fee2e2;--g:#16a34a;--gl:#dcfce7;--y:#ca8a04;--yl:#fef9c3;--bl:#2563eb;--bll:#dbeafe;--or:#ea580c;--orl:#fff7ed;--t:#1a1a1a;--t2:#555;--t3:#999;--b:#e5e5e5;--b2:#d0d0d0;--rd:10px}
+html,body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);min-height:100dvh;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
+.mono{font-family:'JetBrains Mono',monospace}
+.hdr{background:var(--w);border-bottom:1px solid var(--b);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.hdr-left{display:flex;align-items:center;gap:8px}
+.back{width:32px;height:32px;border-radius:8px;border:1px solid var(--b);background:var(--w);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.back svg{width:18px;height:18px;stroke:var(--t2);fill:none;stroke-width:2}
+.hdr-title{font-size:14px;font-weight:800}.hdr-title span{color:var(--or)}
+.hdr-right{display:flex;align-items:center;gap:6px}
+.lsw{display:flex;border:1px solid var(--b);border-radius:6px;overflow:hidden}
+.lb{padding:4px 8px;font-size:9px;font-weight:700;cursor:pointer;border:none;background:var(--w);color:var(--t3);font-family:inherit}.lb.on{background:var(--or);color:#fff}.lb:not(:last-child){border-right:1px solid var(--b)}
+/* Status bar */
+.status-bar{margin:8px 16px;padding:12px 16px;border-radius:var(--rd);display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:13px;color:#fff;cursor:pointer}
+.st-draft{background:var(--t3)}.st-sent{background:var(--y)}.st-accepted{background:var(--g)}.st-rejected{background:var(--r)}
+.st-label{font-size:10px;font-weight:600;opacity:.85}
+.st-btns{display:flex;gap:4px}
+.st-btn{padding:4px 10px;border-radius:4px;font-size:9px;font-weight:700;cursor:pointer;border:1.5px solid rgba(255,255,255,.4);background:none;color:#fff;font-family:inherit}.st-btn:hover{background:rgba(255,255,255,.2)}.st-btn.active{background:rgba(255,255,255,.3);border-color:#fff}
+/* Deviz document */
+.deviz{margin:8px 16px;background:var(--w);border:1px solid var(--b);border-radius:var(--rd);padding:16px;font-size:11px}
+.dv-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid var(--or)}
+.dv-logo{font-size:16px;font-weight:800;font-style:italic;color:var(--or)}
+.dv-nr{text-align:right}.dv-nr b{font-size:14px;display:block}
+.dv-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--b);border-radius:6px;overflow:hidden;margin-bottom:10px}
+.dv-col{padding:8px 10px;border-bottom:1px solid var(--b)}.dv-col:nth-child(odd){border-right:1px solid var(--b)}
+.dv-lbl{font-size:8px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.5px}.dv-val{font-size:11px;font-weight:700;margin-top:1px}
+.dv-auto{padding:8px 10px;background:var(--bg);border:1px solid var(--b);border-radius:6px;margin-bottom:10px}
+/* Tarif settings */
+.tarif-bar{display:flex;gap:10px;align-items:center;padding:8px 10px;background:var(--orl);border:1px solid var(--or);border-radius:6px;margin-bottom:10px;flex-wrap:wrap}
+.tarif-bar label{font-size:9px;font-weight:700;color:var(--or)}
+.tarif-bar input{width:60px;text-align:center;border:1px solid var(--b);border-radius:4px;padding:3px;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace}
+/* Tables */
+.dtbl{width:100%;border-collapse:collapse;font-size:10px;margin-bottom:12px}
+.dtbl th{padding:6px 4px;text-align:left;font-size:8px;font-weight:700;color:var(--or);border-bottom:2px solid var(--or);text-transform:uppercase;letter-spacing:.3px}
+.dtbl th.r{text-align:right}.dtbl td.r{text-align:right}
+.dtbl td{padding:4px;border-bottom:1px solid var(--b);vertical-align:middle}
+.dtbl tr:hover{background:var(--orl)}
+.dtbl input,.dtbl select{border:1px solid var(--b);border-radius:3px;padding:2px 4px;font-size:10px;font-family:inherit;outline:none;background:var(--w)}.dtbl input:focus{border-color:var(--or)}
+.dtbl .w40{width:40px;text-align:center}.dtbl .w55{width:55px;text-align:right}.dtbl .w70{width:70px}
+.del-btn{width:20px;height:20px;border-radius:50%;border:none;background:var(--r50);color:var(--r);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.add-row{margin-top:6px;padding:6px;border:2px dashed var(--b2);border-radius:6px;text-align:center;cursor:pointer;font-size:10px;font-weight:700;color:var(--t3)}.add-row:hover{background:var(--orl);border-color:var(--or);color:var(--or)}
+/* Summary */
+.dv-sum{border:2px solid var(--or);border-radius:6px;overflow:hidden;margin-top:12px}
+.dv-sum-row{display:flex;justify-content:space-between;padding:6px 12px;font-size:11px;border-bottom:1px solid var(--b)}.dv-sum-row:last-child{border:none}
+.dv-sum-total{background:var(--or);color:#fff;font-size:16px;font-weight:800;padding:10px 12px;display:flex;justify-content:space-between}
+.dv-sum-lbl{font-weight:600;color:var(--t2)}.dv-sum-val{font-weight:800;font-family:'JetBrains Mono',monospace}
+/* Guarantee */
+.dv-garant{margin-top:10px;font-size:8px;color:var(--t3);line-height:1.4;padding:8px;background:var(--bg);border-radius:6px}
+.dv-sig{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.dv-sig-box{text-align:center;font-size:9px;font-weight:700;color:var(--t2)}.dv-sig-line{border-top:1px solid var(--b);margin-top:30px;padding-top:4px}
+/* Buttons */
+.btn{border:none;border-radius:var(--rd);padding:10px 16px;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;width:100%}
+.btn-o{background:var(--w);color:var(--t2);border:1px solid var(--b2)}.btn-wa{background:#25D366;color:#fff}.btn-g{background:var(--g);color:#fff}
+.action-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:10px 16px}.action-grid .btn{font-size:11px}
+.toast{position:fixed;bottom:20px;left:16px;right:16px;background:var(--w);padding:11px 14px;border-radius:var(--rd);font-size:12px;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,.12);border-left:4px solid var(--g);z-index:250}.toast.err{border-left-color:var(--r)}
+.bpad{height:24px}.loading{text-align:center;padding:60px;color:var(--t3);font-size:14px}
+@media print{.hdr,.action-grid,.add-row,.del-btn,.lsw,.status-bar,.tarif-bar,.st-btns{display:none!important}.deviz{margin:0;border:none;padding:10px}.dtbl input,.dtbl select{border:none;padding:0;font-weight:700}body{background:#fff}}
+</style>
+</head>
+<body>
+<div id="app"><div class="loading">Se incarca...</div></div>
+<script>
+var SB_URL='https://pxypbbvqinbwesfikkdb.supabase.co';
+var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB4eXBiYnZxaW5id2VzZmlra2RiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEwMjMwNzIsImV4cCI6MjA4NjU5OTA3Mn0.WZBdbr-YBxLq1ALnHY2weFQ7j2JhUUj6hOUGkuuErnQ';
+var sb=supabase.createClient(SB_URL,SB_KEY);
+var JOB=null,S={ts:null,te:0};
+var TVA=21;
+
+function gJI(){return new URLSearchParams(location.search).get('job')}
+async function loadJob(){
+  var jid=gJI();if(!jid){render();return}
+  var cached=localStorage.getItem('rpw_job_'+jid);
+  if(cached){try{JOB=JSON.parse(cached);render()}catch(e){}}
+  try{
+    var res=await sb.from('rpw_jobs').select('id,data,updated_at').eq('id',jid).single();
+    if(res.error)throw res.error;
+    var _lts=0,_sts=0;try{_lts=Date.parse(localStorage.getItem('rpw_job_ts_'+jid)||0)||0;_sts=Date.parse(res.data.updated_at||0)||0}catch(e){}
+    if(!(JOB&&_lts&&_sts<=_lts)){JOB=res.data.data;
+    try{localStorage.setItem('rpw_job_'+jid,JSON.stringify(JOB));localStorage.setItem('rpw_job_ts_'+jid,res.data.updated_at||new Date().toISOString())}catch(e){}}
+    try{localStorage.setItem('rpw_job_'+jid,JSON.stringify(JOB))}catch(e){}
+    /* nincs auto-mentes betolteskor */
+  }catch(e){if(!JOB)JOB=null}
+  render();
+}
+var _saveTimer=null;
+async function saveJ(){
+  if(!JOB)return;
+  try{localStorage.setItem('rpw_job_'+JOB.id,JSON.stringify(JOB));localStorage.setItem('rpw_job_ts_'+JOB.id,new Date().toISOString())}catch(e){}
+  clearTimeout(_saveTimer);
+  _saveTimer=setTimeout(async function(){
+    try{await sb.from('rpw_jobs').upsert({id:JOB.id,data:JOB,updated_at:new Date().toISOString()})}
+    catch(e){console.error('Save:',e)}
+  },500);
+}
+function buildMaterials(){
+  var m=[],aR=JOB.afterRows||[];
+  for(var x=0;x<aR.length;x++){var r=aR[x];m.push({cod:'',desc:r.name||'',cant:1,pret:0,disc:0})}
+  m.push({cod:'MAT',desc:'Mat vopsitorie',cant:1,pret:0,disc:0});
+  m.push({cod:'',desc:'Materiale consumabile',cant:1,pret:0,disc:0});
+  return m;
+}
+function buildManopera(){
+  var m=[],aR=JOB.afterRows||[],tarif=JOB.deviz?JOB.deviz.tarifManopera:120;
+  for(var x=0;x<aR.length;x++){
+    var r=aR[x],w=(r.op||'').toLowerCase();
+    var desc=r.name||'';
+    if(w.indexOf('inlocui')>=0||w==='replace')m.push({desc:'INLOCUIT '+desc,mecanic:'',norma:parseFloat(r.hours)||2,tarif:tarif,tip:'lakatos'});
+    else m.push({desc:'REPARAT '+desc,mecanic:'',norma:parseFloat(r.hours)||3,tarif:tarif,tip:'lakatos'});
+    m.push({desc:'Revopsit '+desc,mecanic:'',norma:3,tarif:tarif,tip:'vopsitorie'});
+  }
+  m.push({desc:'OPER DEZASAMBLARE',mecanic:'',norma:1,tarif:tarif,tip:'lakatos'});
+  return m;
+}
+function toast(m,e){S.ts=m;S.te=e?1:0;render();setTimeout(function(){S.ts=null;render()},3000)}
+function fmt(n){return(Math.round(n*100)/100).toFixed(2)}
+function gL(){return localStorage.getItem('rpw_lang')||'ro'}
+function sL(l){localStorage.setItem('rpw_lang',l);render()}
+
+function render(){
+  if(!JOB){document.getElementById('app').innerHTML='<div class="loading">Nu exista lucrare</div>';return}
+  // Initialize deviz if missing
+  if(!JOB.deviz){
+    var aR=JOB.afterRows||[],ev=JOB.evalRows||[];
+    var mats=[{cod:'MAT',desc:'Materiale vopsitorie',cant:1,pret:0,disc:0},{cod:'',desc:'Materiale consumabile',cant:1,pret:0,disc:0}];
+    var mans=[];
+    ev.forEach(function(r){
+      if(!r.name)return;
+      var desc=r.name.toUpperCase(),hrs=parseFloat(r.hours)||2,t=120;
+      if(r.op&&r.op.toLowerCase().indexOf('inlocui')>=0)mans.push({desc:'INLOCUIT '+desc,mecanic:'',norma:hrs,tarif:t,tip:'lakatos'});
+      else mans.push({desc:'REPARAT '+desc,mecanic:'',norma:hrs,tarif:t,tip:'lakatos'});
+      mans.push({desc:'Revopsit '+desc,mecanic:'',norma:3,tarif:t,tip:'vopsitorie'});
+    });
+    var yr=new Date().getFullYear().toString().slice(-2);
+    var cnt=(JOB.devizCount||0)+1;JOB.devizCount=cnt;
+    JOB.deviz={nr:'DV-'+yr+'-'+String(cnt).padStart(3,'0'),date:new Date().toISOString().slice(0,10),status:'draft',tarifManopera:120,globalDisc:0,tva:19,materials:mats,manopera:mans,responseNote:''};
+  }
+  var ln=gL(),dv=JOB.deviz,tarif=dv.tarifManopera||120;
+
+  // Calc materials
+  var matFTVA=0;
+  dv.materials.forEach(function(m){
+    var p=parseFloat(m.pret)||0,c=parseFloat(m.cant)||1,d=parseFloat(m.disc)||0;
+    var val=p*c*(1-d/100);matFTVA+=val;
+  });
+  var matTVA=matFTVA*TVA/100,matCTVA=matFTVA+matTVA;
+
+  // Calc manopera
+  var manFTVA=0;
+  dv.manopera.forEach(function(m){var n=parseFloat(m.norma)||0,t=parseFloat(m.tarif)||tarif,d=parseFloat(m.disc)||0;manFTVA+=n*t*(1-d/100)});
+  var manTVA=manFTVA*TVA/100,manCTVA=manFTVA+manTVA;
+
+  var totalFTVA=matFTVA+manFTVA;
+  var gd=parseFloat(dv.globalDisc)||0;
+  var discAmount=totalFTVA*gd/100;
+  var totalAfterDisc=totalFTVA-discAmount;
+  var totalTVA=totalAfterDisc*TVA/100;
+  var totalCTVA=totalAfterDisc+totalTVA;
+
+  // Status
+  var stCls=dv.status==='sent'?'st-sent':dv.status==='accepted'?'st-accepted':dv.status==='rejected'?'st-rejected':'st-draft';
+  var stLabel=dv.status==='sent'?'TRIMIS — ASTEPTAM RASPUNS':dv.status==='accepted'?'ACCEPTAT ✓':dv.status==='rejected'?'REFUZAT ✗':'CIORNA';
+
+  var h='<div class="hdr"><div class="hdr-left"><div class="back" onclick="location.assign(\'rpw-evaluare.html?job='+JOB.id+'\')"><svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></div><div class="hdr-title"><span>Red</span> Deviz Upsell</div></div><div class="hdr-right"><div class="lsw"><button class="lb '+(ln==='ro'?'on':'')+'" onclick="sL(\'ro\')">RO</button><button class="lb '+(ln==='en'?'on':'')+'" onclick="sL(\'en\')">EN</button><button class="lb '+(ln==='hu'?'on':'')+'" onclick="sL(\'hu\')">HU</button></div></div></div>';
+
+  // Status bar
+  h+='<div class="status-bar '+stCls+'"><div><div class="st-label">STATUS DEVIZ</div><div>'+stLabel+'</div>'+(dv.responseDate?'<div style="font-size:9px;opacity:.8;margin-top:2px">Raspuns: '+dv.responseDate+'</div>':'')+'</div><div class="st-btns"><button class="st-btn '+(dv.status==='draft'?'active':'')+'" onclick="setSt(\'draft\')">Ciorna</button><button class="st-btn '+(dv.status==='sent'?'active':'')+'" onclick="setSt(\'sent\')">Trimis</button><button class="st-btn '+(dv.status==='accepted'?'active':'')+'" onclick="setSt(\'accepted\')">Acceptat</button><button class="st-btn '+(dv.status==='rejected'?'active':'')+'" onclick="setSt(\'rejected\')">Refuzat</button></div></div>';
+  if(dv.status==='sent'){
+    h+='<div style="margin:0 16px;padding:12px;background:var(--yl);border:2px solid var(--y);border-radius:var(--rd);display:flex;gap:8px;align-items:center;flex-wrap:wrap"><div style="font-size:12px;font-weight:800;color:var(--y)">Raspuns primit?</div><button class="btn" style="width:auto;padding:8px 16px;background:var(--g);color:#fff;flex:none" onclick="dvResponse(\'accepted\')">✓ Acceptat</button><button class="btn" style="width:auto;padding:8px 16px;background:var(--r);color:#fff;flex:none" onclick="dvResponse(\'rejected\')">✗ Refuzat</button></div>';
+  }
+  if(dv.responseNote){
+    h+='<div style="margin:4px 16px;padding:8px 12px;background:var(--w);border:1px solid var(--b);border-radius:var(--rd);font-size:11px"><span style="font-weight:700;color:var(--t3)">Raspuns client:</span> '+dv.responseNote+'</div>';
+  }
+
+  h+='<div class="deviz">';
+  // Header
+  h+='<div class="dv-hdr"><div><div class="dv-logo">Szkaliczki Service</div><div style="font-size:9px;color:var(--t3);margin-top:2px">OFERTA DE REPARATIE</div></div><div class="dv-nr"><b>DEVIZ Nr. '+dv.nr+'</b><div style="font-size:9px;color:var(--t3)">Data '+(dv.date||'')+'</div></div></div>';
+
+  // Unit + Client
+  h+='<div class="dv-grid"><div class="dv-col"><div class="dv-lbl">Unitate</div><div class="dv-val">SC SZKALICZKI SERVICE SRL</div></div><div class="dv-col"><div class="dv-lbl">Client</div><div class="dv-val">'+(JOB.proprietar||JOB.client||'—')+'</div></div>';
+  h+='<div class="dv-col"><div class="dv-lbl">Cod fiscal</div><div class="dv-val">RO16250445</div></div><div class="dv-col"><div class="dv-lbl">Telefon</div><div class="dv-val">'+(JOB.phone||'—')+'</div></div>';
+  h+='<div class="dv-col"><div class="dv-lbl">Adresa</div><div class="dv-val">Str. Petki David, Nr.27/A</div></div><div class="dv-col"><div class="dv-lbl">Adresa</div><div class="dv-val">—</div></div>';
+  h+='<div class="dv-col"><div class="dv-lbl">Telefon</div><div class="dv-val">0265318020</div></div><div class="dv-col"><div class="dv-lbl">Nr. ord</div><div class="dv-val">—</div></div></div>';
+
+  // Auto
+  h+='<div class="dv-auto"><div style="display:flex;gap:16px;flex-wrap:wrap"><div><span class="dv-lbl">Tip auto </span><span class="dv-val">'+(JOB.brand||JOB.auto||'—')+'</span></div><div><span class="dv-lbl">Nr. inm. </span><span class="dv-val mono" style="font-size:13px">'+(JOB.plate||'—')+'</span></div><div><span class="dv-lbl">Serie sasiu </span><span class="dv-val mono">'+(JOB.vin||'—')+'</span></div><div><span class="dv-lbl">An </span><span class="dv-val">'+(JOB.year||'—')+'</span></div><div><span class="dv-lbl">Km </span><span class="dv-val mono">'+(JOB.km||'—')+'</span></div></div></div>';
+
+  // Tarif setting
+  h+='<div class="tarif-bar"><label>Tarif manopera (RON/ora):</label><input class="mono" type="number" value="'+tarif+'" onchange="setTarif(this.value)"><label>TVA:</label><span class="mono" style="font-weight:700">'+TVA+'%</span><label>Discount global %:</label><input class="mono" type="number" value="'+(dv.globalDisc||0)+'" onchange="setGDisc(this.value)"></div>';
+
+  // Detaliere materiale
+  h+='<div style="font-size:10px;font-weight:800;color:var(--or);margin:10px 0 4px">DETALIERE MATERIALE</div>';
+  h+='<table class="dtbl"><thead><tr><th>Nr</th><th>Cod</th><th>Descriere</th><th class="r">Cant.</th><th class="r">Pret f.TVA</th><th class="r">Disc.%</th><th class="r">Val f.TVA</th><th class="r">Val cu TVA</th><th></th></tr></thead><tbody>';
+  for(var x=0;x<dv.materials.length;x++){
+    var m=dv.materials[x],p=parseFloat(m.pret)||0,c=parseFloat(m.cant)||1,d=parseFloat(m.disc)||0;
+    var vf=p*c*(1-d/100),vc=vf*(1+TVA/100);
+    h+='<tr><td>'+(x+1)+'</td><td><input class="w70" value="'+(m.cod||'')+'" onchange="uMat('+x+',\'cod\',this.value)"></td><td><input style="width:100%" value="'+(m.desc||'')+'" onchange="uMat('+x+',\'desc\',this.value)"></td><td><input class="w40 mono" type="number" step="1" min="1" value="'+c+'" onchange="uMat('+x+',\'cant\',this.value)"></td><td><input class="w55 mono" type="number" step="0.01" value="'+p+'" onchange="uMat('+x+',\'pret\',this.value)"></td><td><input class="w40 mono" type="number" step="1" value="'+d+'" onchange="uMat('+x+',\'disc\',this.value)"></td><td class="r mono" style="font-weight:700">'+fmt(vf)+'</td><td class="r mono" style="font-weight:700">'+fmt(vc)+'</td><td><button class="del-btn" onclick="dMat('+x+')">×</button></td></tr>';
+  }
+  h+='</tbody></table><div class="add-row" onclick="aMat()">+ Material</div>';
+
+  // Detaliere manopere
+  h+='<div style="font-size:10px;font-weight:800;color:var(--or);margin:14px 0 4px">DETALIERE MANOPERE</div>';
+  h+='<table class="dtbl"><thead><tr><th>Nr</th><th>Descriere</th><th>Mecanic</th><th class="r">Norma</th><th class="r">Tarif</th><th class="r">Disc.%</th><th class="r">Val f.TVA</th><th class="r">Val cu TVA</th><th></th></tr></thead><tbody>';
+  for(var x=0;x<dv.manopera.length;x++){
+    var m=dv.manopera[x],n=parseFloat(m.norma)||0,t=parseFloat(m.tarif)||tarif,d=parseFloat(m.disc)||0;
+    var vf=n*t*(1-d/100),vc=vf*(1+TVA/100);
+    h+='<tr><td>'+(x+1)+'</td><td><input style="width:100%" value="'+(m.desc||'')+'" onchange="uMan('+x+',\'desc\',this.value)"></td><td><input class="w70" value="'+(m.mecanic||'')+'" onchange="uMan('+x+',\'mecanic\',this.value)"></td><td><input class="w40 mono" type="number" step="0.1" min="0" value="'+n+'" onchange="uMan('+x+',\'norma\',this.value)"></td><td><input class="w55 mono" type="number" step="1" min="0" value="'+t+'" onchange="uMan('+x+',\'tarif\',this.value)"></td><td><input class="w40 mono" type="number" step="1" value="'+d+'" onchange="uMan('+x+',\'disc\',this.value)"></td><td class="r mono" style="font-weight:700">'+fmt(vf)+'</td><td class="r mono" style="font-weight:700">'+fmt(vc)+'</td><td><button class="del-btn" onclick="dMan('+x+')">×</button></td></tr>';
+  }
+  h+='</tbody></table><div class="add-row" onclick="aMan()">+ Manopera</div>';
+
+  // Summary
+  h+='<div class="dv-sum"><div class="dv-sum-row"><span class="dv-sum-lbl">Materiale fara TVA</span><span class="dv-sum-val">'+fmt(matFTVA)+' RON</span></div><div class="dv-sum-row"><span class="dv-sum-lbl">Manopera fara TVA</span><span class="dv-sum-val">'+fmt(manFTVA)+' RON</span></div><div class="dv-sum-row"><span class="dv-sum-lbl">Subtotal fara TVA</span><span class="dv-sum-val">'+fmt(totalFTVA)+' RON</span></div>';
+  if(gd>0)h+='<div class="dv-sum-row" style="color:var(--g)"><span class="dv-sum-lbl">Discount global ('+gd+'%)</span><span class="dv-sum-val">-'+fmt(discAmount)+' RON</span></div><div class="dv-sum-row"><span class="dv-sum-lbl">Total dupa discount</span><span class="dv-sum-val">'+fmt(totalAfterDisc)+' RON</span></div>';
+  h+='<div class="dv-sum-row"><span class="dv-sum-lbl">TVA ('+TVA+'%)</span><span class="dv-sum-val">'+fmt(totalTVA)+' RON</span></div><div class="dv-sum-total"><span>TOTAL CU TVA:</span><span>'+fmt(totalCTVA)+' RON</span></div></div>';
+
+  // Guarantee
+  h+='<div class="dv-garant">CONDITII DE GARANTIE — Unitatea noastra acorda garantie pentru lucrari de reparatii conform O.U.G. 140/2021: pentru lucrarile de reparatii termenul de garantie este de 6 luni de la data receptiei; pentru piesele furnizate de unitatea noastra termenul de garantie este de 24 luni. Clientul se obliga sa asigure o exploatare corecta a autovehiculului reparat in conformitate cu cerintele impuse de producator.</div>';
+
+  // Signatures
+  h+='<div class="dv-sig"><div class="dv-sig-box">Lucrarile corespund calitativ, SEF UNITATE<div class="dv-sig-line">SZKALICZKI FERENC</div></div><div class="dv-sig-box">Am preluat autovehiculul reparat si cu inventar complet, CLIENT<div class="dv-sig-line">'+(JOB.proprietar||JOB.client||'')+'</div></div></div>';
+
+  h+='</div>'; // end deviz
+
+  // Actions
+  h+='<div class="action-grid"><button class="btn btn-wa" onclick="waDeviz()"><svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492l4.636-1.467A11.932 11.932 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-2.168 0-4.19-.592-5.935-1.62l-.424-.253-2.748.87.884-2.678-.278-.44A9.768 9.768 0 012.182 12c0-5.423 4.395-9.818 9.818-9.818S21.818 6.577 21.818 12 17.423 21.818 12 21.818z"/></svg> WhatsApp</button><button class="btn btn-o" onclick="window.print()">Printeaza</button><button class="btn btn-o" onclick="emailDeviz()">Email</button></div>';
+
+  h+='<div class="bpad"></div>';
+  if(S.ts)h+='<div class="toast '+(S.te?'err':'')+'">'+S.ts+'</div>';
+  document.getElementById('app').innerHTML=h;
+}
+
+// Material handlers
+window.uMat=async function(i,f,v){JOB.deviz.materials[i][f]=v;await saveJ();render()};
+window.dMat=async function(i){JOB.deviz.materials.splice(i,1);await saveJ();render()};
+window.aMat=async function(){JOB.deviz.materials.push({cod:'',desc:'',cant:1,pret:0,disc:0});await saveJ();render()};
+// Manopera handlers
+window.uMan=async function(i,f,v){JOB.deviz.manopera[i][f]=v;await saveJ();render()};
+window.dMan=async function(i){JOB.deviz.manopera.splice(i,1);await saveJ();render()};
+window.aMan=async function(){JOB.deviz.manopera.push({desc:'',mecanic:'',norma:0,tarif:JOB.deviz.tarifManopera||120,tip:'lakatos'});await saveJ();render()};
+// Tarif
+window.setTarif=async function(v){
+  var newT=parseFloat(v)||120,oldT=JOB.deviz.tarifManopera||120;
+  JOB.deviz.tarifManopera=newT;
+  JOB.deviz.manopera.forEach(function(m){if(!m.tarif||m.tarif===oldT)m.tarif=newT});
+  await saveJ();render()
+};
+// Status
+window.setSt=async function(st){JOB.deviz.status=st;await saveJ();render();toast(st==='sent'?'Trimis!':st==='accepted'?'Acceptat ✓':st==='rejected'?'Refuzat ✗':'Ciorna')};
+window.setGDisc=async function(v){JOB.deviz.globalDisc=parseFloat(v)||0;await saveJ();render()};
+window.dvResponse=async function(st){
+  var note=prompt('Nota raspuns client:','');
+  JOB.deviz.status=st;
+  JOB.deviz.responseDate=new Date().toISOString().slice(0,10);
+  JOB.deviz.responseNote=note||'';
+  if(st==='accepted'&&JOB.phase<=2){
+    JOB.phases[2].status='done';JOB.phases[2].finished=new Date().toISOString();
+    JOB.phase=3;JOB.phases[3].status='active';JOB.phases[3].started=new Date().toISOString();
+    await saveJ();toast('Client acceptat ✓ — faza 3 activa');
+    setTimeout(function(){location.assign('rpw-dosar.html?job='+JOB.id)},1500);
+  }else{await saveJ();render();toast(st==='accepted'?'Acceptat ✓':'Refuzat ✗')}
+};
+
+window.waDeviz=function(){
+  var dv=JOB.deviz,tarif=dv.tarifManopera||120;
+  var phone=(JOB.phone||'').replace(/[^0-9+]/g,'');
+  if(!phone||phone.length<6){phone=prompt('Numar telefon client:','');if(!phone)return}
+  phone=phone.replace(/[^0-9]/g,'');
+  if(phone[0]==='0')phone='40'+phone.slice(1);
+  var matT=0;dv.materials.forEach(function(m){var p=parseFloat(m.pret)||0,c=parseFloat(m.cant)||1,d=parseFloat(m.disc)||0;matT+=p*c*(1-d/100)});
+  var manT=0;dv.manopera.forEach(function(m){var rt=parseFloat(m.tarif)||tarif,rd=parseFloat(m.disc)||0;manT+=(parseFloat(m.norma)||0)*rt*(1-rd/100)});
+  var subtotal=matT+manT,gd2=parseFloat(dv.globalDisc)||0;
+  var afterDisc=subtotal*(1-gd2/100);
+  var total=afterDisc*(1+TVA/100);
+  var msg='*OFERTA DE REPARATIE*\n*SC SZKALICZKI SERVICE SRL*\n';
+  msg+='Deviz: '+dv.nr+' / '+dv.date+'\n\n';
+  msg+='🚗 '+(JOB.brand||JOB.auto||'')+' · '+(JOB.plate||'')+'\n';
+  msg+='Client: '+(JOB.proprietar||JOB.client||'')+'\n\n';
+  msg+='*Materiale:*\n';
+  dv.materials.forEach(function(m,i){
+    var p=parseFloat(m.pret)||0;if(!p)return;
+    var c=parseFloat(m.cant)||1,d=parseFloat(m.disc)||0,v=p*c*(1-d/100);
+    msg+=(i+1)+'. '+m.desc+(d?' (-'+d+'%)':'')+' — '+fmt(v)+' RON\n';
+  });
+  msg+='\n*Manopera:*\n';
+  dv.manopera.forEach(function(m,i){
+    var n=parseFloat(m.norma)||0;if(!n)return;
+    var mt=parseFloat(m.tarif)||tarif,md=parseFloat(m.disc)||0,mv=n*mt*(1-md/100);
+    msg+=(i+1)+'. '+m.desc+' — '+n+'h × '+mt+(md?' (-'+md+'%)':'')+' = '+fmt(mv)+' RON\n';
+  });
+  msg+='\n';
+  if(gd2>0)msg+='Discount: '+gd2+'%\n';
+  msg+='*TOTAL CU TVA: '+fmt(total)+' RON*\n\n';
+  msg+='📞 0265318020\n📍 SC SZKALICZKI SERVICE SRL';
+  var _waA=document.createElement('a');_waA.href='https://wa.me/'+phone+'?text='+encodeURIComponent(msg);_waA.target='_blank';_waA.rel='noopener';document.body.appendChild(_waA);_waA.click();setTimeout(function(){document.body.removeChild(_waA)},100);
+  if(dv.status==='draft'){JOB.deviz.status='sent';saveJ();render()}
+};
+
+window.emailDeviz=function(){
+  var dv=JOB.deviz,tarif=dv.tarifManopera||120;
+  var to=JOB.email||'';if(!to){to=prompt('Email client:','');if(!to)return}
+  var matT=0;dv.materials.forEach(function(m){var p=parseFloat(m.pret)||0,c=parseFloat(m.cant)||1,d=parseFloat(m.disc)||0;matT+=p*c*(1-d/100)});
+  var manT=0;dv.manopera.forEach(function(m){var rt=parseFloat(m.tarif)||tarif,rd=parseFloat(m.disc)||0;manT+=(parseFloat(m.norma)||0)*rt*(1-rd/100)});
+  var gd3=parseFloat(dv.globalDisc)||0;
+  var subtotal=matT+manT,afterDisc=subtotal*(1-gd3/100),total=afterDisc*(1+TVA/100);
+  var subj='Oferta reparatie — '+(JOB.plate||'')+' — '+fmt(total)+' RON — '+dv.nr;
+  var body='OFERTA DE REPARATIE\nSC SZKALICZKI SERVICE SRL\nStr. Petki David, Nr.27/A, Sangeorgiu de Mures\nTel: 0265318020\n\nDeviz: '+dv.nr+' / '+dv.date+'\n\nAuto: '+(JOB.brand||'')+' - '+(JOB.plate||'')+'\nVIN: '+(JOB.vin||'')+'\nClient: '+(JOB.proprietar||JOB.client||'')+'\n\nMATERIALE:\n';
+  dv.materials.forEach(function(m,i){var p=parseFloat(m.pret)||0;if(!p)return;var c=parseFloat(m.cant)||1,d=parseFloat(m.disc)||0,v=p*c*(1-d/100);body+=(i+1)+'. '+m.desc+(d?' (-'+d+'%)':'')+' — '+fmt(v)+' RON\n'});
+  body+='\nMANOPERA:\n';
+  dv.manopera.forEach(function(m,i){var n=parseFloat(m.norma)||0;if(!n)return;var mt=parseFloat(m.tarif)||tarif,md=parseFloat(m.disc)||0,mv=n*mt*(1-md/100);body+=(i+1)+'. '+m.desc+' — '+n+'h x '+mt+(md?' (-'+md+'%)':'')+' = '+fmt(mv)+' RON\n'});
+  body+='\nSubtotal fara TVA: '+fmt(subtotal)+' RON\n';
+  if(gd3>0)body+='Discount ('+gd3+'%): -'+fmt(subtotal*gd3/100)+' RON\n';
+  body+='TVA ('+TVA+'%): '+fmt(afterDisc*TVA/100)+' RON\nTOTAL CU TVA: '+fmt(total)+' RON\n\nSC SZKALICZKI SERVICE SRL\nTel: 0265318020';
+  var _mlA=document.createElement('a');_mlA.href='mailto:'+to+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(body);document.body.appendChild(_mlA);_mlA.click();setTimeout(function(){document.body.removeChild(_mlA)},100);
+  if(dv.status==='draft'){JOB.deviz.status='sent';saveJ();render()}
+};
+
+loadJob();
+</script>
+</body>
+</html>

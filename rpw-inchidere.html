@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23dc2626'/><circle cx='50' cy='50' r='18' fill='%23fff'/></svg>" type="image/svg+xml">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>RedAssistance — Inchidere</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f5f5f3;--w:#fff;--r:#dc2626;--r50:#fef2f2;--r100:#fee2e2;--g:#16a34a;--gl:#dcfce7;--y:#ca8a04;--yl:#fef9c3;--bl:#2563eb;--bll:#dbeafe;--t:#1a1a1a;--t2:#555;--t3:#999;--b:#e5e5e5;--b2:#d0d0d0;--rd:10px}
+html,body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);min-height:100dvh;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
+.mono{font-family:'JetBrains Mono',monospace}
+.hdr{background:var(--w);border-bottom:1px solid var(--b);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.hdr-left{display:flex;align-items:center;gap:8px}
+.back{width:32px;height:32px;border-radius:8px;border:1px solid var(--b);background:var(--w);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.back svg{width:18px;height:18px;stroke:var(--t2);fill:none;stroke-width:2}
+.hdr-title{font-size:14px;font-weight:800}.hdr-title span{color:var(--g)}
+.hdr-right{display:flex;align-items:center;gap:8px}
+.hdr-job{text-align:right;font-size:11px;line-height:1.3}.hdr-job b{font-size:12px}
+.lsw{display:flex;border:1px solid var(--b);border-radius:6px;overflow:hidden}
+.lb{padding:4px 8px;font-size:9px;font-weight:700;cursor:pointer;border:none;background:var(--w);color:var(--t3);font-family:inherit}.lb.on{background:var(--g);color:#fff}.lb:not(:last-child){border-right:1px solid var(--b)}
+.btn{border:none;border-radius:var(--rd);padding:10px 16px;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;width:100%}
+.btn-g{background:var(--g);color:#fff}.btn-o{background:var(--w);color:var(--t2);border:1px solid var(--b2)}
+.sec{margin:8px 16px 0;background:var(--w);border:1px solid var(--b);border-radius:var(--rd);overflow:hidden}
+.sec-h{padding:12px 14px;display:flex;justify-content:space-between;align-items:center}
+.sec-t{font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px}
+.sec-badge{font-size:10px;font-weight:700;padding:3px 10px;border-radius:12px}
+.sb-ok{background:var(--gl);color:var(--g)}.sb-nd{background:var(--r100);color:var(--r)}
+.sec-bd{padding:0 14px 14px}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.info-f{background:var(--bg);border:1px solid var(--b);border-radius:6px;padding:8px 10px}
+.info-l{font-size:8px;color:var(--t3);letter-spacing:.8px;text-transform:uppercase;font-weight:600;margin-bottom:2px}
+.info-v{width:100%;border:none;background:none;font-size:13px;font-weight:700;color:var(--t);font-family:inherit;outline:none}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+.pslot{background:var(--bg);border:2px dashed var(--b2);border-radius:8px;aspect-ratio:4/3;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden}
+.pslot.done{border:2px solid var(--g);background:var(--gl)}
+.pslot img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.pslot input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;z-index:2;font-size:0}
+.pslot-icon{width:24px;height:24px;stroke:var(--t3);fill:none;stroke-width:1.5}
+.pslot-n{font-size:9px;font-weight:700;color:var(--t3);margin-top:2px}
+.pslot-chk{position:absolute;top:4px;right:4px;width:18px;height:18px;background:var(--g);border-radius:50%;display:flex;align-items:center;justify-content:center}
+.pslot-chk svg{width:10px;height:10px;stroke:#fff;fill:none;stroke-width:2.5}
+.cl{margin:12px 16px;background:var(--w);border:1px solid var(--b);border-radius:var(--rd);padding:14px}
+.cl-t{font-size:10px;font-weight:700;color:var(--g);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
+.cl-i{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12px}
+.cl-ic{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cl-ic.ok{background:var(--g)}.cl-ic.no{background:var(--r100)}
+.cl-ic svg{width:10px;height:10px;fill:none;stroke-width:3}.cl-ic.ok svg{stroke:#fff}.cl-ic.no svg{stroke:var(--r)}
+.cl-tx{flex:1}.cl-tx.ok{color:var(--g)}.cl-tx.no{color:var(--r);font-weight:600}
+.close-btn{margin:10px 16px;padding:16px;border-radius:var(--rd);text-align:center;font-size:16px;font-weight:800;cursor:pointer;border:none;width:calc(100% - 32px)}
+.close-ok{background:var(--g);color:#fff}
+.close-no{background:var(--b);color:var(--t3)}
+.closed-box{margin:12px 16px;padding:20px;background:var(--gl);border:2px solid var(--g);border-radius:var(--rd);text-align:center}
+.closed-box-title{font-size:18px;font-weight:800;color:var(--g);margin-bottom:4px}
+.closed-box-date{font-size:12px;color:var(--t3)}
+.export-btn{margin:10px 16px;padding:14px;border-radius:var(--rd);background:var(--bl);color:#fff;font-size:13px;font-weight:800;border:none;cursor:pointer;width:calc(100% - 32px);display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit}
+.toast{position:fixed;bottom:20px;left:16px;right:16px;background:var(--w);padding:11px 14px;border-radius:var(--rd);font-size:12px;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,.12);border-left:4px solid var(--g);z-index:250}.toast.err{border-left-color:var(--r)}
+.bpad{height:24px}.loading{text-align:center;padding:60px;color:var(--t3);font-size:14px}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:var(--w);border-radius:var(--rd);max-width:500px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.modal-hdr{padding:14px 18px;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;align-items:center}
+.modal-t{font-size:14px;font-weight:800}
+.modal-x{border:none;background:none;cursor:pointer;font-size:20px;color:var(--t3);padding:0;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:4px}
+.modal-x:hover{background:var(--bg);color:var(--r)}
+.modal-body{padding:14px 18px}
+.modal-select-row{display:flex;gap:8px;margin-bottom:10px;font-size:10px;font-weight:700}
+.modal-select-row button{border:1px solid var(--b);background:var(--w);padding:4px 10px;border-radius:4px;cursor:pointer;font-family:inherit;font-weight:600;font-size:10px;color:var(--t2)}
+.exp-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border:1px solid var(--b);border-radius:8px;margin-bottom:5px;cursor:pointer;background:var(--bg)}
+.exp-item.on{border-color:var(--g);background:var(--gl)}
+.exp-chk{width:20px;height:20px;border-radius:4px;border:2px solid var(--b2);background:var(--w);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.exp-item.on .exp-chk{border-color:var(--g);background:var(--g)}
+.exp-item.on .exp-chk svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:3}
+.exp-item .exp-chk svg{display:none}
+.exp-item.on .exp-chk svg{display:block}
+.exp-lbl{flex:1;font-size:12px;font-weight:600}
+.exp-count{font-size:10px;color:var(--t3);font-weight:700;background:var(--w);padding:1px 7px;border-radius:10px}
+.modal-ftr{padding:12px 18px;border-top:1px solid var(--b);display:flex;gap:8px;justify-content:flex-end}
+.modal-btn{padding:9px 16px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:inherit}
+.modal-btn-c{background:var(--w);border:1px solid var(--b2);color:var(--t2)}
+.modal-btn-g{background:var(--g);color:#fff;display:flex;align-items:center;gap:6px}
+.modal-btn-g:disabled{opacity:.5;cursor:not-allowed}
+.exp-progress{height:4px;background:var(--b);border-radius:2px;overflow:hidden;margin:8px 0}
+.exp-progress-bar{height:100%;background:var(--g);transition:width .3s}
+.exp-progress-txt{font-size:11px;color:var(--t3);text-align:center;font-weight:600}
+</style>
+</head>
+<body>
+<div id="app"><div class="loading">Se incarca...</div></div>
+<script>
+var SB_URL='https://pxypbbvqinbwesfikkdb.supabase.co';
+var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB4eXBiYnZxaW5id2VzZmlra2RiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEwMjMwNzIsImV4cCI6MjA4NjU5OTA3Mn0.WZBdbr-YBxLq1ALnHY2weFQ7j2JhUUj6hOUGkuuErnQ';
+var sb=supabase.createClient(SB_URL,SB_KEY);
+var JOB=null,S={ts:null,te:0,showExp:0,expSel:{talon:1,buletin:1,constatare:1,customDocs:1,overview:1,elements:1,closingPhotos:1,dataHTML:1},expLoading:0,expProgress:0};
+
+// ════════════════════════════════════════════════════════════════
+// FILE SYSTEM ACCESS API — mentes a szerviz PC-jenek mappajaba
+// ────────────────────────────────────────────────────────────────
+// IndexedDB-be mentjuk a directory handle-t (localStorage nem tudja).
+// Eloszor a felhasznalo kivalasztja a Dosare mappat, utana a bongeszo
+// megjegyzi (permission-nel egyutt).
+// ════════════════════════════════════════════════════════════════
+var FSAH_DB='rpw_fs_handles', FSAH_STORE='handles', FSAH_KEY='dosareFolder';
+
+function idbOpen(){
+  return new Promise(function(res,rej){
+    var req=indexedDB.open(FSAH_DB,1);
+    req.onupgradeneeded=function(){req.result.createObjectStore(FSAH_STORE)};
+    req.onsuccess=function(){res(req.result)};
+    req.onerror=function(){rej(req.error)};
+  });
+}
+async function getDirHandle(){
+  try{
+    var db=await idbOpen();
+    return await new Promise(function(res){
+      var tx=db.transaction(FSAH_STORE,'readonly');
+      var req=tx.objectStore(FSAH_STORE).get(FSAH_KEY);
+      req.onsuccess=function(){res(req.result||null)};
+      req.onerror=function(){res(null)};
+    });
+  }catch(e){return null}
+}
+async function saveDirHandle(handle){
+  try{
+    var db=await idbOpen();
+    return await new Promise(function(res){
+      var tx=db.transaction(FSAH_STORE,'readwrite');
+      tx.objectStore(FSAH_STORE).put(handle,FSAH_KEY);
+      tx.oncomplete=function(){res(true)};
+      tx.onerror=function(){res(false)};
+    });
+  }catch(e){return false}
+}
+async function pickDosareFolder(){
+  if(!window.showDirectoryPicker)return null;
+  try{
+    var handle=await window.showDirectoryPicker({mode:'readwrite',id:'rpwDosare',startIn:'documents'});
+    await saveDirHandle(handle);
+    return handle;
+  }catch(e){return null} // user cancelled
+}
+async function ensurePermission(handle){
+  if(!handle||!handle.queryPermission)return false;
+  try{
+    var p=await handle.queryPermission({mode:'readwrite'});
+    if(p==='granted')return true;
+    p=await handle.requestPermission({mode:'readwrite'});
+    return p==='granted';
+  }catch(e){return false}
+}
+// Visszatert ertek: {ok:true, path:'2026\\05\\file.zip'} vagy null
+async function saveZipToDir(blob, fileName){
+  if(!window.showDirectoryPicker)return null;
+  try{
+    var rootHandle=await getDirHandle();
+    if(!rootHandle){
+      rootHandle=await pickDosareFolder();
+      if(!rootHandle)return null;
+    }
+    var ok=await ensurePermission(rootHandle);
+    if(!ok){
+      // permission elveszett, ujra kerjuk
+      rootHandle=await pickDosareFolder();
+      if(!rootHandle)return null;
+    }
+    var d=new Date();
+    var year=String(d.getFullYear());
+    var month=String(d.getMonth()+1).padStart(2,'0');
+    var yearH=await rootHandle.getDirectoryHandle(year,{create:true});
+    var monthH=await yearH.getDirectoryHandle(month,{create:true});
+    var fileH=await monthH.getFileHandle(fileName,{create:true});
+    var writable=await fileH.createWritable();
+    await writable.write(blob);
+    await writable.close();
+    return {ok:true, path:year+'\\'+month+'\\'+fileName};
+  }catch(e){
+    console.error('saveZipToDir',e);
+    return {ok:false, error:e.message||String(e)};
+  }
+}
+
+function gJI(){return new URLSearchParams(location.search).get('job')}
+async function loadJob(){
+  var jid=gJI();if(!jid){render();return}
+  var cached=localStorage.getItem('rpw_job_'+jid);
+  if(cached){try{JOB=JSON.parse(cached);if(!JOB.phases)JOB.phases={};for(var p=1;p<=7;p++){if(!JOB.phases[p])JOB.phases[p]={status:"pending"}};render()}catch(e){}}
+  try{
+    var res=await sb.from('rpw_jobs').select('id,data,updated_at').eq('id',jid).single();
+    if(res.error)throw res.error;
+    var _lts=0,_sts=0;try{_lts=Date.parse(localStorage.getItem('rpw_job_ts_'+jid)||0)||0;_sts=Date.parse(res.data.updated_at||0)||0}catch(e){}
+    if(!(JOB&&_lts&&_sts<=_lts)){JOB=res.data.data;if(!JOB.phases)JOB.phases={};for(var p=1;p<=7;p++){if(!JOB.phases[p])JOB.phases[p]={status:"pending"}};
+    try{localStorage.setItem('rpw_job_'+jid,JSON.stringify(JOB));localStorage.setItem('rpw_job_ts_'+jid,res.data.updated_at||new Date().toISOString())}catch(e){}}
+    try{localStorage.setItem('rpw_job_'+jid,JSON.stringify(JOB))}catch(e){}
+    /* nincs auto-mentes betolteskor */
+  }catch(e){if(!JOB)JOB=null}
+  render();
+}
+var _saveTimer=null;
+async function saveJ(){
+  if(!JOB)return;
+  try{localStorage.setItem('rpw_job_'+JOB.id,JSON.stringify(JOB));localStorage.setItem('rpw_job_ts_'+JOB.id,new Date().toISOString())}catch(e){}
+  clearTimeout(_saveTimer);
+  _saveTimer=setTimeout(async function(){
+    try{await sb.from('rpw_jobs').upsert({id:JOB.id,data:JOB,updated_at:new Date().toISOString()})}
+    catch(e){console.error('Save:',e)}
+  },500);
+}
+function toast(m,e){S.ts=m;S.te=e?1:0;render();setTimeout(function(){S.ts=null;render()},3000)}
+function resize(file,cb){var r=new FileReader();r.onload=function(e){var img=new Image();img.onload=function(){var c=document.createElement('canvas'),mx=1280,sc=img.width>mx?mx/img.width:1;c.width=img.width*sc;c.height=img.height*sc;c.getContext('2d').drawImage(img,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',.82))};img.src=e.target.result};r.readAsDataURL(file)}
+
+var VK=['fata','spate','stanga','dreapta','detaliu'];
+var IC={cam:'<svg class="pslot-icon" viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>',chk:'<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>',x:'<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',dl:'<svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>'};
+
+var i={inchidere:{ro:'Inchidere Lucrare',en:'Close Job',hu:'Munka Lezaras'},
+factura:{ro:'Nr. factura',en:'Invoice no.',hu:'Szamlaszam'},devizRef:{ro:'Referinta deviz',en:'Deviz reference',hu:'Deviz hivatkozas'},devizType:{ro:'Tip deviz',en:'Deviz type',hu:'Deviz tipus'},asigurator:{ro:'Asigurator',en:'Insurer',hu:'Biztosito'},note:{ro:'Observatii finale',en:'Final notes',hu:'Vegso megjegyzesek'},
+photosFinal:{ro:'FOTOGRAFII AUTO REPARAT',en:'REPAIRED CAR PHOTOS',hu:'JAVITOTT AUTO FOTOK'},
+fata:{ro:'Fata',en:'Front',hu:'Elol'},spate:{ro:'Spate',en:'Rear',hu:'Hatul'},stanga:{ro:'Stanga',en:'Left',hu:'Bal'},dreapta:{ro:'Dreapta',en:'Right',hu:'Jobb'},detaliu:{ro:'Detaliu',en:'Detail',hu:'Reszlet'},
+closeCond:{ro:'CONDITII INCHIDERE',en:'CLOSE CONDITIONS',hu:'LEZARAS FELTETELEK'},
+facturaOk:{ro:'Factura introdusa',en:'Invoice entered',hu:'Szamla megadva'},devizOk:{ro:'Deviz completat',en:'Deviz completed',hu:'Deviz kitoltve'},photosOk:{ro:'5 fotografii auto reparat',en:'5 repaired car photos',hu:'5 javitott auto foto'},
+closeBtn:{ro:'💾 Salvare şi închidere dosar',en:'💾 Save and close file',hu:'💾 Lezárás és mentés'},incomplete:{ro:'Incomplet',en:'Incomplete',hu:'Hianyos'},
+savedToDisk:{ro:'Salvat',en:'Saved',hu:'Mentve'},
+savedFallback:{ro:'Salvat în Downloads (selector folder nesuportat)',en:'Saved to Downloads (folder picker unsupported)',hu:'Mentve Downloads-ba (mappavalaszto nem tamogatott)'},
+pickFolder:{ro:'Alege folderul Dosare (o singura data)',en:'Choose Dosare folder (one time)',hu:'Valassz Dosare mappat (egyszer)'},
+pickCancelled:{ro:'Selectie anulata',en:'Selection cancelled',hu:'Mappavalasztas megszakitva'},
+saveError:{ro:'Eroare la salvare',en:'Save error',hu:'Mentesi hiba'},
+
+// Cronologie (3 mile-stones in raport.html)
+m_workflow:{ro:'Cronologie lucrare',en:'Workflow timeline',hu:'Munkamenet idosor'},
+m_dosarOpening:{ro:'Deschidere dosar',en:'File opening',hu:'Dosar megnyitas'},
+m_reconst:{ro:'Reconstatare',en:'Re-assessment',hu:'Ujra-felmeres'},
+m_dosarClose:{ro:'Inchidere dosar',en:'File closing',hu:'Dosar lezaras'},
+m_version:{ro:'Versiune',en:'Version',hu:'Verzio'},
+
+// Modul cimek
+mod_deviz:{ro:'Deviz (Cost estimate)',en:'Quote (Cost estimate)',hu:'Koltsegbecsles'},
+mod_eval:{ro:'Evaluare',en:'Assessment',hu:'Ertekeles'},
+mod_reconstM:{ro:'Reconstatare',en:'Re-assessment',hu:'Ujra-felmeres'},
+mod_tin:{ro:'Tinichigerie',en:'Body work',hu:'Karosszeria'},
+mod_vop:{ro:'Vopsitorie',en:'Painting',hu:'Festes'},
+mod_ctrl:{ro:'Control final',en:'Final inspection',hu:'Vegellenorzes'},
+
+// Deviz oszlopok
+d_evalRows:{ro:'Constatare initiala',en:'Initial assessment',hu:'Kezdeti felmeres'},
+d_afterRows:{ro:'Suplimentari',en:'Additional items',hu:'Potlolagos tetelek'},
+
+// Kozos oszlopok
+col_nr:{ro:'Nr.',en:'No.',hu:'Sz.'},
+col_elem:{ro:'Element',en:'Element',hu:'Elem'},
+col_name:{ro:'Denumire',en:'Name',hu:'Megnevezes'},
+col_op:{ro:'Operatie',en:'Operation',hu:'Muvelet'},
+col_hours:{ro:'Ore',en:'Hours',hu:'Ora'},
+col_note:{ro:'Observatii',en:'Notes',hu:'Megjegyzes'},
+col_tip:{ro:'Tip',en:'Type',hu:'Tipus'},
+col_status:{ro:'Status',en:'Status',hu:'Allapot'},
+col_total:{ro:'Total',en:'Total',hu:'Osszesen'},
+
+// Reconst kulonleges
+r_tipAvarie:{ro:'Tip avarie',en:'Damage type',hu:'Karkategoria'},
+r_pozAsig:{ro:'Pozitie asigurare',en:'Insurance position',hu:'Biztosito pozicio'},
+r_docs:{ro:'Documente reconstatare',en:'Re-assessment documents',hu:'Dokumentumok'},
+r_photos:{ro:'Fotografii reconstatare',en:'Re-assessment photos',hu:'Fotok'},
+
+// Tinichigerie kulonleges
+t_bodyType:{ro:'Tip lucrare',en:'Work type',hu:'Munka tipus'},
+t_approval:{ro:'Aprobare bodywork',en:'Body work approval',hu:'Bodywork jovahagyas'},
+
+// Vopsitorie kulonleges
+v_paintType:{ro:'Tip vopsea',en:'Paint type',hu:'Festektipus'},
+v_vopsire:{ro:'Vopsire',en:'Painting',hu:'Festes'},
+v_approval:{ro:'Aprobare vopsitorie',en:'Painting approval',hu:'Festes jovahagyas'},
+
+// Control kulonleges
+c_cat:{ro:'Categorie',en:'Category',hu:'Kategoria'},
+c_check:{ro:'Verificare',en:'Check item',hu:'Ellenorzesi pont'},
+c_ok:{ro:'OK',en:'OK',hu:'OK'},
+c_nok:{ro:'Defect (NOK)',en:'Defect (NOK)',hu:'Hibas (NOK)'},
+c_na:{ro:'N/A',en:'N/A',hu:'N/A'},
+c_pending:{ro:'Neverificat',en:'Not checked',hu:'Nem ellenorizve'},
+c_summary:{ro:'Rezumat',en:'Summary',hu:'Osszegzes'},
+c_passed:{ro:'Trecut',en:'Passed',hu:'Atment'},
+c_failed:{ro:'Picat',en:'Failed',hu:'Bukott'},
+emptyTable:{ro:'(fara date)',en:'(no data)',hu:'(nincs adat)'},
+phase:{ro:'Faza',en:'Phase',hu:'Fazis'},
+damaged:{ro:'Avariate',en:'Damaged',hu:'Serult'},
+suggested:{ro:'Recomandate',en:'Suggested',hu:'Ajanlott'},
+
+closed:{ro:'LUCRARE INCHISA',en:'JOB CLOSED',hu:'MUNKA LEZARVA'},
+exportBtn:{ro:'Descarca dosar complet',en:'Download complete file',hu:'Teljes akta letoltes'},
+expTitle:{ro:'Alege ce exporti',en:'Select what to export',hu:'Mit exportalunk?'},
+expTalon:{ro:'Talon (1 foto)',en:'Reg card',hu:'Talon'},
+expBul:{ro:'Buletin',en:'ID card',hu:'Buletin'},
+expConst:{ro:'Constatare',en:'Report',hu:'Jkv'},
+expCust:{ro:'Documente adaugate',en:'Added docs',hu:'Hozzaadott dokumentumok'},
+expOv:{ro:'Fotografii ansamblu (6)',en:'Overview photos',hu:'Attekinto fotok'},
+expElem:{ro:'Fotografii elemente avariate',en:'Damaged element photos',hu:'Serult elem fotok'},
+expClose:{ro:'Fotografii auto reparat',en:'Repaired photos',hu:'Javitott auto fotok'},
+expData:{ro:'Raport HTML (dosar complet)',en:'HTML report',hu:'HTML jelentes'},
+expCancel:{ro:'Anuleaza',en:'Cancel',hu:'Megsem'},
+expStart:{ro:'Descarca ZIP',en:'Download ZIP',hu:'ZIP letoltes'},
+expPreparing:{ro:'Se pregateste ZIP...',en:'Preparing ZIP...',hu:'ZIP keszites...'},
+expDownloaded:{ro:'Descarcat!',en:'Downloaded!',hu:'Letoltve!'},
+expSelAll:{ro:'Selecteaza toate',en:'Select all',hu:'Osszes'},
+expSelNone:{ro:'Deselecteaza',en:'Deselect',hu:'Semmi'},
+noJob:{ro:'Nu exista lucrare',en:'No job',hu:'Nincs munka'},openD:{ro:'Dashboard',en:'Dashboard',hu:'Dashboard'},saved:{ro:'Salvat',en:'Saved',hu:'Mentve'}};
+
+function gL(){return localStorage.getItem('rpw_lang')||'ro'}
+function sL(l){localStorage.setItem('rpw_lang',l);render()}
+function T(k){var e=i[k];return e?e[gL()]||e.ro||k:k}
+
+function render(){
+  var ln=gL(),job=JOB;
+  if(!job){document.getElementById('app').innerHTML='<div class="loading">'+T('noJob')+'</div>';return}
+  var cl=job.closing||{},photos=job.closingPhotos||[];
+  var isClosed=!!cl.closedAt;
+
+  var h='<div class="hdr"><div class="hdr-left"><div class="back" onclick="location.assign(\'rpw-dosar.html?job='+job.id+'\')"><svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></div><div class="hdr-title"><span>Red</span> '+T('inchidere')+'</div></div><div class="hdr-right"><div class="hdr-job"><b class="mono">'+(job.number||job.id)+'</b><br><span style="color:var(--t3)">'+(job.plate||'')+' · '+(job.auto||'')+'</span></div><div class="lsw"><button class="lb '+(ln==='ro'?'on':'')+'" onclick="sL(\'ro\')">RO</button><button class="lb '+(ln==='en'?'on':'')+'" onclick="sL(\'en\')">EN</button><button class="lb '+(ln==='hu'?'on':'')+'" onclick="sL(\'hu\')">HU</button></div></div></div>';
+
+  if(isClosed){
+    h+='<div class="closed-box"><div class="closed-box-title">✓ '+T('closed')+'</div><div class="closed-box-date">'+cl.closedAt+'</div></div>';
+    h+='<button class="export-btn" onclick="openExport()">'+IC.dl+' '+T('exportBtn')+'</button>';
+  }
+
+  // Factura / Deviz
+  h+='<div class="sec"><div class="sec-h"><div class="sec-t">'+T('factura')+' / '+T('devizRef')+'</div></div><div class="sec-bd"><div class="info-grid"><div class="info-f"><div class="info-l">'+T('factura')+'</div><input class="info-v mono" value="'+(cl.factura||'')+'" onchange="uCl(\'factura\',this.value)" '+(isClosed?'disabled':'')+'></div><div class="info-f"><div class="info-l">'+T('asigurator')+'</div><input class="info-v" value="'+(cl.asigurator||(job.reconst?job.reconst.asigurator:'')||'')+'" onchange="uCl(\'asigurator\',this.value)" '+(isClosed?'disabled':'')+'></div></div>';
+  h+='<div class="info-grid" style="margin-top:6px"><div class="info-f"><div class="info-l">'+T('devizType')+'</div><select class="info-v" onchange="uCl(\'devizType\',this.value)" '+(isClosed?'disabled':'')+'><option value="audatex" '+(cl.devizType==='audatex'?'selected':'')+'>Audatex</option><option value="intern" '+(cl.devizType==='intern'?'selected':'')+'>Intern (RPW)</option></select></div><div class="info-f"><div class="info-l">'+T('devizRef')+'</div><input class="info-v mono" value="'+(cl.devizRef||'')+'" onchange="uCl(\'devizRef\',this.value)" '+(isClosed?'disabled':'')+'></div></div>';
+  h+='<div style="margin-top:6px"><div class="info-f" style="background:var(--bg);border:1px solid var(--b);border-radius:6px;padding:8px 10px"><div class="info-l">'+T('note')+'</div><textarea class="info-v" style="resize:none;min-height:40px" onchange="uCl(\'note\',this.value)" '+(isClosed?'disabled':'')+' >'+(cl.note||'')+'</textarea></div></div></div></div>';
+
+  // Photos
+  h+='<div class="sec"><div class="sec-h"><div class="sec-t">'+T('photosFinal')+'</div><span class="sec-badge '+(photos.length>=5?'sb-ok':'sb-nd')+'">'+photos.length+'/5</span></div><div class="sec-bd"><div class="pgrid">';
+  for(var x=0;x<5;x++){
+    var p=photos[x];
+    h+='<div class="pslot '+(p?'done':'')+'">'+(p?'<img src="'+p.data+'"/><div class="pslot-chk">'+IC.chk+'</div>':IC.cam)+'<div class="pslot-n">'+T(VK[x])+'</div>'+(isClosed?'':'<input type="file" accept="image/*" capture="environment" onchange="addPh('+x+',event)"/>')+'</div>';
+  }
+  h+='</div></div></div>';
+
+  if(!isClosed){
+    // Checklist
+    var hasFactura=!!(cl.factura);
+    var hasDeviz=!!(cl.devizRef);
+    var hasPhotos=photos.length>=5;
+    var canClose=hasFactura&&hasDeviz&&hasPhotos;
+
+    h+='<div class="cl"><div class="cl-t">'+T('closeCond')+'</div>';
+    [{ok:hasFactura,t:T('facturaOk')},{ok:hasDeviz,t:T('devizOk')},{ok:hasPhotos,t:T('photosOk')}].forEach(function(c){
+      h+='<div class="cl-i"><div class="cl-ic '+(c.ok?'ok':'no')+'">'+(c.ok?IC.chk:IC.x)+'</div><span class="cl-tx '+(c.ok?'ok':'no')+'">'+c.t+'</span></div>';
+    });
+    h+='</div>';
+    h+='<button class="close-btn '+(canClose?'close-ok':'close-no')+'" onclick="closeJob()" '+(canClose?'':'disabled')+'>'+T(canClose?'closeBtn':'incomplete')+'</button>';
+  }
+
+  h+='<div class="bpad"></div>';
+
+  // EXPORT MODAL
+  if(S.showExp){
+    var photoKeys=job.photoKeys||{};
+    var customDocs=job.customDocs||[];
+    var elements=job.elements||{};
+    var elPhotos=0;for(var ek in elements){if(elements[ek].photo)elPhotos++}
+    var ovCnt=0;['ov_front','ov_back','ov_left','ov_right','ov_serieCaros','ov_km'].forEach(function(k){if(photoKeys[k])ovCnt++});
+    var customCnt=customDocs.length;
+    var closingCnt=(job.closingPhotos||[]).filter(function(p){return p&&p.data}).length;
+
+    h+='<div class="modal-bg" onclick="if(event.target===this)closeExp()">';
+    h+='<div class="modal">';
+    h+='<div class="modal-hdr"><div class="modal-t">📦 '+T('expTitle')+'</div><button class="modal-x" onclick="closeExp()">×</button></div>';
+    h+='<div class="modal-body">';
+    if(S.expLoading){
+      h+='<div style="padding:20px 0"><div class="exp-progress-txt">'+T('expPreparing')+'</div><div class="exp-progress"><div class="exp-progress-bar" style="width:'+S.expProgress+'%"></div></div></div>';
+    }else{
+      h+='<div class="modal-select-row"><button onclick="expAll(1)">'+T('expSelAll')+'</button><button onclick="expAll(0)">'+T('expSelNone')+'</button></div>';
+      var items=[
+        {k:'talon',    lbl:T('expTalon'),   cnt:photoKeys.photo_talon?1:0},
+        {k:'buletin',  lbl:T('expBul'),     cnt:photoKeys.doc_buletin?1:0},
+        {k:'constatare',lbl:T('expConst'),  cnt:photoKeys.doc_constatare?1:0},
+        {k:'customDocs',lbl:T('expCust'),   cnt:customCnt},
+        {k:'overview', lbl:T('expOv'),      cnt:ovCnt},
+        {k:'elements', lbl:T('expElem'),    cnt:elPhotos},
+        {k:'closingPhotos',lbl:T('expClose'),cnt:closingCnt},
+        {k:'dataHTML', lbl:T('expData'),    cnt:1}
+      ];
+      items.forEach(function(it){
+        var on=!!S.expSel[it.k];
+        var disabled=it.cnt===0;
+        h+='<div class="exp-item '+(on?'on':'')+'" onclick="expToggle(\''+it.k+'\')" '+(disabled?'style="opacity:.4;pointer-events:none"':'')+'>';
+        h+='<div class="exp-chk">'+IC.chk+'</div>';
+        h+='<div class="exp-lbl">'+it.lbl+'</div>';
+        h+='<div class="exp-count">'+(it.cnt||0)+'</div>';
+        h+='</div>';
+      });
+    }
+    h+='</div>';
+    if(!S.expLoading){
+      h+='<div class="modal-ftr"><button class="modal-btn modal-btn-c" onclick="closeExp()">'+T('expCancel')+'</button><button class="modal-btn modal-btn-g" onclick="doExportZip()">'+IC.dl+' '+T('expStart')+'</button></div>';
+    }
+    h+='</div></div>';
+  }
+
+  if(S.ts)h+='<div class="toast '+(S.te?'err':'')+'">'+S.ts+'</div>';
+  document.getElementById('app').innerHTML=h;
+}
+
+window.uCl=async function(f,v){if(!JOB.closing)JOB.closing={};JOB.closing[f]=v;await saveJ();render()};
+window.addPh=function(x,e){var f=e.target.files&&e.target.files[0];if(!f)return;resize(f,async function(d){if(!JOB.closingPhotos)JOB.closingPhotos=[];while(JOB.closingPhotos.length<=x)JOB.closingPhotos.push(null);JOB.closingPhotos[x]={data:d,label:VK[x],ts:new Date().toISOString()};await saveJ();toast(T(VK[x])+' OK');render()})};
+
+window.closeJob=async function(){
+  if(!JOB)return;
+  var cl=JOB.closing||{},ph=JOB.closingPhotos||[];
+  if(!cl.factura||!cl.devizRef||ph.length<5){toast(T('incomplete'),1);return}
+  JOB.closing.closedAt=new Date().toISOString().slice(0,10);
+  JOB.phases[7].status='done';JOB.phases[7].finished=new Date().toISOString();
+  JOB.phase=7;
+  await saveJ();
+  toast(T('closed'));
+  // 1-klikkes "Lezaras + Mentes" — automatikusan megnyitja az export modalt
+  // a felhasznalo csak megerositi (minden be van pipalva alapertelmezesben)
+  S.showExp=1;
+  render();
+};
+
+// ====== EXPORT MODAL HANDLERS ======
+window.openExport=function(){S.showExp=1;render()};
+window.closeExp=function(){if(S.expLoading)return;S.showExp=0;render()};
+window.expToggle=function(k){S.expSel[k]=S.expSel[k]?0:1;render()};
+window.expAll=function(v){Object.keys(S.expSel).forEach(function(k){S.expSel[k]=v});render()};
+
+// fetch publikus URL-rol blob-ba (a ZIP-be)
+async function fetchBlob(url){
+  try{var r=await fetch(url);if(!r.ok)return null;return await r.blob()}
+  catch(e){console.error('fetchBlob',url,e);return null}
+}
+// base64 dataURL -> blob
+function dataUrlToBlob(du){
+  try{
+    var arr=du.split(',');if(arr.length<2)return null;
+    var mime=(arr[0].match(/:(.*?);/)||[])[1]||'image/jpeg';
+    var bstr=atob(arr[1]);
+    var n=bstr.length,u8=new Uint8Array(n);
+    while(n--)u8[n]=bstr.charCodeAt(n);
+    return new Blob([u8],{type:mime});
+  }catch(e){return null}
+}
+// Egy kep "beszerzese" barhonnan (urls/keys/data)
+async function getPhotoBlob(key){
+  if(!JOB)return null;
+  var urls=JOB.photoUrls||{},keys=JOB.photoKeys||{};
+  if(urls[key]){var b=await fetchBlob(urls[key]);if(b)return b}
+  // Ha nincs URL de van storage key, szerezd meg a publikus URL-t
+  if(keys[key] && window.sb){
+    try{var pub=sb.storage.from('rpw-photos').getPublicUrl(keys[key]).data.publicUrl;var b2=await fetchBlob(pub);if(b2)return b2}catch(e){}
+  }
+  return null;
+}
+
+// Elemek fotok - regi formatumban photo mezo base64
+function getElementPhotoBlob(e){
+  if(e.photo && typeof e.photo==='string' && e.photo.indexOf('data:')===0){
+    return dataUrlToBlob(e.photo);
+  }
+  return null;
+}
+
+// ════════════════════════════════════════════════════════════════
+// HTML GENERAL HELPERS (a 6 modul jelenteseinek kozos sablonja)
+// ════════════════════════════════════════════════════════════════
+function escHtml(s){
+  if(s===null||s===undefined)return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function htmlHeader(title){
+  var plate=JOB.plate||'', nr=JOB.number||JOB.id||'';
+  return '<!DOCTYPE html><html lang="'+gL()+'"><head><meta charset="UTF-8"><title>'+escHtml(title+' — '+nr)+'</title>'+
+    '<style>body{font-family:Arial,sans-serif;padding:20px;font-size:12px;max-width:1000px;margin:0 auto;color:#222}'+
+    'h1{color:#dc2626;font-size:20px;border-bottom:3px solid #dc2626;padding-bottom:6px;margin-bottom:4px}'+
+    'h2{color:#333;font-size:14px;margin-top:18px;border-bottom:1px solid #dc2626;padding-bottom:3px}'+
+    'h3{color:#555;font-size:12px;margin-top:12px;text-transform:uppercase;letter-spacing:1px}'+
+    'table{width:100%;border-collapse:collapse;margin:8px 0}'+
+    'td,th{padding:6px 8px;border:1px solid #ccc;text-align:left;font-size:11px;vertical-align:top}'+
+    'th{background:#f5f5f3;font-weight:700;color:#333}'+
+    '.meta{background:#fafaf8;font-size:10px;color:#888;margin-bottom:14px}'+
+    '.ok{color:#16a34a;font-weight:700}.nok{color:#dc2626;font-weight:700}.na{color:#ca8a04;font-weight:700}.pend{color:#999}'+
+    '.foot{text-align:center;color:#999;font-size:10px;margin-top:30px;border-top:1px solid #eee;padding-top:8px}'+
+    '@media print{body{padding:8px}}</style></head><body>'+
+    '<h1>'+escHtml(title)+'</h1>'+
+    '<div class="meta">Dosar: <b>'+escHtml(nr)+'</b> · '+escHtml(plate)+' · '+escHtml(JOB.brand||JOB.auto||'')+' · Generat: '+new Date().toISOString().slice(0,19).replace('T',' ')+'</div>';
+}
+function htmlFooter(){
+  return '<div class="foot">SC SZKALICZKI SERVICE SRL · RO16250445 · Str. Petki David, Nr.27/A, Sangeorgiu de Mures · Tel: 0265318020</div></body></html>';
+}
+function ifEmpty(arr,msg){
+  return (!arr||!arr.length) ? '<p style="color:#999;font-style:italic">'+escHtml(msg||T('emptyTable'))+'</p>' : '';
+}
+
+// Reconstatare fotok base64 -> Blob
+function getReconstPhotoBlob(p){
+  if(p && p.data && typeof p.data==='string' && p.data.indexOf('data:')===0){
+    return dataUrlToBlob(p.data);
+  }
+  return null;
+}
+
+window.doExportZip=async function(){
+  if(!JOB||S.expLoading)return;
+  if(typeof JSZip==='undefined'){toast('JSZip lipseste',1);return}
+  S.expLoading=1;S.expProgress=5;render();
+
+  var zip=new JSZip();
+  var cl=JOB.closing||{};
+  var plate=(JOB.plate||'').replace(/[\s]/g,'');
+  var model=(JOB.brand||JOB.auto||'').replace(/\s+/g,'_');
+  var date=cl.closedAt||new Date().toISOString().slice(0,10);
+  var asig=(cl.asigurator||'').replace(/\s+/g,'_');
+  var baseFileName=[plate,model,date,asig].filter(Boolean).join('_');
+
+  try{
+    // ── documente/ talon buletin constatare ──
+    var docFolder=zip.folder('documente');
+
+    if(S.expSel.talon){
+      var b=await getPhotoBlob('photo_talon');
+      if(b)docFolder.file('talon.jpg',b);
+      S.expProgress=15;render();
+    }
+    if(S.expSel.buletin){
+      var b=await getPhotoBlob('doc_buletin');
+      if(b)docFolder.file('buletin.jpg',b);
+      S.expProgress=22;render();
+    }
+    if(S.expSel.constatare){
+      var b=await getPhotoBlob('doc_constatare');
+      if(b)docFolder.file('constatare.jpg',b);
+      S.expProgress=30;render();
+    }
+
+    // ── customDocs/ egyeb dokumentumok ──
+    if(S.expSel.customDocs){
+      var customDocs=JOB.customDocs||[];
+      for(var ci=0;ci<customDocs.length;ci++){
+        var cd=customDocs[ci];
+        var cdKey='custdoc_'+cd.id;
+        var b=await getPhotoBlob(cdKey);
+        if(b){
+          var safeName=(cd.name||'doc_'+(ci+1)).replace(/[^a-zA-Z0-9._-]/g,'_');
+          docFolder.file(safeName+'.jpg',b);
+        }
+      }
+      S.expProgress=40;render();
+    }
+
+    // ── fotografii_ansamblu/ 6 ovewiew ──
+    if(S.expSel.overview){
+      var ovFolder=zip.folder('fotografii_ansamblu');
+      var ovKeys=[['ov_front','ansamblu_fata.jpg'],['ov_back','ansamblu_spate.jpg'],['ov_left','ansamblu_stanga.jpg'],['ov_right','ansamblu_dreapta.jpg'],['ov_serieCaros','serie_caroserie.jpg'],['ov_km','kilometraj.jpg']];
+      for(var oi=0;oi<ovKeys.length;oi++){
+        var b=await getPhotoBlob(ovKeys[oi][0]);
+        if(b)ovFolder.file(ovKeys[oi][1],b);
+      }
+      S.expProgress=55;render();
+    }
+
+    // ── fotografii_elemente/ serult elem fotok ──
+    if(S.expSel.elements){
+      var elFolder=zip.folder('fotografii_elemente');
+      var elements=JOB.elements||{};
+      for(var ek in elements){
+        var e=elements[ek];
+        if(!e.photo)continue;
+        var b=getElementPhotoBlob(e);
+        if(!b){
+          // Probald az ev Supabase URL-el (ha ilyen formatumba van)
+          if(typeof e.photo==='string' && e.photo.indexOf('http')===0){
+            b=await fetchBlob(e.photo);
+          }
+        }
+        if(b)elFolder.file('element_'+ek+'.jpg',b);
+      }
+      S.expProgress=70;render();
+    }
+
+    // ── fotografii_reparat/ javitott auto ──
+    if(S.expSel.closingPhotos){
+      var clFolder=zip.folder('fotografii_reparat');
+      var clPhotos=JOB.closingPhotos||[];
+      var VK_LOCAL=['fata','spate','stanga','dreapta','detaliu'];
+      for(var pi=0;pi<clPhotos.length;pi++){
+        var p=clPhotos[pi];if(!p||!p.data)continue;
+        var b=dataUrlToBlob(p.data);
+        if(b)clFolder.file('reparat_'+(VK_LOCAL[pi]||('foto'+(pi+1)))+'.jpg',b);
+      }
+      S.expProgress=80;render();
+    }
+
+    // ── raport.html ──
+    if(S.expSel.dataHTML){
+      var ph=JOB.phases||{};
+      var openDate=(ph[1]&&ph[1].finished)?ph[1].finished.slice(0,10):'—';
+      var reconstDate=(ph[3]&&ph[3].finished)?ph[3].finished.slice(0,10):(JOB.reconst?'(in curs)':'—');
+      var closeDate=date;
+      var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Dosar '+plate+'</title>';
+      html+='<style>body{font-family:Arial,sans-serif;padding:20px;font-size:12px;max-width:900px;margin:0 auto}h1{color:#dc2626;font-size:18px;border-bottom:3px solid #dc2626;padding-bottom:6px}h2{color:#333;font-size:14px;margin-top:16px;border-bottom:1px solid #dc2626;padding-bottom:3px}table{width:100%;border-collapse:collapse;margin:8px 0}td,th{padding:5px 8px;border:1px solid #ccc;text-align:left;font-size:11px}th{background:#f5f5f3;font-weight:700}.ms{display:table;width:100%;margin:10px 0}.ms-row{display:table-row}.ms-cell{display:table-cell;padding:8px 10px;border:1px solid #ccc;background:#fafaf8;width:33.33%;vertical-align:top}.ms-cell h3{margin:0 0 4px;font-size:11px;color:#dc2626;text-transform:uppercase;letter-spacing:.8px}.ms-cell .dt{font-size:14px;font-weight:700;color:#222}.ms-cell .sub{font-size:10px;color:#666;margin-top:2px}</style></head><body>';
+      html+='<h1>SC SZKALICZKI SERVICE SRL — Dosar Lucrare</h1>';
+      // Cronologie 3 mile-stones
+      html+='<h2>'+T('m_workflow')+'</h2>';
+      html+='<div class="ms"><div class="ms-row">';
+      html+='<div class="ms-cell"><h3>'+T('m_dosarOpening')+'</h3><div class="dt">'+openDate+'</div><div class="sub">'+T('phase')+' 1 — Receptie</div></div>';
+      html+='<div class="ms-cell"><h3>'+T('m_reconst')+'</h3><div class="dt">'+reconstDate+'</div><div class="sub">'+T('phase')+' 3</div></div>';
+      html+='<div class="ms-cell"><h3>'+T('m_dosarClose')+'</h3><div class="dt">'+closeDate+'</div><div class="sub">'+T('phase')+' 7 — Inchidere</div></div>';
+      html+='</div></div>';
+      html+='<table><tr><th>Nr. lucrare</th><td>'+(JOB.number||JOB.id)+'</td><th>Data inchidere</th><td>'+date+'</td></tr>';
+      html+='<tr><th>Auto</th><td>'+(JOB.brand||JOB.auto||'')+'</td><th>Nr. inmatr.</th><td>'+(JOB.plate||'')+'</td></tr>';
+      html+='<tr><th>VIN</th><td>'+(JOB.vin||'')+'</td><th>An</th><td>'+(JOB.year||'')+'</td></tr>';
+      html+='<tr><th>Client</th><td>'+(JOB.proprietar||JOB.client||'')+'</td><th>Telefon</th><td>'+(JOB.phone||'')+'</td></tr>';
+      html+='<tr><th>Asigurator</th><td>'+(cl.asigurator||'')+'</td><th>Factura</th><td>'+(cl.factura||'')+'</td></tr>';
+      html+='<tr><th>Deviz</th><td>'+(cl.devizType||'')+' — '+(cl.devizRef||'')+' (v'+(JOB.devizCount||1)+')</td><th>Tip dauna</th><td>'+(JOB.damageType==='asig'?'Asigurare':'Auto')+'</td></tr></table>';
+      var dr=JOB.damageReport||{};
+      if(dr.damaged&&dr.damaged.length){
+        html+='<h2>Elemente avariate ('+dr.damaged.length+')</h2><table><tr><th>Element</th><th>Operatie</th><th>Obs.</th></tr>';
+        dr.damaged.forEach(function(d){html+='<tr><td>'+(d.name||'')+'</td><td>'+(d.work||'')+'</td><td>'+(d.note||'')+'</td></tr>'});
+        html+='</table>';
+      }
+      if(dr.suggested&&dr.suggested.length){
+        html+='<h2>Elemente recomandate ('+dr.suggested.length+')</h2><table><tr><th>Element</th><th>Operatie</th><th>Obs.</th></tr>';
+        dr.suggested.forEach(function(d){html+='<tr><td>'+(d.name||'')+'</td><td>'+(d.work||'')+'</td><td>'+(d.note||'')+'</td></tr>'});
+        html+='</table>';
+      }
+      if(cl.note)html+='<h2>Observatii finale</h2><p>'+cl.note+'</p>';
+      html+='<br><hr><p style="text-align:center;color:#999;font-size:10px">SC SZKALICZKI SERVICE SRL · RO16250445 · Str. Petki David, Nr.27/A, Sangeorgiu de Mures · Tel: 0265318020<br>Generat: '+new Date().toISOString().slice(0,19)+'</p>';
+      html+='</body></html>';
+      zip.file('raport.html',html);
+      S.expProgress=85;render();
+    }
+
+    // ════════════════════════════════════════════════════════
+    //  6 UJ MODUL JELENTES (B opcio: teljes backup)
+    // ════════════════════════════════════════════════════════
+
+    // ── deviz.html ──
+    {
+      var d=JOB.deviz||{}, evR=JOB.evalRows||[], afR=JOB.afterRows||[];
+      var h=htmlHeader(T('mod_deviz'));
+      h+='<h3>'+T('m_version')+': '+(JOB.devizCount||1)+'</h3>';
+      h+='<h2>'+T('d_evalRows')+' ('+evR.length+')</h2>';
+      h+=ifEmpty(evR);
+      if(evR.length){
+        h+='<table><tr><th>'+T('col_elem')+'</th><th>'+T('col_op')+'</th><th>'+T('col_hours')+'</th><th>'+T('col_note')+'</th></tr>';
+        evR.forEach(function(r){h+='<tr><td>'+escHtml(r.name||r.elKey||'')+'</td><td>'+escHtml(r.op||'')+'</td><td>'+escHtml(r.hours||'')+'</td><td>'+escHtml(r.note||'')+'</td></tr>'});
+        h+='</table>';
+      }
+      h+='<h2>'+T('d_afterRows')+' ('+afR.length+')</h2>';
+      h+=ifEmpty(afR);
+      if(afR.length){
+        h+='<table><tr><th>'+T('col_elem')+'</th><th>'+T('col_op')+'</th><th>'+T('col_hours')+'</th><th>'+T('col_note')+'</th></tr>';
+        afR.forEach(function(r){h+='<tr><td>'+escHtml(r.name||r.elKey||'')+'</td><td>'+escHtml(r.op||'')+'</td><td>'+escHtml(r.hours||'')+'</td><td>'+escHtml(r.note||'')+'</td></tr>'});
+        h+='</table>';
+      }
+      h+=htmlFooter();
+      zip.file('deviz.html',h);
+    }
+
+    // ── evaluare.html ──
+    {
+      var ev=JOB.evalData||{}, elements=JOB.elements||{};
+      var elKeys=Object.keys(elements).filter(function(k){return elements[k].status==='damaged'||elements[k].status==='suggested'});
+      var h=htmlHeader(T('mod_eval'));
+      h+='<h2>'+T('mod_eval')+' — '+T('damaged')+'/'+T('suggested')+' ('+elKeys.length+')</h2>';
+      h+=ifEmpty(elKeys);
+      if(elKeys.length){
+        h+='<table><tr><th>'+T('col_elem')+'</th><th>'+T('col_status')+'</th><th>'+T('col_op')+'</th><th>'+T('col_hours')+'</th><th>'+T('col_note')+'</th></tr>';
+        elKeys.forEach(function(k){
+          var e=elements[k]||{};
+          h+='<tr><td>'+escHtml(k)+'</td><td>'+escHtml(e.status||'')+'</td><td>'+escHtml(e.op||e.work||'')+'</td><td>'+escHtml(e.hours||'')+'</td><td>'+escHtml(e.note||'')+'</td></tr>';
+        });
+        h+='</table>';
+      }
+      if(ev && Object.keys(ev).length){
+        h+='<h3>Date evaluare (raw)</h3><pre style="background:#f5f5f3;padding:8px;font-size:10px;overflow:auto;border:1px solid #ddd">'+escHtml(JSON.stringify(ev,null,2))+'</pre>';
+      }
+      h+=htmlFooter();
+      zip.file('evaluare.html',h);
+    }
+
+    // ── reconstatare.html + fotografii_reconstatare/ ──
+    {
+      var rc=JOB.reconst||{}, rRows=rc.rows||[], rDocs=rc.docs||{}, rPhotos=JOB.reconstPhotos||[];
+      var h=htmlHeader(T('mod_reconstM'));
+      h+='<h2>'+T('mod_reconstM')+' ('+rRows.length+')</h2>';
+      h+=ifEmpty(rRows);
+      if(rRows.length){
+        h+='<table><tr><th>'+T('col_nr')+'</th><th>'+T('col_name')+'</th><th>'+T('col_op')+'</th><th>'+T('col_hours')+'</th><th>'+T('r_tipAvarie')+'</th><th>'+T('r_pozAsig')+'</th></tr>';
+        rRows.forEach(function(r){h+='<tr><td>'+escHtml(r.nr||'')+'</td><td>'+escHtml(r.name||'')+'</td><td>'+escHtml(r.op||'')+'</td><td>'+escHtml(r.hours||'')+'</td><td>'+escHtml(r.tipAvarie||'')+'</td><td>'+escHtml(r.pozAsig||'')+'</td></tr>'});
+        h+='</table>';
+      }
+      if(rDocs && Object.keys(rDocs).length){
+        h+='<h2>'+T('r_docs')+'</h2><pre style="background:#f5f5f3;padding:8px;font-size:10px;overflow:auto;border:1px solid #ddd">'+escHtml(JSON.stringify(rDocs,null,2))+'</pre>';
+      }
+      h+='<h2>'+T('r_photos')+' ('+rPhotos.filter(function(p){return p&&p.data}).length+')</h2>';
+      h+='<p style="color:#666;font-size:11px">Vezi mapa <code>fotografii_reconstatare/</code></p>';
+      h+=htmlFooter();
+      zip.file('reconstatare.html',h);
+
+      // Fotók kibontása base64-bol
+      var rcFolder=zip.folder('fotografii_reconstatare');
+      var rcCnt=0;
+      for(var ri=0;ri<rPhotos.length;ri++){
+        var b=getReconstPhotoBlob(rPhotos[ri]);
+        if(b){rcCnt++;rcFolder.file('reconst_'+String(rcCnt).padStart(2,'0')+'.jpg',b)}
+      }
+    }
+
+    // ── tinichigerie.html ──
+    {
+      var bR=JOB.bodyRows||[], bA=JOB.bodyApproval||null;
+      var h=htmlHeader(T('mod_tin'));
+      h+='<h2>'+T('mod_tin')+' ('+bR.length+')</h2>';
+      h+=ifEmpty(bR);
+      if(bR.length){
+        h+='<table><tr><th>'+T('col_name')+'</th><th>'+T('t_bodyType')+'</th><th>'+T('col_hours')+'</th><th>'+T('col_note')+'</th></tr>';
+        bR.forEach(function(r){h+='<tr><td>'+escHtml(r.name||'')+'</td><td>'+escHtml(r.bodyType||'')+'</td><td>'+escHtml(r.hours||'')+'</td><td>'+escHtml(r.note||'')+'</td></tr>'});
+        h+='</table>';
+      }
+      if(bA){h+='<h3>'+T('t_approval')+'</h3><pre style="background:#f5f5f3;padding:8px;font-size:10px;overflow:auto;border:1px solid #ddd">'+escHtml(JSON.stringify(bA,null,2))+'</pre>'}
+      h+=htmlFooter();
+      zip.file('tinichigerie.html',h);
+    }
+
+    // ── vopsitorie.html ──
+    {
+      var pR=JOB.paintRows||[], pA=JOB.paintApproval||null;
+      var h=htmlHeader(T('mod_vop'));
+      h+='<h2>'+T('mod_vop')+' ('+pR.length+')</h2>';
+      h+=ifEmpty(pR);
+      if(pR.length){
+        h+='<table><tr><th>'+T('col_name')+'</th><th>'+T('v_paintType')+'</th><th>'+T('v_vopsire')+'</th><th>'+T('col_hours')+'</th><th>'+T('col_note')+'</th></tr>';
+        pR.forEach(function(r){h+='<tr><td>'+escHtml(r.name||'')+'</td><td>'+escHtml(r.paintType||'')+'</td><td>'+(r.vopsire?'✓':'—')+'</td><td>'+escHtml(r.hours||'')+'</td><td>'+escHtml(r.note||'')+'</td></tr>'});
+        h+='</table>';
+      }
+      if(pA){h+='<h3>'+T('v_approval')+'</h3><pre style="background:#f5f5f3;padding:8px;font-size:10px;overflow:auto;border:1px solid #ddd">'+escHtml(JSON.stringify(pA,null,2))+'</pre>'}
+      h+=htmlFooter();
+      zip.file('vopsitorie.html',h);
+    }
+
+    // ── control.html ──
+    {
+      var cc=JOB.controlChecks||{};
+      var h=htmlHeader(T('mod_ctrl'));
+      // Osszegzes
+      var ok=0,nok=0,na=0,pend=0,tot=0;
+      Object.keys(cc).forEach(function(k){
+        if(k.indexOf('_note')>=0)return;
+        tot++;
+        var v=cc[k];
+        if(v==='ok')ok++;
+        else if(v==='nok')nok++;
+        else if(v==='na')na++;
+        else pend++;
+      });
+      h+='<h2>'+T('c_summary')+'</h2>';
+      h+='<table><tr><th>'+T('col_total')+'</th><th class="ok">'+T('c_ok')+'</th><th class="nok">'+T('c_nok')+'</th><th class="na">'+T('c_na')+'</th><th class="pend">'+T('c_pending')+'</th></tr>';
+      h+='<tr><td><b>'+tot+'</b></td><td class="ok">'+ok+'</td><td class="nok">'+nok+'</td><td class="na">'+na+'</td><td class="pend">'+pend+'</td></tr></table>';
+      h+='<p><b>'+(nok===0?T('c_passed'):T('c_failed'))+'</b></p>';
+      // Reszletes lista
+      h+='<h2>'+T('mod_ctrl')+' — '+T('c_check')+'</h2>';
+      var keys=Object.keys(cc).filter(function(k){return k.indexOf('_note')<0});
+      if(!keys.length){
+        h+=ifEmpty([]);
+      }else{
+        h+='<table><tr><th>ID</th><th>'+T('col_status')+'</th><th>'+T('col_note')+'</th></tr>';
+        keys.forEach(function(k){
+          var v=cc[k]||'';
+          var cls=v==='ok'?'ok':(v==='nok'?'nok':(v==='na'?'na':'pend'));
+          var label=v==='ok'?T('c_ok'):(v==='nok'?T('c_nok'):(v==='na'?T('c_na'):T('c_pending')));
+          var note=cc[k+'_note']||'';
+          h+='<tr><td>'+escHtml(k)+'</td><td class="'+cls+'">'+escHtml(label)+'</td><td>'+escHtml(note)+'</td></tr>';
+        });
+        h+='</table>';
+      }
+      h+=htmlFooter();
+      zip.file('control.html',h);
+    }
+
+    S.expProgress=90;render();
+
+    // Generalj ZIP-et
+    var blob=await zip.generateAsync({type:'blob',compression:'DEFLATE'},function(meta){S.expProgress=90+Math.round(meta.percent/10);render()});
+    S.expProgress=100;render();
+
+    var zipName=baseFileName+'.zip';
+
+    // UJ: probaljuk a File System Access API-t (szervezett mappa, ev/honap)
+    var saveResult=await saveZipToDir(blob, zipName);
+    if(saveResult && saveResult.ok){
+      // Sikeres mentes a kivalasztott mappaba
+      S.expLoading=0;S.showExp=0;
+      toast(T('savedToDisk')+': '+saveResult.path);
+      render();
+    }else{
+      // Fallback: bongeszo Downloads mappaja
+      var a=document.createElement('a');
+      a.href=URL.createObjectURL(blob);
+      a.download=zipName;
+      a.click();
+      setTimeout(function(){URL.revokeObjectURL(a.href)},1000);
+      S.expLoading=0;S.showExp=0;
+      // Ha hiba volt a mentesben (nem user-cancel), jelezzuk
+      if(saveResult && saveResult.error){
+        toast(T('saveError')+' — '+T('savedFallback'),1);
+      }else{
+        toast(T('savedFallback'));
+      }
+      render();
+    }
+  }catch(err){
+    console.error('Export ZIP:',err);
+    S.expLoading=0;
+    toast('Eroare: '+(err.message||err),1);
+    render();
+  }
+};
+
+// Regi exportDosar -> backcompat, de most a modal-t nyitja
+window.exportDosar=function(){window.openExport()};
+
+loadJob();
+</script>
+</body>
+</html>
