@@ -244,11 +244,11 @@ function render(){
   document.getElementById('app').innerHTML=h;
 }
 
-// ── Actions (unchanged except addPh) ──
+// ── Actions ──
 window.uRC=async function(f,v){if(!JOB||!JOB.reconst)return;JOB.reconst[f]=v;await saveJ()};
-window.uRow=async function(idx,f,v){if(!JOB||!JOB.reconst)return;JOB.reconst.rows[idx][f]=v;await saveJ()};
-window.dRow=async function(idx){if(!JOB||!JOB.reconst)return;JOB.reconst.rows.splice(idx,1);await saveJ();render()};
-window.aRow=async function(){if(!JOB||!JOB.reconst)return;JOB.reconst.rows.push({nr:JOB.reconst.rows.length+1,name:'',op:'',hours:'',tipAvarie:'',pozAsig:''});await saveJ();render()};
+window.uRow=async function(idx,f,v){if(!JOB||!JOB.reconst||!JOB.reconst.rows||!JOB.reconst.rows[idx])return;JOB.reconst.rows[idx][f]=v;await saveJ()};
+window.dRow=async function(idx){if(!JOB||!JOB.reconst||!JOB.reconst.rows)return;JOB.reconst.rows.splice(idx,1);await saveJ();render()};
+window.aRow=async function(){if(!JOB||!JOB.reconst)return;if(!JOB.reconst.rows)JOB.reconst.rows=[];JOB.reconst.rows.push({nr:JOB.reconst.rows.length+1,name:'',op:'',hours:'',tipAvarie:'',pozAsig:''});await saveJ();render()};
 window.uDoc=async function(f,v){if(!JOB||!JOB.reconst)return;JOB.reconst.docs[f]=v;await saveJ()};
 window.setRcSt=async function(st){if(!JOB||!JOB.reconst)return;JOB.reconst.status=st;await saveJ();render();toast(st==='sent'?'Trimis!':st==='accepted'?'Acceptat ✓':st==='rejected'?'Refuzat ✗':'Ciorna')};
 window.rcResponse=async function(st){
@@ -261,13 +261,11 @@ window.rcResponse=async function(st){
   toast(st==='accepted'?'Acceptat ✓':'Refuzat ✗');
 };
 
-// ── MODIFIED: addPh → uploadPhoto to Storage ──
 window.addPh=function(x,e){
   var f=e.target.files&&e.target.files[0];if(!f)return;
   resize(f,async function(d){
     var url=await uploadPhoto(JOB.id,'reconst_'+x,d);
     if(!JOB.reconstPhotos)JOB.reconstPhotos=[];
-    // ensure array slot exists
     while(JOB.reconstPhotos.length<=x)JOB.reconstPhotos.push(null);
     JOB.reconstPhotos[x]={data:url,ts:new Date().toISOString()};
     await saveJ();toast(T('saved'));render();
@@ -317,7 +315,6 @@ window.emailReconst=function(){
   if(JOB.reconst.status==='draft'){JOB.reconst.status='sent';saveJ();render()}
 };
 
-// shareReconst works with URLs too — fetch(url) → blob → share
 window.shareReconst=async function(){
   if(!JOB)return;
   var photos=JOB.reconstPhotos||[],files=[];
