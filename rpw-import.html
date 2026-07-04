@@ -156,7 +156,9 @@ var i={
   creating:{ro:'Se creeaza...',en:'Creating...',hu:'Letrehozas...'},
   emptyFiles:{ro:'Niciun fisier incarcat inca',en:'No files yet',hu:'Meg nincs fajl'},
   errNoTalon:{ro:'Nu s-a incarcat niciun talon. Se poate crea dosar dar datele vehiculului vor fi goale.',en:'No talon loaded.',hu:'Nincs talon.'},
-  jobCreated:{ro:'Dosar creat!',en:'File created!',hu:'Dosszie letrehozva!'}
+  jobCreated:{ro:'Dosar creat!',en:'File created!',hu:'Dosszie letrehozva!'},
+  jobExists:{ro:'Lucrarea exista deja pe server',en:'Job already exists on server',hu:'A munka mar letezik a szerveren'},
+  jobExistsOpen:{ro:'Lucrarea exista deja. Deschideti lucrarea existenta?',en:'Job already exists. Open the existing one?',hu:'A munka mar letezik. Megnyitod a meglevot?'}
 };
 function gL(){return localStorage.getItem(LANG_KEY)||'ro'}
 function T(k){var e=i[k];return e?e[gL()]||e.ro:k}
@@ -350,6 +352,15 @@ async function createJob(){
       job.photoKeys[key]=storageKey;
       job.photoUrls[key]=publicUrl;
       job.importedFiles.push({key:key,storageKey:storageKey,publicUrl:publicUrl,type:f.type,name:f.name});
+    }
+
+    // 2.A — letezes-ellenorzes: soha ne irjunk felul letezo munkat, ertheto uzenettel
+    var exist=await sb.from('rpw_jobs').select('id').eq('id',jid).maybeSingle();
+    if(exist && exist.data){
+      S.creating=false;
+      toast(T('jobExists'),1);
+      if(confirm(T('jobExistsOpen'))) location.assign('rpw-recepcio.html?job='+jid);
+      return;
     }
 
     // Dosszie mentes
