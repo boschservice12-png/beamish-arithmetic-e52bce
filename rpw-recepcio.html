@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="api.js"></script>
+<script src="rpw-config.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--bg:#f5f5f3;--w:#fff;--r:#dc2626;--r50:#fef2f2;--r100:#fee2e2;--r700:#b91c1c;--g:#16a34a;--gl:#dcfce7;--y:#ca8a04;--yl:#fef9c3;--bl:#2563eb;--bll:#dbeafe;--p:#7c3aed;--pl:#ede9fe;--or:#ea580c;--orl:#fff7ed;--tl:#0d9488;--tll:#ccfbf1;--t:#1a1a1a;--t2:#555;--t3:#999;--b:#e5e5e5;--b2:#d0d0d0;--rd:10px}
@@ -154,7 +154,10 @@ html,body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);m
    ============================================================= */
 
 // ────── SUPABASE ──────────────────────────────────────────────
-// A Supabase kliens, a tabla es a Storage bucket mostantol az api.js-ben el.
+var SB_URL=RPW_CFG.SB_URL;
+var SB_KEY=RPW_CFG.SB_KEY;
+var sb=supabase.createClient(SB_URL,SB_KEY);
+var STORAGE_BUCKET=RPW_CFG.BUCKET;
 
 // ────── STATE ─────────────────────────────────────────────────
 var JOB=null;
@@ -377,17 +380,23 @@ function migrateLegacy(job){
 async function loadJob(){
   var jid=gJI();
   if(!jid){render();return}
-  var cached=API.peek(jid);
+  var cached=localStorage.getItem('rpw_job_'+jid);
   if(cached){
-    JOB=cached;
-    fixPhases();migrateLegacy(JOB);
-    render();
+    try{
+      JOB=JSON.parse(cached);
+      fixPhases();migrateLegacy(JOB);
+      render();
+    }catch(e){}
   }
   try{
-    var srv=await API.loadJob(jid);
-    if(srv){
-      JOB=srv;
+    var res=await sb.from('rpw_jobs').select('id,data,updated_at').eq('id',jid).single();
+    if(res.error)throw res.error;
+    var lts=null;try{lts=localStorage.getItem('rpw_job_ts_'+jid)}catch(e){}
+    var sNew=Date.parse(res.data.updated_at||0)||0, lNew=Date.parse(lts||0)||0;
+    if(!JOB||!lts||sNew>lNew){
+      JOB=res.data.data;
       fixPhases();migrateLegacy(JOB);
+      try{localStorage.setItem('rpw_job_'+JOB.id,JSON.stringify(JOB));localStorage.setItem('rpw_job_ts_'+JOB.id,res.data.updated_at||new Date().toISOString())}catch(e){}
     }
     /* nincs auto-mentes betolteskor */
   }catch(e){if(!JOB)JOB=null}
@@ -404,9 +413,18 @@ function fixPhases(){
   if(!JOB.alteParti)JOB.alteParti=[];
 }
 
+var _saveTimer=null;
 async function saveJ(){
   if(!JOB)return;
-  await API.saveJob(JOB);
+  try{localStorage.setItem('rpw_job_'+JOB.id,JSON.stringify(JOB));localStorage.setItem('rpw_job_ts_'+JOB.id,new Date().toISOString())}catch(e){}
+  clearTimeout(_saveTimer);
+  _saveTimer=setTimeout(async function(){
+    try{
+      var p=sb.from('rpw_jobs').upsert({id:JOB.id,data:JOB,updated_at:new Date().toISOString()});
+      var t=new Promise(function(_,rej){setTimeout(function(){rej(new Error('timeout'))},4000)});
+      Promise.race([p,t]).catch(function(e){console.warn('SB offline:',e.message)});
+    }catch(e){console.error('Save:',e)}
+  },600);
 }
 
 // ────── UTILS ────────────────────────────────────────────────
@@ -446,7 +464,13 @@ async function uploadPhoto(photoKey,dataUrl){
     // dataUrl -> blob
     var res=await fetch(dataUrl);
     var blob=await res.blob();
-    var url=await API.uploadPhoto(JOB.id,photoKey,blob);
+    var path=JOB.id+'/'+photoKey+'.jpg';
+    // Upsert (lecsereli ha mar letezik)
+    var up=await sb.storage.from(STORAGE_BUCKET).upload(path,blob,{contentType:'image/jpeg',upsert:true});
+    if(up.error)throw up.error;
+    // Public URL
+    var urlData=sb.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+    var url=urlData.data.publicUrl;
     // Update JOB
     if(!JOB.photoKeys)JOB.photoKeys={};
     if(!JOB.photoUrls)JOB.photoUrls={};
@@ -464,7 +488,8 @@ async function uploadPhoto(photoKey,dataUrl){
 /* Foto torles a Storage-bol */
 async function deletePhoto(photoKey){
   if(!JOB||!JOB.id)return;
-  try{await API.deletePhoto(JOB.id,photoKey)}catch(e){console.warn('Delete:',e)}
+  var path=JOB.id+'/'+photoKey+'.jpg';
+  try{await sb.storage.from(STORAGE_BUCKET).remove([path])}catch(e){console.warn('Delete:',e)}
   if(JOB.photoKeys)delete JOB.photoKeys[photoKey];
   if(JOB.photoUrls)delete JOB.photoUrls[photoKey];
   delete S.photoCache[photoKey];

@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RedAssistance — Recuperare date</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="rpw-config.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Segoe UI',Arial,sans-serif;background:#f5f5f3;color:#1a1a1a;padding:16px}
@@ -31,8 +32,8 @@ button{border:none;border-radius:8px;padding:9px 16px;font-size:12px;font-weight
 <div class="sub">Copiile locale ale lucrarilor de pe ACEST dispozitiv. Daca aici sunt date care lipsesc de pe server, apasa RESTAUREZ.</div>
 <div id="list"><div class="empty">Se incarca...</div></div>
 <script>
-var SB_URL='https://pxypbbvqinbwesfikkdb.supabase.co';
-var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB4eXBiYnZxaW5id2VzZmlra2RiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEwMjMwNzIsImV4cCI6MjA4NjU5OTA3Mn0.WZBdbr-YBxLq1ALnHY2weFQ7j2JhUUj6hOUGkuuErnQ';
+var SB_URL=RPW_CFG.SB_URL;
+var SB_KEY=RPW_CFG.SB_KEY;
 var sb=null;
 function toast(m){var t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(function(){t.remove()},3500)}
 function summarize(j){

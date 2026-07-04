@@ -12,6 +12,7 @@
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="rpw-config.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--bg:#f5f5f3;--w:#fff;--r:#dc2626;--r50:#fef2f2;--r100:#fee2e2;--r700:#b91c1c;--g:#16a34a;--gl:#dcfce7;--y:#ca8a04;--yl:#fef9c3;--bl:#2563eb;--bll:#dbeafe;--p:#7c3aed;--pl:#ede9fe;--or:#ea580c;--orl:#fff7ed;--tl:#0d9488;--tll:#ccfbf1;--t:#1a1a1a;--t2:#555;--t3:#999;--b:#e5e5e5;--b2:#d0d0d0;--rd:10px}
@@ -55,6 +56,39 @@ html,body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);m
 .tbl .hrs{width:44px;text-align:center}
 .tbl .nr{width:28px;text-align:center;font-weight:700;color:var(--t3)}
 .add-row{margin-top:6px;padding:6px;border:2px dashed var(--b2);border-radius:6px;text-align:center;cursor:pointer;font-size:10px;font-weight:700;color:var(--t3)}.add-row:hover{background:var(--bll);border-color:var(--bl);color:var(--bl)}
+.rc-card{background:var(--bg);border:1px solid var(--b);border-radius:8px;padding:10px;margin-bottom:8px}
+.rc-line{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--b);border-radius:8px;padding:8px 10px;margin-bottom:6px}
+.rc-line-phw{position:relative;display:inline-block;flex:0 0 auto}
+.rc-line-phx{position:absolute;top:-6px;right:-6px;width:16px;height:16px;border:none;border-radius:50%;background:#dc2626;color:#fff;font-size:10px;line-height:1;cursor:pointer;padding:0;z-index:3}
+.pslot-x{position:absolute;top:4px;right:4px;width:22px;height:22px;border:none;border-radius:50%;background:#dc2626;color:#fff;font-size:13px;font-weight:800;line-height:1;cursor:pointer;padding:0;z-index:5}
+.rc-line-nm{flex:1;font-size:13px;font-weight:800;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rc-line-h{font-family:monospace;font-size:12px;font-weight:800;color:#92400e;background:#fef3c7;border-radius:6px;padding:2px 8px;white-space:nowrap}
+.rc-line-obs{font-size:11px;color:var(--t3);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rc-line-ph{width:28px;height:28px;object-fit:cover;border-radius:6px;border:1px solid var(--b)}
+.rc-line-edit{width:28px;height:28px;border:1px solid var(--b);background:#eff6ff;color:#1d4ed8;border-radius:6px;font-size:13px;cursor:pointer;flex:0 0 auto}
+.rc-save{display:block;width:100%;margin-top:8px;padding:9px;border:none;border-radius:8px;background:#16a34a;color:#fff;font-size:13px;font-weight:800;cursor:pointer}
+.rc-card-top{display:flex;gap:6px;align-items:center;margin-bottom:6px}
+.rc-card-nr{width:22px;height:22px;border-radius:50%;background:var(--bl);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0}
+.rc-name{flex:1;border:1px solid var(--b);border-radius:6px;padding:6px 8px;font-size:13px;font-weight:700;font-family:inherit;outline:none}.rc-name:focus{border-color:var(--bl)}
+.rc-card-del{width:24px;height:24px;border-radius:6px;border:none;background:var(--r50);color:var(--r);cursor:pointer;font-size:14px;font-weight:700;flex-shrink:0}
+.op-btns{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:6px}
+.op-btn{padding:5px 10px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;border:1.5px solid var(--b);background:var(--w);font-family:inherit;color:var(--t2)}
+.op-btn.on.op-inl{background:var(--r100);border-color:var(--r);color:var(--r)}
+.op-btn.on.op-rep{background:var(--yl);border-color:var(--y);color:var(--y)}
+.op-btn.on.op-dem{background:var(--bll);border-color:var(--bl);color:var(--bl)}
+.op-btn.on.op-vop{background:var(--pl);border-color:var(--p);color:var(--p)}
+.op-btn.on.op-rvp{background:var(--tll);border-color:var(--tl);color:var(--tl)}
+.rc-row2{display:flex;gap:6px;align-items:center;margin-bottom:6px}
+.rc-ora{display:inline-flex;align-items:center;gap:4px;background:var(--yl);border:1.5px solid var(--y);border-radius:6px;padding:4px 8px;flex-shrink:0}
+.rc-ora input{width:48px;border:none;background:transparent;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--y);outline:none;text-align:center}
+.rc-ora-lbl{font-size:9px;font-weight:700;color:var(--y)}
+.rc-obs{flex:1;border:1px solid var(--b);border-radius:6px;padding:6px 8px;font-size:11px;font-family:inherit;outline:none}
+.rc-phs{display:flex;gap:4px;flex-wrap:wrap}
+.rc-ph{width:52px;height:40px;background:var(--w);border:1.5px dashed var(--b2);border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden;flex-shrink:0}
+.rc-ph.done{border:1.5px solid var(--g)}.rc-ph img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.rc-ph input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
+.rc-ph svg{width:16px;height:16px;stroke:var(--t3);fill:none;stroke-width:1.5}
+.rc-ph-del{position:absolute;top:-3px;right:-3px;width:16px;height:16px;background:var(--r);color:#fff;border-radius:50%;font-size:10px;line-height:14px;cursor:pointer;z-index:3;border:none;padding:0}
 .del-btn{width:20px;height:20px;border-radius:50%;border:none;background:var(--r50);color:var(--r);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
 .chk-row{display:flex;align-items:center;gap:6px;padding:3px 0;font-size:11px}
 .chk-row input[type=checkbox]{width:14px;height:14px;accent-color:var(--bl)}
@@ -83,8 +117,8 @@ html,body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);m
 <body>
 <div id="app"><div class="loading">Se incarca...</div></div>
 <script>
-var SB_URL='https://zwsjfzqtskicrukidaog.supabase.co';
-var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3c2pmenF0c2tpY3J1a2lkYW9nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwODc3NjUsImV4cCI6MjA4ODY2Mzc2NX0.Qe-5G_TDkXinqc49FzaB-YezWNajefteQI0vnZSPah0';
+var SB_URL=RPW_CFG.SB_URL;
+var SB_KEY=RPW_CFG.SB_KEY;
 var sb=supabase.createClient(SB_URL,SB_KEY);
 
 var JOB=null;
@@ -97,38 +131,33 @@ async function loadJob(){
   var cached=localStorage.getItem('rpw_job_'+jid);
   if(cached){try{JOB=JSON.parse(cached);if(!JOB.phases)JOB.phases={};for(var p=1;p<=7;p++){if(!JOB.phases[p])JOB.phases[p]={status:"pending"}};render()}catch(e){}}
   try{
-    var res=await sb.from('jobs').select('id,data,updated_at').eq('id',jid).single();
+    var res=await sb.from('rpw_jobs').select('id,data,updated_at').eq('id',jid).single();
     if(res.error)throw res.error;
-    JOB=res.data.data;if(!JOB.phases)JOB.phases={};for(var p=1;p<=7;p++){if(!JOB.phases[p])JOB.phases[p]={status:"pending"}};
+    var _lts=0,_sts=0;try{_lts=Date.parse(localStorage.getItem('rpw_job_ts_'+jid)||0)||0;_sts=Date.parse(res.data.updated_at||0)||0}catch(e){}
+    if(!(JOB&&_lts&&_sts<=_lts)){JOB=res.data.data;if(!JOB.phases)JOB.phases={};for(var p=1;p<=7;p++){if(!JOB.phases[p])JOB.phases[p]={status:"pending"}};
+    try{localStorage.setItem('rpw_job_'+jid,JSON.stringify(JOB));localStorage.setItem('rpw_job_ts_'+jid,res.data.updated_at||new Date().toISOString())}catch(e){}}
     try{localStorage.setItem('rpw_job_'+jid,JSON.stringify(JOB))}catch(e){}
-    await saveJ();
+    /* nincs auto-mentes betolteskor */
   }catch(e){if(!JOB)JOB=null}
   render();
 }
 var _saveTimer=null;
 async function saveJ(){
   if(!JOB)return;
-  try{localStorage.setItem('rpw_job_'+JOB.id,JSON.stringify(JOB))}catch(e){}
+  try{localStorage.setItem('rpw_job_'+JOB.id,JSON.stringify(JOB));localStorage.setItem('rpw_job_ts_'+JOB.id,new Date().toISOString())}catch(e){}
   clearTimeout(_saveTimer);
   _saveTimer=setTimeout(async function(){
-    try{await sb.from('jobs').upsert({id:JOB.id,data:JOB,updated_at:new Date().toISOString()})}
+    try{await sb.from('rpw_jobs').upsert({id:JOB.id,data:JOB,updated_at:new Date().toISOString()})}
     catch(e){console.error('Save:',e)}
   },500);
 }
 
-// ── Storage upload (identical pattern to receptie) ──
-async function uploadPhoto(jobId, ptype, dataURL){
-  try{
-    var r=await fetch(dataURL);
-    var blob=await r.blob();
-    var path=jobId+'/'+ptype+'_'+Date.now()+'.jpg';
-    var up=await sb.storage.from('job-photos').upload(path,blob,{contentType:'image/jpeg',upsert:true});
-    if(up.error)throw up.error;
-    return sb.storage.from('job-photos').getPublicUrl(path).data.publicUrl;
-  }catch(e){
-    console.warn('[Storage] fallback base64:',e.message||e);
-    return dataURL;
+function buildInitRows(){
+  var rows=[],el=JOB.elements||{},n=1;
+  for(var k in el){
+    if(el[k].status==='damaged'){rows.push({nr:n++,name:T(k),op:el[k].work==='replace'?'Inlocuire':'Reparare',hours:'',tipAvarie:el[k].note||'',pozAsig:''})}
   }
+  return rows;
 }
 
 function toast(m,e){S.ts=m;S.te=e?1:0;render();setTimeout(function(){S.ts=null;render()},3000)}
@@ -166,10 +195,12 @@ var IC={back:'<svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
 function render(){
   var ln=gL(),job=JOB;
   if(!job){document.getElementById('app').innerHTML='<div class="loading">'+T('noJob')+'<br><br><button class="btn btn-b" style="width:auto;padding:10px 24px;display:inline-flex" onclick="location.assign(\'index.html\')">'+T('openD')+'</button></div>';return}
+  if(initReconst())saveJ();
   var rc=job.reconst||{},rows=rc.rows||[],docs=rc.docs||{},photos=job.reconstPhotos||[];
 
   var h='<div class="hdr"><div class="hdr-left"><div class="back" onclick="location.assign(\'rpw-dosar.html?job='+job.id+'\')">'+IC.back+'</div><div class="hdr-title"><span>Red</span> '+T('reconstatare')+'</div></div><div class="hdr-right"><div class="hdr-job"><b class="mono">'+(job.number||job.id)+'</b><br><span style="color:var(--t3)">'+(job.plate||'')+'</span></div><div class="lsw"><button class="lb '+(ln==='ro'?'on':'')+'" onclick="sL(\'ro\')">RO</button><button class="lb '+(ln==='en'?'on':'')+'" onclick="sL(\'en\')">EN</button><button class="lb '+(ln==='hu'?'on':'')+'" onclick="sL(\'hu\')">HU</button></div></div></div>';
 
+  // Status bar
   var rcSt=rc.status||'draft';
   var stCls=rcSt==='sent'?'st-sent':rcSt==='accepted'?'st-accepted':rcSt==='rejected'?'st-rejected':'st-draft';
   var stLabel=rcSt==='sent'?'TRIMIS — ASTEPTAM RASPUNS':rcSt==='accepted'?'ACCEPTAT ✓':rcSt==='rejected'?'REFUZAT ✗':'CIORNA';
@@ -185,32 +216,33 @@ function render(){
   h+='<div class="doc-title">NOTA DE RECONSTATARE</div>';
   h+='<div class="doc-sub">(constatare suplimentara a avariilor constatate pe parcursul reparatiei)</div>';
 
+  // I. Dosar dauna
   h+='<div class="sec-title">'+T('s1')+'</div>';
   h+='<div class="fg"><div class="ff"><div class="ff-l">'+T('asigurator')+'</div><input class="ff-v" value="'+(rc.asigurator||'')+'" onchange="uRC(\'asigurator\',this.value)"/></div><div class="ff"><div class="ff-l">'+T('nrDosar')+'</div><input class="ff-v mono" value="'+(rc.nrDosar||'')+'" onchange="uRC(\'nrDosar\',this.value)"/></div></div>';
   h+='<div class="fg"><div class="ff"><div class="ff-l">'+T('polita')+'</div><input class="ff-v" value="'+(rc.polita||'')+'" onchange="uRC(\'polita\',this.value)"/></div><div class="ff"><div class="ff-l">'+T('valabila')+'</div><input class="ff-v" type="date" value="'+(rc.valabila||'')+'" onchange="uRC(\'valabila\',this.value)"/></div></div>';
   h+='<div class="fg"><div class="ff"><div class="ff-l">'+T('inspector')+'</div><input class="ff-v" value="'+(rc.inspector||'')+'" onchange="uRC(\'inspector\',this.value)"/></div><div class="ff"><div class="ff-l">'+T('telInsp')+'</div><input class="ff-v" value="'+(rc.telInsp||'')+'" onchange="uRC(\'telInsp\',this.value)"/></div></div>';
   h+='<div class="fg"><div class="ff"><div class="ff-l">'+T('pagubita')+'</div><input class="ff-v" value="'+(rc.pagubita||job.proprietar||job.client||'')+'" onchange="uRC(\'pagubita\',this.value)"/></div><div class="ff"><div class="ff-l">'+T('service')+'</div><input class="ff-v" value="'+(rc.service||'SC SZKALICZKI SERVICE SRL')+'" onchange="uRC(\'service\',this.value)"/></div></div>';
 
+  // II. Date vehicul
   h+='<div class="sec-title">'+T('s2')+'</div>';
   h+='<div class="fg"><div class="ff"><div class="ff-l">'+T('marca')+'</div><div class="ff-v">'+(job.brand||job.auto||'—')+'</div></div><div class="ff"><div class="ff-l">'+T('nrInm')+'</div><div class="ff-v mono" style="font-weight:800">'+(job.plate||'—')+'</div></div></div>';
   h+='<div class="fg"><div class="ff"><div class="ff-l">'+T('serieSasiu')+'</div><div class="ff-v mono">'+(job.vin||'—')+'</div></div><div class="ff"><div class="ff-l">'+T('anFabr')+'</div><div class="ff-v mono">'+(job.year||'—')+'</div></div></div>';
   h+='<div class="fg"><div class="ff"><div class="ff-l">'+T('dataConst')+'</div><input class="ff-v" type="date" value="'+(rc.dataConst||'')+'" onchange="uRC(\'dataConst\',this.value)"/></div><div class="ff"><div class="ff-l">'+T('dataReconst')+'</div><input class="ff-v" type="date" value="'+(rc.dataReconst||'')+'" onchange="uRC(\'dataReconst\',this.value)"/></div></div>';
 
+  // III. Obiectul
   h+='<div class="sec-title">'+T('s3')+'</div>';
   h+='<div class="fix-text">'+T('s3text')+'</div>';
 
+  // IV. Elemente
   h+='<div class="sec-title">'+T('s4')+'</div>';
-  h+='<table class="tbl"><thead><tr><th class="nr">'+T('nr')+'</th><th>'+T('elemName')+'</th><th>'+T('operatiune')+'</th><th>'+T('normaTimp')+'</th><th>'+T('tipAvarie')+'</th><th>'+T('pozAsig')+'</th><th></th></tr></thead><tbody>';
-  for(var x=0;x<rows.length;x++){
-    var r=rows[x];
-    h+='<tr><td class="nr">'+(x+1)+'</td><td><input value="'+(r.name||'')+'" onchange="uRow('+x+',\'name\',this.value)"/></td><td><input value="'+(r.op||'')+'" onchange="uRow('+x+',\'op\',this.value)"/></td><td><input class="hrs mono" type="number" step="0.25" min="0" value="'+(r.hours||'')+'" onchange="uRow('+x+',\'hours\',this.value)"/></td><td><textarea onchange="uRow('+x+',\'tipAvarie\',this.value)">'+(r.tipAvarie||'')+'</textarea></td><td><input value="'+(r.pozAsig||'')+'" onchange="uRow('+x+',\'pozAsig\',this.value)"/></td><td><button class="del-btn" onclick="dRow('+x+')">×</button></td></tr>';
-  }
-  h+='</tbody></table>';
+  for(var x=0;x<rows.length;x++)h+=renderRcCard(rows[x],x);
   h+='<div class="add-row" onclick="aRow()">'+T('addRow')+'</div>';
 
+  // V. Cauzalitate
   h+='<div class="sec-title">'+T('s5')+'</div>';
   h+='<div class="fix-text">'+T('s5text')+'</div>';
 
+  // VI. Documente
   h+='<div class="sec-title">'+T('s6')+'</div>';
   h+='<div class="chk-row"><input type="checkbox" '+(docs.foto?'checked':'')+' onchange="uDoc(\'foto\',this.checked)"/> '+T('dFoto')+'</div>';
   h+='<div class="chk-row"><input type="checkbox" '+(docs.deviz?'checked':'')+' onchange="uDoc(\'deviz\',this.checked)"/> '+T('dDeviz')+'</div>';
@@ -218,9 +250,11 @@ function render(){
   h+='<div class="chk-row"><input type="checkbox" '+(docs.copieConst?'checked':'')+' onchange="uDoc(\'copieConst\',this.checked)"/> '+T('dCopie')+'</div>';
   h+='<div class="chk-row"><input type="checkbox" '+(docs.alte?'checked':'')+' onchange="uDoc(\'alte\',this.checked)"/> '+T('dAlte')+': <input style="flex:1;border:none;border-bottom:1px solid var(--b2);outline:none;font-size:11px;font-family:inherit;margin-left:4px" value="'+(docs.alteText||'')+'" onchange="uDoc(\'alteText\',this.value)"/></div>';
 
+  // VII. Solicitare
   h+='<div class="sec-title">'+T('s7')+'</div>';
   h+='<div class="fix-text">'+T('s7text')+'</div>';
 
+  // VIII. Semnaturi
   h+='<div class="sec-title">'+T('s8')+'</div>';
   h+='<div class="sig-grid"><div class="sig-box"><div class="sig-box-t">'+T('sigUnit')+'</div><input placeholder="'+T('sigName')+'" value="'+(rc.sigUnit||'')+'" onchange="uRC(\'sigUnit\',this.value)"/><input placeholder="'+T('sigFunc')+'" value="'+(rc.sigUnitFunc||'')+'" onchange="uRC(\'sigUnitFunc\',this.value)"/><div class="sig-space"></div></div>';
   h+='<div class="sig-box"><div class="sig-box-t">'+T('sigClient')+'</div><input placeholder="'+T('sigName')+'" value="'+(rc.sigClient||'')+'" onchange="uRC(\'sigClient\',this.value)"/><input placeholder="'+T('sigFunc')+'" value="'+(rc.sigClientFunc||'')+'" onchange="uRC(\'sigClientFunc\',this.value)"/><div class="sig-space"></div></div>';
@@ -228,14 +262,15 @@ function render(){
 
   h+='</div>'; // end doc
 
-  // Photos — 20 slots
-  h+='<div class="photo-sec"><div class="photo-title"><span>'+T('photos')+'</span><span style="font-size:10px;color:var(--t3)">'+photos.filter(function(p){return p&&p.data}).length+'/20</span></div><div class="pgrid">';
+  // Photos section
+  h+='<div class="photo-sec"><div class="photo-title"><span>'+T('photos')+'</span><span style="font-size:10px;color:var(--t3)">'+photos.length+'/20</span></div><div class="pgrid">';
   for(var x=0;x<20;x++){
     var p=photos[x];
-    h+='<div class="pslot '+(p&&p.data?'done':'')+'">'+(p&&p.data?'<img src="'+p.data+'"/><div class="pslot-chk">'+IC.chk+'</div>':IC.cam)+'<div class="pslot-n">'+(x+1)+'</div><input type="file" accept="image/*" capture="environment" onchange="addPh('+x+',event)"/></div>';
+    h+='<div class="pslot '+(p?'done':'')+'">'+(p?'<img src="'+p.data+'"/><button class="pslot-x" onclick="delPh('+x+')">×</button>':IC.cam)+'<div class="pslot-n">'+(x+1)+'</div><input type="file" accept="image/*" capture="environment" onchange="addPh('+x+',event)"/></div>';
   }
   h+='</div></div>';
 
+  // Actions
   h+='<div class="action-grid"><button class="btn btn-wa" onclick="waReconst()">'+IC.wa+' '+T('waAsig')+'</button><button class="btn btn-mail" onclick="emailReconst()">'+IC.mail+' '+T('emailAsig')+'</button><button class="btn btn-o" onclick="shareReconst()">'+IC.share+' '+T('sharePhBtn')+'</button><button class="btn btn-o" onclick="window.print()">'+IC.print+' '+T('print')+'</button></div>';
   h+='<div style="padding:0 16px 10px"><button class="btn btn-g" onclick="advPh()">'+T('advance')+'</button></div>';
 
@@ -244,11 +279,15 @@ function render(){
   document.getElementById('app').innerHTML=h;
 }
 
-// ── Actions ──
-window.uRC=async function(f,v){if(!JOB||!JOB.reconst)return;JOB.reconst[f]=v;await saveJ()};
-window.uRow=async function(idx,f,v){if(!JOB||!JOB.reconst||!JOB.reconst.rows||!JOB.reconst.rows[idx])return;JOB.reconst.rows[idx][f]=v;await saveJ()};
-window.dRow=async function(idx){if(!JOB||!JOB.reconst||!JOB.reconst.rows)return;JOB.reconst.rows.splice(idx,1);await saveJ();render()};
-window.aRow=async function(){if(!JOB||!JOB.reconst)return;if(!JOB.reconst.rows)JOB.reconst.rows=[];JOB.reconst.rows.push({nr:JOB.reconst.rows.length+1,name:'',op:'',hours:'',tipAvarie:'',pozAsig:''});await saveJ();render()};
+window.uRC=async function(f,v){if(!JOB)return;if(!JOB.reconst)JOB.reconst={};JOB.reconst[f]=v;await saveJ()};
+window.uRow=async function(idx,f,v){if(!JOB)return;if(!JOB.reconst)JOB.reconst={};if(!JOB.reconst.rows)JOB.reconst.rows=[];if(JOB.reconst.rows[idx]){JOB.reconst.rows[idx][f]=v;await saveJ()}};
+window.dRow=async function(idx){if(!JOB||!JOB.reconst||!JOB.reconst.rows)return;var nm=(JOB.reconst.rows[idx]&&JOB.reconst.rows[idx].name)||('rand '+(idx+1));if(!confirm('Sterg "'+nm+'"?'))return;JOB.reconst.rows.splice(idx,1);await saveJ();render()};
+window.aRow=async function(){if(!JOB)return;if(!JOB.reconst)JOB.reconst={};if(!JOB.reconst.rows)JOB.reconst.rows=[];JOB.reconst.rows.push({nr:JOB.reconst.rows.length+1,name:'',op:'',hours:'',tipAvarie:'',pozAsig:'',photos:[],editing:true});await saveJ();render()};
+window.saveRow=async function(x){if(!JOB||!JOB.reconst||!JOB.reconst.rows||!JOB.reconst.rows[x])return;var r=JOB.reconst.rows[x];if(!r.name){alert('Completeaza numele elementului');return}r.editing=false;await saveJ();render()};
+window.editRow=async function(x){if(!JOB||!JOB.reconst||!JOB.reconst.rows||!JOB.reconst.rows[x])return;JOB.reconst.rows[x].editing=true;await saveJ();render()};
+window.setRowOp=async function(idx,op){if(!JOB||!JOB.reconst||!JOB.reconst.rows||!JOB.reconst.rows[idx])return;var r=JOB.reconst.rows[idx];r.op=(r.op===op?'':op);await saveJ();render()};
+window.addRowPhoto=function(idx,e){var f=e.target.files&&e.target.files[0];if(!f)return;resize(f,async function(d){if(!JOB||!JOB.reconst||!JOB.reconst.rows||!JOB.reconst.rows[idx])return;if(!JOB.reconst.rows[idx].photos)JOB.reconst.rows[idx].photos=[];JOB.reconst.rows[idx].photos.push(d);await saveJ();toast(T('saved'));render()})};
+window.delRowPhoto=async function(idx,pidx){if(!JOB||!JOB.reconst||!JOB.reconst.rows||!JOB.reconst.rows[idx]||!JOB.reconst.rows[idx].photos)return;if(!confirm('Sterg fotografia?'))return;JOB.reconst.rows[idx].photos.splice(pidx,1);await saveJ();render()};
 window.uDoc=async function(f,v){if(!JOB||!JOB.reconst)return;JOB.reconst.docs[f]=v;await saveJ()};
 window.setRcSt=async function(st){if(!JOB||!JOB.reconst)return;JOB.reconst.status=st;await saveJ();render();toast(st==='sent'?'Trimis!':st==='accepted'?'Acceptat ✓':st==='rejected'?'Refuzat ✗':'Ciorna')};
 window.rcResponse=async function(st){
@@ -260,18 +299,8 @@ window.rcResponse=async function(st){
   await saveJ();render();
   toast(st==='accepted'?'Acceptat ✓':'Refuzat ✗');
 };
-
-window.addPh=function(x,e){
-  var f=e.target.files&&e.target.files[0];if(!f)return;
-  resize(f,async function(d){
-    var url=await uploadPhoto(JOB.id,'reconst_'+x,d);
-    if(!JOB.reconstPhotos)JOB.reconstPhotos=[];
-    while(JOB.reconstPhotos.length<=x)JOB.reconstPhotos.push(null);
-    JOB.reconstPhotos[x]={data:url,ts:new Date().toISOString()};
-    await saveJ();toast(T('saved'));render();
-  });
-};
-
+window.addPh=function(x,e){var f=e.target.files&&e.target.files[0];if(!f)return;resize(f,async function(d){if(!JOB.reconstPhotos)JOB.reconstPhotos=[];if(JOB.reconstPhotos.length>x)JOB.reconstPhotos[x]={data:d,ts:new Date().toISOString()};else JOB.reconstPhotos.push({data:d,ts:new Date().toISOString()});await saveJ();toast(T('saved'));render()})};
+window.delPh=async function(x){if(!JOB||!JOB.reconstPhotos||!JOB.reconstPhotos[x])return;if(!confirm('Sterg fotografia '+(x+1)+'?'))return;JOB.reconstPhotos.splice(x,1);await saveJ();render()};
 window.advPh=async function(){
   if(!JOB)return;
   JOB.phases[3].status='done';JOB.phases[3].finished=new Date().toISOString();
@@ -280,16 +309,120 @@ window.advPh=async function(){
   setTimeout(function(){location.assign('rpw-dosar.html?job='+JOB.id)},1500);
 };
 
+function isoDate(s){try{return new Date(s).toISOString().slice(0,10)}catch(e){return ''}}
+function initReconst(){
+  if(!JOB)return false;
+  if(!JOB.reconst)JOB.reconst={};
+  var rc=JOB.reconst,ch=false;
+  if(!rc.asigurator&&JOB.asigurator){rc.asigurator=JOB.asigurator;ch=true}
+  if(!rc.nrDosar&&JOB.nrDosar){rc.nrDosar=JOB.nrDosar;ch=true}
+  if(!rc.pagubita){var nm=JOB.proprietarDosar||JOB.proprietar||JOB.client;if(nm){rc.pagubita=nm;ch=true}}
+  if(!rc.dataConst){var d=(JOB.phases&&JOB.phases[1]&&JOB.phases[1].finished)||JOB.created;if(d){rc.dataConst=isoDate(d);ch=true}}
+  if(!rc.dataReconst){rc.dataReconst=isoDate(new Date());ch=true}
+  return ch;
+}
+
+function renderRcCard(r,x){
+  var ops=[['inlocuit','Inlocuit','op-inl'],['reparat','Reparat','op-rep'],['demontat','Demontat','op-dem'],['vopsit','Vopsit','op-vop'],['revopsit','Revopsit','op-rvp']];
+  var opL={inlocuit:'Inlocuit',reparat:'Reparat',demontat:'Demontat',vopsit:'Vopsit',revopsit:'Revopsit'};
+  var opC={inlocuit:'op-inl',reparat:'op-rep',demontat:'op-dem',vopsit:'op-vop',revopsit:'op-rvp'};
+  function esc(s){return String(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;')}
+  var phs=r.photos||[];
+  if(r.editing!==true){
+    var o='<div class="rc-line"><div class="rc-card-nr">'+(x+1)+'</div><div class="rc-line-nm">'+esc(r.name||'—')+'</div>'+(r.op&&opL[r.op]?'<span class="op-btn on '+opC[r.op]+'" style="cursor:default">'+opL[r.op]+'</span>':'')+'<span class="rc-line-h">'+(r.hours?r.hours+' ore':'')+'</span>'+(r.tipAvarie?'<span class="rc-line-obs">'+esc(r.tipAvarie)+'</span>':'');
+    for(var p=0;p<phs.length;p++){o+='<span class="rc-line-phw"><img class="rc-line-ph" src="'+phs[p]+'"/><button class="rc-line-phx" onclick="delRowPhoto('+x+','+p+')">×</button></span>'}
+    o+='<button class="rc-line-edit" onclick="editRow('+x+')">✎</button><button class="rc-card-del" onclick="dRow('+x+')">×</button></div>';
+    return o;
+  }
+  var o='<div class="rc-card"><div class="rc-card-top"><div class="rc-card-nr">'+(x+1)+'</div><input class="rc-name" value="'+esc(r.name)+'" placeholder="Element (ex: Bara fata)" onchange="uRow('+x+',\'name\',this.value)"/><button class="rc-card-del" onclick="dRow('+x+')">×</button></div>';
+  o+='<div class="op-btns">';
+  for(var i=0;i<ops.length;i++){o+='<button class="op-btn '+ops[i][2]+(r.op===ops[i][0]?' on':'')+'" onclick="setRowOp('+x+',\''+ops[i][0]+'\')">'+ops[i][1]+'</button>'}
+  o+='</div>';
+  o+='<div class="rc-row2"><div class="rc-ora"><input type="number" step="0.25" min="0" value="'+(r.hours||'')+'" onchange="uRow('+x+',\'hours\',this.value)"/><span class="rc-ora-lbl">ore</span></div><input class="rc-obs" value="'+esc(r.tipAvarie)+'" placeholder="Tip avarie / obs." onchange="uRow('+x+',\'tipAvarie\',this.value)"/></div>';
+  o+='<div class="rc-phs">';
+  for(var p=0;p<phs.length;p++){o+='<div class="rc-ph done"><img src="'+phs[p]+'"/><button class="rc-ph-del" onclick="delRowPhoto('+x+','+p+')">×</button></div>'}
+  o+='<div class="rc-ph"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg><input type="file" accept="image/*" capture="environment" onchange="addRowPhoto('+x+',event)"/></div>';
+  o+='</div><button class="rc-save" onclick="saveRow('+x+')">✓ Salveaza rand</button></div>';
+  return o;
+}
+
 function buildReconstText(){
   var rc=JOB.reconst||{},rows=rc.rows||[];
-  var t='*NOTA DE RECONSTATARE*\n_(constatare suplimentara a avariilor)_\n\n';
+  var t='*NOTA DE RECONSTATARE*\n';
+  t+='_(constatare suplimentara a avariilor)_\n\n';
   t+='*I. Dosar dauna*\n';
-  t+='Asigurator: '+(rc.asigurator||'—')+'\nNr. dosar: '+(rc.nrDosar||'—')+'\nPolita: '+(rc.polita||'—')+'\nInspector: '+(rc.inspector||'—')+'\nTel: '+(rc.telInsp||'—')+'\nPagubita: '+(rc.pagubita||JOB.proprietar||JOB.client||'—')+'\nService: '+(rc.service||'SC SZKALICZKI SERVICE SRL')+'\n\n';
-  t+='*II. Vehicul*\n🚗 '+(JOB.brand||JOB.auto||'')+' · '+(JOB.plate||'')+'\nVIN: '+(JOB.vin||'—')+'\nAn: '+(JOB.year||'—')+'\nData constatarii initiale: '+(rc.dataConst||'—')+'\nData reconstatarii: '+(rc.dataReconst||'—')+'\n\n';
+  t+='Asigurator: '+(rc.asigurator||'—')+'\n';
+  t+='Nr. dosar: '+(rc.nrDosar||'—')+'\n';
+  t+='Polita: '+(rc.polita||'—')+'\n';
+  t+='Inspector: '+(rc.inspector||'—')+'\n';
+  t+='Tel: '+(rc.telInsp||'—')+'\n';
+  t+='Pagubita: '+(rc.pagubita||JOB.proprietar||JOB.client||'—')+'\n';
+  t+='Service: '+(rc.service||'SC SZKALICZKI SERVICE SRL')+'\n\n';
+  t+='*II. Vehicul*\n';
+  t+='🚗 '+(JOB.brand||JOB.auto||'')+' · '+(JOB.plate||'')+'\n';
+  t+='VIN: '+(JOB.vin||'—')+'\n';
+  t+='An: '+(JOB.year||'—')+'\n';
+  t+='Data constatarii initiale: '+(rc.dataConst||'—')+'\n';
+  t+='Data reconstatarii: '+(rc.dataReconst||'—')+'\n\n';
   t+='*III. Elemente constatate suplimentar*\n';
-  if(rows.length){for(var x=0;x<rows.length;x++){var r=rows[x];t+=(x+1)+'. *'+r.name+'* — '+(r.op||'?')+' — '+(r.hours?r.hours+' ore':'?')+(r.tipAvarie?' — '+r.tipAvarie:'')+'\n'}}else t+='(nu sunt elemente)\n';
-  t+='\n*IV. Solicitare*\nVa solicitam analizarea de urgenta a prezentei note si actualizarea dosarului de dauna.\n\n📞 0265318020\n📍 SC SZKALICZKI SERVICE SRL\nStr. Petki David, Nr.27/A, Sangeorgiu de Mures\n\n_Fotografiile cu zonele afectate vor fi trimise separat._';
+  if(rows.length){
+    for(var x=0;x<rows.length;x++){
+      var r=rows[x];
+      t+=(x+1)+'. *'+r.name+'* — '+(r.op||'?')+' — '+(r.hours?r.hours+' ore':'?')+(r.tipAvarie?' — '+r.tipAvarie:'')+'\n';
+    }
+  }else t+='(nu sunt elemente)\n';
+  t+='\n*IV. Solicitare*\n';
+  t+='Va solicitam analizarea de urgenta a prezentei note si actualizarea dosarului de dauna.\n\n';
+  t+='📞 0265318020\n';
+  t+='📍 SC SZKALICZKI SERVICE SRL\n';
+  t+='Str. Petki David, Nr.27/A, Sangeorgiu de Mures\n\n';
+  t+='_Fotografiile cu zonele afectate vor fi trimise separat._';
   return t;
+}
+
+function loadJsPDF(){
+  if(window.jspdf&&window.jspdf.jsPDF)return Promise.resolve();
+  return new Promise(function(res,rej){
+    var s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js';
+    s.onload=res;s.onerror=function(){rej(new Error('jsPDF load failed'))};
+    document.head.appendChild(s);
+  });
+}
+
+async function buildReconstPdf(){
+  await loadJsPDF();
+  var rc=JOB.reconst||{},rows=rc.rows||[];
+  var doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'});
+  var y=18,L=15,W=180;
+  function line(txt,size,bold,color){
+    doc.setFontSize(size||10);doc.setFont(undefined,bold?'bold':'normal');
+    if(color)doc.setTextColor(color[0],color[1],color[2]);else doc.setTextColor(30,30,30);
+    var ls=doc.splitTextToSize(String(txt),W);
+    for(var i=0;i<ls.length;i++){if(y>282){doc.addPage();y=18}doc.text(ls[i],L,y);y+=(size||10)*0.5+0.6}
+  }
+  function gap(h){y+=(h||3)}
+  line('SC SZKALICZKI SERVICE SRL',11,true);
+  line('RO16250445 · Str. Petki David Nr.27/A, Sangeorgiu de Mures · Tel: 0265318020',8,false,[120,120,120]);
+  gap(1);doc.setDrawColor(220,38,38);doc.setLineWidth(0.8);doc.line(L,y,L+W,y);gap(4);
+  line('NOTA DE RECONSTATARE',16,true,[220,38,38]);
+  line('(constatare suplimentara a avariilor)',9,false,[120,120,120]);gap(3);
+  line('I. DOSAR DAUNA',11,true,[220,38,38]);gap(1);
+  line('Asigurator: '+(rc.asigurator||'—'));
+  line('Nr. dosar: '+(rc.nrDosar||'—')+'    Polita: '+(rc.polita||'—'));
+  line('Inspector: '+(rc.inspector||'—')+'    Tel: '+(rc.telInsp||'—'));
+  line('Persoana pagubita: '+(rc.pagubita||JOB.proprietar||JOB.client||'—'));gap(3);
+  line('II. VEHICUL',11,true,[220,38,38]);gap(1);
+  line((JOB.brand||JOB.auto||'')+'  ·  '+(JOB.plate||''));
+  line('VIN: '+(JOB.vin||'—')+'    An: '+(JOB.year||'—'));
+  line('Data reconstatarii: '+(rc.dataReconst||'—'));gap(3);
+  line('III. ELEMENTE CONSTATATE SUPLIMENTAR',11,true,[220,38,38]);gap(1);
+  if(rows.length){for(var x=0;x<rows.length;x++){var r=rows[x];var nf=(r.photos||[]).length;line((x+1)+'. '+(r.name||'—')+'  —  '+(r.op||'?')+'  —  '+(r.hours?r.hours+' ore':'?')+(r.tipAvarie?'  —  '+r.tipAvarie:'')+(nf?'  ('+nf+' foto)':''));}}
+  else line('(nu sunt elemente)');gap(3);
+  line('IV. SOLICITARE',11,true,[220,38,38]);gap(1);
+  line('Va solicitam analizarea de urgenta a prezentei note si actualizarea dosarului de dauna conform elementelor constatate suplimentar.');gap(6);
+  line('Data: '+new Date().toLocaleDateString('ro-RO')+'                    Unitatea reparatoare: SC SZKALICZKI SERVICE SRL',9,false,[80,80,80]);
+  return doc.output('datauristring').split(',')[1];
 }
 
 window.waReconst=function(){
@@ -299,20 +432,39 @@ window.waReconst=function(){
   if(!phone||phone.length<6){phone=prompt('Numar telefon asigurator / inspector:','');if(!phone)return}
   phone=phone.replace(/[^0-9]/g,'');
   if(phone.length&&phone[0]==='0')phone='40'+phone.slice(1);
-  var a=document.createElement('a');a.href='https://wa.me/'+phone+'?text='+encodeURIComponent(buildReconstText());a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();setTimeout(function(){document.body.removeChild(a)},100);
+  var _waA=document.createElement('a');_waA.href='https://wa.me/'+phone+'?text='+encodeURIComponent(buildReconstText());_waA.target='_blank';_waA.rel='noopener';document.body.appendChild(_waA);_waA.click();setTimeout(function(){document.body.removeChild(_waA)},100);
   if(JOB.reconst.status==='draft'){JOB.reconst.status='sent';saveJ();render()}
 };
 
-window.emailReconst=function(){
+window.emailReconst=async function(){
   if(!JOB)return;
   var rc=JOB.reconst||{};
   var to=rc.emailInsp||'';
   if(!to){var em=(rc.telInsp||'').match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);to=em?em[0]:''}
-  if(!to){to=prompt('Email inspector / asigurator:','');if(!to)return}
+  if(!to){to=prompt('Email asigurator:','');if(!to)return}
+  var cfg={};try{cfg=JSON.parse(localStorage.getItem('rpw_config')||'{}')}catch(e){}
+  var fromName=cfg.unitate||'SC SZKALICZKI SERVICE SRL';
+  var replyTo=cfg.email||'';
   var subj='Nota de reconstatare — '+(JOB.plate||'')+' — Dosar '+(rc.nrDosar||'');
-  var body=buildReconstText().replace(/\*/g,'').replace(/_/g,'').replace(/[🚗📞📍]/g,'');
-  var a=document.createElement('a');a.href='mailto:'+to+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(body);document.body.appendChild(a);a.click();setTimeout(function(){document.body.removeChild(a)},100);
-  if(JOB.reconst.status==='draft'){JOB.reconst.status='sent';saveJ();render()}
+  var body='Buna ziua,\n\nAtasat va transmitem Nota de Reconstatare si fotografiile aferente pentru dosarul de dauna '+(rc.nrDosar||'—')+', autovehicul '+(JOB.brand||JOB.auto||'')+' '+(JOB.plate||'')+'.\n\nVa rugam sa analizati documentatia si sa actualizati dosarul de dauna conform elementelor constatate suplimentar.\n\nCu stima,\n'+fromName+'\nTel: 0265318020\nStr. Petki David Nr.27/A, Sangeorgiu de Mures';
+  toast('Se genereaza si se trimite...');
+  try{
+    var pdfB64=await buildReconstPdf();
+    var atts=[{filename:'Nota_reconstatare_'+(JOB.plate||'auto').replace(/[^A-Za-z0-9]/g,'')+'.pdf',content:pdfB64}];
+    var photos=JOB.reconstPhotos||[];
+    for(var x=0;x<photos.length;x++){if(photos[x]&&photos[x].data&&photos[x].data.indexOf(',')>0){atts.push({filename:'foto_'+(x+1)+'.jpg',content:photos[x].data.split(',')[1]})}}
+    var rws=(JOB.reconst&&JOB.reconst.rows)||[];
+    for(var ri=0;ri<rws.length;ri++){
+      var rp=rws[ri].photos||[];
+      var nmF=String(rws[ri].name||('element_'+(ri+1))).replace(/[^A-Za-z0-9]+/g,'_').replace(/^_+|_+$/g,'').slice(0,30)||('element_'+(ri+1));
+      for(var pi=0;pi<rp.length;pi++){if(rp[pi]&&rp[pi].indexOf(',')>0)atts.push({filename:(ri+1)+'_'+nmF+'_'+(pi+1)+'.jpg',content:rp[pi].split(',')[1]})}
+    }
+    var res=await fetch('/.netlify/functions/sendmail',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to:to,from_name:fromName,reply_to:replyTo,subject:subj,text:body,attachments:atts})});
+    var data=await res.json().catch(function(){return{}});
+    if(!res.ok||!data.ok){toast('Eroare email: '+(data.error||res.status),1);return}
+    toast('Email trimis ✓ ('+atts.length+' atasamente)');
+    if(JOB.reconst.status==='draft'){JOB.reconst.status='sent';await saveJ();render()}
+  }catch(e){toast('Eroare: '+e.message,1)}
 };
 
 window.shareReconst=async function(){
@@ -320,7 +472,11 @@ window.shareReconst=async function(){
   var photos=JOB.reconstPhotos||[],files=[];
   for(var x=0;x<photos.length;x++){
     if(photos[x]&&photos[x].data){
-      try{var resp=await fetch(photos[x].data);var blob=await resp.blob();files.push(new File([blob],'reconst_'+(x+1)+'.jpg',{type:'image/jpeg'}))}catch(e){}
+      try{
+        var resp=await fetch(photos[x].data);
+        var blob=await resp.blob();
+        files.push(new File([blob],'reconst_'+(x+1)+'.jpg',{type:'image/jpeg'}));
+      }catch(e){}
     }
   }
   if(!files.length){toast('Nu sunt fotografii',1);return}

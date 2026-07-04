@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="rpw-config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -93,8 +94,8 @@ html,body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);m
 <body>
 <div id="app"><div class="loading">Se incarca...</div></div>
 <script>
-var SB_URL='https://pxypbbvqinbwesfikkdb.supabase.co';
-var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB4eXBiYnZxaW5id2VzZmlra2RiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEwMjMwNzIsImV4cCI6MjA4NjU5OTA3Mn0.WZBdbr-YBxLq1ALnHY2weFQ7j2JhUUj6hOUGkuuErnQ';
+var SB_URL=RPW_CFG.SB_URL;
+var SB_KEY=RPW_CFG.SB_KEY;
 var sb=supabase.createClient(SB_URL,SB_KEY);
 var JOB=null,S={ts:null,te:0,showExp:0,expSel:{talon:1,buletin:1,constatare:1,customDocs:1,overview:1,elements:1,closingPhotos:1,dataHTML:1},expLoading:0,expProgress:0};
 
@@ -452,7 +453,7 @@ async function getPhotoBlob(key){
   if(urls[key]){var b=await fetchBlob(urls[key]);if(b)return b}
   // Ha nincs URL de van storage key, szerezd meg a publikus URL-t
   if(keys[key] && window.sb){
-    try{var pub=sb.storage.from('rpw-photos').getPublicUrl(keys[key]).data.publicUrl;var b2=await fetchBlob(pub);if(b2)return b2}catch(e){}
+    try{var pub=sb.storage.from(RPW_CFG.BUCKET).getPublicUrl(keys[key]).data.publicUrl;var b2=await fetchBlob(pub);if(b2)return b2}catch(e){}
   }
   return null;
 }
