@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23E11D2E'/><circle cx='50' cy='50' r='18' fill='%23fff'/></svg>" type="image/svg+xml">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#FAF8F5">
+<title>RedAssistance — Ops</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#FAF8F5;--w:#fff;--r:#E11D2E;--bad:#C81E33;--y:#A6701F;--yl:#FAEFD8;--t:#0F141A;--t2:#3F4956;--t3:#6B7280;--b:#E8EBEF;--b2:#D7DBE2}
+html,body{height:100%;font-family:'Geist',system-ui,sans-serif;background:var(--bg);color:var(--t);-webkit-tap-highlight-color:transparent}
+body{display:flex;flex-direction:column;height:100dvh;overflow:hidden}
+.hdr{background:var(--w);border-bottom:1px solid var(--b);padding:9px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0}
+.title{font-size:15px;font-weight:700;letter-spacing:-.01em}.title span{color:var(--r)}
+.b-back{border:1px solid var(--b2);background:var(--w);color:var(--t2);border-radius:8px;padding:7px 13px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.tabs{display:flex;gap:6px;padding:8px 16px;background:var(--w);border-bottom:1px solid var(--b);flex-shrink:0}
+.tab{flex:1;border:1px solid var(--b);background:var(--w);color:var(--t2);border-radius:8px;padding:9px 8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px}
+.tab:hover{background:var(--bg)}
+.tab.on{background:var(--r);border-color:var(--r);color:#fff}
+.tab.tab-warn.on{background:var(--y);border-color:var(--y)}
+.tab .em{font-size:14px}
+.frame-wrap{flex:1;position:relative;background:var(--bg)}
+#frame{width:100%;height:100%;border:none;display:block}
+.reload{position:absolute;top:8px;right:12px;z-index:2;background:var(--w);border:1px solid var(--b2);color:var(--t2);border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 2px 8px rgba(15,20,26,.08)}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="title"><span>Red</span>Assistance — Ops</div>
+  <button class="b-back" onclick="location.assign('index.html')">← Panou</button>
+</div>
+<div class="tabs">
+  <button class="tab on" id="tab-health" onclick="go('rpw-health.html','health')"><span class="em">🩺</span> Health</button>
+  <button class="tab" id="tab-diag" onclick="go('rpw-diag.html','diag')"><span class="em">🔍</span> Diagnostic</button>
+  <button class="tab tab-warn" id="tab-clean" onclick="go('rpw-cleanup.html','clean')"><span class="em">🧹</span> Curatare</button>
+</div>
+<div class="frame-wrap">
+  <button class="reload" onclick="reloadFrame()" title="Reincarca">↻</button>
+  <iframe id="frame" src="rpw-health.html" title="Ops"></iframe>
+</div>
+<script>
+var CUR='rpw-health.html';
+function go(url,key){
+  CUR=url;
+  document.getElementById('frame').src=url;
+  ['health','diag','clean'].forEach(function(k){
+    document.getElementById('tab-'+k).classList.toggle('on',k===key);
+  });
+}
+function reloadFrame(){document.getElementById('frame').src=CUR}
+</script>
+</body>
+</html>
