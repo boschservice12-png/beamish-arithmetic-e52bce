@@ -321,7 +321,7 @@ actions:{ro:'Actiuni',en:'Actions',hu:'Muveletek'},
 noJobs:{ro:'Nu sunt lucrari',en:'No jobs',hu:'Nincs munka'},
 addFirst:{ro:'Adauga prima lucrare',en:'Add first job',hu:'Vegyel fel munkat'},
 panou:{ro:'Programări',en:'Schedule',hu:'Programok'},lucrari:{ro:'Lucrari',en:'Jobs',hu:'Munkak'},
-parametri:{ro:'Parametri',en:'Parameters',hu:'Parameterek'},
+parametri:{ro:'Parametri',en:'Parameters',hu:'Parameterek'},health:{ro:'Health',en:'Health',hu:'Health'},
 prm_label:{ro:'CONFIGURARE',en:'CONFIGURATION',hu:'BEALLITASOK'},
 prm_title:{ro:'Parametrii unitatii',en:'Unit parameters',hu:'Egyseg parameterek'},
 prm_firma:{ro:'Date firma',en:'Company data',hu:'Cegadatok'},
@@ -547,6 +547,7 @@ function sbNav(active){
     it('lucrari',IC.jobs,T('lucrari'),'lucrari')+
     it('statistici',IC.stats,T('statistici'),'statistici')+
     it('parametri',IC.params,T('parametri'),'parametri')+
+    (isAdmin()?'<div class="sb-item" onclick="location.assign(\'rpw-health.html\')"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><span>'+T('health')+'</span></div>':'')+
     '</div><div style="padding:6px 4px;border-top:1px solid var(--b)"><div class="sb-item'+(isAdmin()?' sb-admin-on':'')+'" onclick="toggleAdmin()"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="'+(isAdmin()?'M7 11V7a5 5 0 019.9-1':'M7 11V7a5 5 0 0110 0v4')+'"/></svg><span>'+(isAdmin()?'ADMIN ✓':T('admin_lbl'))+'</span></div></div><div class="sb-lang"><button class="lb '+(ln==='ro'?'on':'')+'" onclick="sL(\'ro\')">RO</button><button class="lb '+(ln==='en'?'on':'')+'" onclick="sL(\'en\')">EN</button><button class="lb '+(ln==='hu'?'on':'')+'" onclick="sL(\'hu\')">HU</button></div></div>';
 }
 
