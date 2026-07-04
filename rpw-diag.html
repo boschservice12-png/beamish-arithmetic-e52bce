@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23E11D2E'/><circle cx='50' cy='50' r='18' fill='%23fff'/></svg>" type="image/svg+xml">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#FAF8F5">
+<title>RedAssistance — Diagnostic date (read-only)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="rpw-config.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#FAF8F5;--w:#fff;--r:#E11D2E;--r50:#FDF3F4;--bad:#C81E33;--g:#1E9D55;--gl:#E1F4E8;--y:#A6701F;--yl:#FAEFD8;--t:#0F141A;--t2:#3F4956;--t3:#6B7280;--b:#E8EBEF;--b2:#D7DBE2;--rd:10px}
+html,body{font-family:'Geist',system-ui,sans-serif;background:var(--bg);color:var(--t);padding:16px;-webkit-tap-highlight-color:transparent}
+.mono{font-family:'Geist Mono',ui-monospace,monospace}
+.wrap{max-width:920px;margin:0 auto}
+h1{font-size:19px;font-weight:700;letter-spacing:-.01em}h1 span{color:var(--r)}
+.ro-banner{margin:8px 0 14px;padding:8px 12px;background:var(--gl);border:1px solid #BFE5CD;border-radius:8px;font-size:11px;font-weight:600;color:#14753F}
+.ro-banner .mono{font-size:10px;color:var(--t3);font-weight:500}
+.sum{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.sum-c{flex:1;min-width:130px;background:var(--w);border:1px solid var(--b);border-radius:var(--rd);padding:10px 14px}
+.sum-l{font-family:'Geist Mono',ui-monospace,monospace;font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--t3);font-weight:600}
+.sum-v{font-family:'Geist Mono',ui-monospace,monospace;font-size:22px;font-weight:700;margin-top:2px}
+.sum-c.bad .sum-v{color:var(--bad)}.sum-c.ok .sum-v{color:var(--g)}
+.sec-t{font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--r);margin:18px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;align-items:center}
+.badge{font-family:'Geist Mono',ui-monospace,monospace;font-size:10px;font-weight:600;padding:3px 10px;border-radius:999px}
+.badge.bad{background:var(--r50);color:var(--bad)}.badge.ok{background:var(--gl);color:#14753F}
+.card{background:var(--w);border:1px solid var(--b);border-radius:var(--rd);padding:12px 14px;margin-bottom:8px;border-left:3px solid var(--bad)}
+.card.okc{border-left-color:var(--g)}
+.card-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.card-id{font-family:'Geist Mono',ui-monospace,monospace;font-size:13px;font-weight:700}
+.card-meta{font-family:'Geist Mono',ui-monospace,monospace;font-size:10px;color:var(--t3)}
+.kv{margin-top:8px;font-size:12px;line-height:1.6}
+.kv b{font-family:'Geist Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:var(--t3);font-weight:600}
+.reason{margin-top:6px;padding:6px 10px;background:var(--r50);border:1px solid #F5CBD0;border-radius:6px;font-size:11px;color:var(--bad);font-weight:600}
+.phline{font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;color:var(--t2);margin-top:4px;word-break:break-word}
+.pathrow{font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;padding:4px 0;border-bottom:1px dashed var(--b);display:flex;justify-content:space-between;gap:8px}
+.pathrow:last-child{border-bottom:none}
+.pathrow .sz{color:var(--y);font-weight:600;white-space:nowrap}
+.loading{text-align:center;padding:50px;color:var(--t3);font-size:14px}
+.foot{margin-top:18px;font-size:10px;color:var(--t3);text-align:center;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1><span>Red</span>Assistance — Diagnostic date</h1>
+<div class="ro-banner">🔒 READ-ONLY — aceasta pagina doar CITESTE (select). NU scrie niciodata in baza de date.<br><span class="mono">Sursa: rpw-config.js → rpw_jobs</span></div>
+<div id="app"><div class="loading">Se scaneaza...</div></div>
+<div class="foot">Diagnostic C1 (integritate faze) + C2 (base64 in blob) · calc local, fara modificari</div>
+</div>
+<script>
+var sb=supabase.createClient(RPW_CFG.SB_URL,RPW_CFG.SB_KEY);
+
+// ── recursiv: gaseste toate stringurile cu 'data:image' + calea + lungimea ──
+function findB64(obj,path,out){
+  if(typeof obj==='string'){ if(obj.indexOf('data:image')>=0)out.push({path:path||'(root)',len:obj.length}); return; }
+  if(Array.isArray(obj)){ for(var idx=0;idx<obj.length;idx++)findB64(obj[idx],path+'['+idx+']',out); return; }
+  if(obj&&typeof obj==='object'){ for(var k in obj){ if(Object.prototype.hasOwnProperty.call(obj,k))findB64(obj[k],path?path+'.'+k:k,out); } }
+}
+function mb(bytes){return (bytes/1048576).toFixed(2)}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+// ── C1: integritate faze (identic cu health.html:199) + motivul exact ──
+function diagC1(d){
+  var t=typeof d.phase, ph=d.phase, phasesObj=d.phases;
+  var phaseNumOk=(t==='number'&&ph>=1&&ph<=7);
+  var phasesOk=(phasesObj&&typeof phasesObj==='object');
+  if(phaseNumOk&&phasesOk)return null; // OK
+  var reasons=[];
+  if(t!=='number')reasons.push('phase NU e numar (tip: '+t+', valoare: '+esc(JSON.stringify(ph))+')');
+  else if(ph<1||ph>7)reasons.push('phase in afara intervalului 1–7: '+ph);
+  if(!phasesOk)reasons.push('phases lipseste sau nu e obiect (tip: '+typeof phasesObj+')');
+  // stare faze daca exista
+  var phInfo='';
+  if(phasesOk){var parts=[];for(var p=1;p<=7;p++){var e=phasesObj[p];parts.push(p+':'+((e&&e.status)||'—'))}phInfo=parts.join('  ')}
+  return {reason:reasons.join(' | '),phaseRaw:esc(JSON.stringify(ph)),phasesInfo:phInfo};
+}
+
+async function run(){
+  var app=document.getElementById('app');
+  if(typeof RPW_CFG==='undefined'){app.innerHTML='<div class="reason">RPW_CFG lipseste (rpw-config.js nu s-a incarcat).</div>';return}
+  var res;
+  try{ res=await sb.from('rpw_jobs').select('id,data,updated_at').order('updated_at',{ascending:false}); }
+  catch(e){ app.innerHTML='<div class="reason">Eroare conexiune: '+esc(e.message||e)+'</div>'; return; }
+  if(res.error){ app.innerHTML='<div class="reason">Eroare: '+esc(res.error.message||res.error)+'</div>'; return; }
+  var rows=res.data||[];
+  var c1=[],c2=[];
+  rows.forEach(function(row){
+    var d=row.data||{};
+    var id=d.number||d.id||row.id;
+    // C1
+    var r1=diagC1(d);
+    if(r1)c1.push({id:id,uid:row.id,det:r1});
+    // C2
+    var out=[]; try{findB64(d,'',out)}catch(e){}
+    if(out.length){
+      var blob=0; try{blob=JSON.stringify(d).length}catch(e){}
+      out.sort(function(a,b){return b.len-a.len});
+      c2.push({id:id,uid:row.id,blob:blob,paths:out});
+    }
+  });
+
+  var h='';
+  // Summary
+  h+='<div class="sum">';
+  h+='<div class="sum-c"><div class="sum-l">Lucrari scanate</div><div class="sum-v">'+rows.length+'</div></div>';
+  h+='<div class="sum-c '+(c1.length?'bad':'ok')+'"><div class="sum-l">C1 · faze sparte</div><div class="sum-v">'+c1.length+'</div></div>';
+  h+='<div class="sum-c '+(c2.length?'bad':'ok')+'"><div class="sum-l">C2 · base64 in blob</div><div class="sum-v">'+c2.length+'</div></div>';
+  h+='</div>';
+
+  // C1
+  h+='<div class="sec-t"><span>C1 — Integritate faze (1–7)</span><span class="badge '+(c1.length?'bad':'ok')+'">'+(c1.length?c1.length+' cu problema':'OK')+'</span></div>';
+  if(!c1.length)h+='<div class="card okc"><div class="kv">Toate lucrarile au phase 1–7 valid + obiect phases. ✓</div></div>';
+  c1.forEach(function(j){
+    h+='<div class="card"><div class="card-h"><span class="card-id">'+esc(j.id)+'</span><span class="card-meta">uid: '+esc(j.uid)+'</span></div>';
+    h+='<div class="reason">'+esc(j.det.reason)+'</div>';
+    h+='<div class="phline"><b>phase (brut):</b> '+j.det.phaseRaw+'</div>';
+    if(j.det.phasesInfo)h+='<div class="phline"><b>phases:</b> '+esc(j.det.phasesInfo)+'</div>';
+    h+='</div>';
+  });
+
+  // C2
+  h+='<div class="sec-t"><span>C2 — Base64 in blob (foto NU in JSON)</span><span class="badge '+(c2.length?'bad':'ok')+'">'+(c2.length?c2.length+' cu base64':'OK')+'</span></div>';
+  if(!c2.length)h+='<div class="card okc"><div class="kv">Nicio lucrare nu are data:image in JSON. ✓</div></div>';
+  c2.forEach(function(j){
+    h+='<div class="card"><div class="card-h"><span class="card-id">'+esc(j.id)+'</span><span class="card-meta">blob total: '+mb(j.blob)+' MB · '+j.paths.length+' imagini base64</span></div>';
+    h+='<div class="kv"><b>Unde e base64 (camp → marime):</b></div>';
+    j.paths.forEach(function(p){ h+='<div class="pathrow"><span>'+esc(p.path)+'</span><span class="sz">'+mb(p.len)+' MB</span></div>'; });
+    h+='</div>';
+  });
+
+  app.innerHTML=h;
+}
+run();
+</script>
+</body>
+</html>
