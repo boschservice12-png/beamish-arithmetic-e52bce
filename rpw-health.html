@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23dc2626'/><circle cx='50' cy='50' r='18' fill='%23fff'/></svg>" type="image/svg+xml">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RedAssistance — Health / Autoaudit</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="rpw-config.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f5f5f3;--w:#fff;--r:#dc2626;--r50:#fef2f2;--r100:#fee2e2;--r700:#b91c1c;--g:#16a34a;--gl:#dcfce7;--y:#ca8a04;--yl:#fef9c3;--t:#1a1a1a;--t2:#555;--t3:#999;--b:#e5e5e5;--b2:#d0d0d0;--rd:10px}
+body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--bg);color:var(--t);padding:16px;max-width:820px;margin:0 auto;-webkit-tap-highlight-color:transparent}
+.hdr{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.title{font-size:18px;font-weight:800}.title span{color:var(--r)}
+.sub{font-size:11px;color:var(--t3);margin-top:2px}
+.btns{display:flex;gap:8px}
+button{border:none;border-radius:8px;padding:9px 16px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit}
+.b-run{background:var(--r);color:#fff}.b-run:disabled{opacity:.5;cursor:default}
+.b-back{background:var(--w);border:1px solid var(--b2);color:var(--t2)}
+.summary{background:var(--w);border:1px solid var(--b);border-radius:var(--rd);padding:16px;margin-bottom:12px;display:flex;align-items:center;gap:14px}
+.sum-dot{width:44px;height:44px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.sum-dot svg{width:24px;height:24px;stroke:#fff;fill:none;stroke-width:3}
+.sum-dot.ok{background:var(--g)}.sum-dot.no{background:var(--r)}.sum-dot.run{background:var(--y)}
+.sum-txt{flex:1}.sum-h{font-size:15px;font-weight:800}.sum-s{font-size:12px;color:var(--t2);margin-top:2px}
+.grp{background:var(--w);border:1px solid var(--b);border-radius:var(--rd);margin-bottom:12px;overflow:hidden}
+.grp-h{padding:12px 14px;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;align-items:center}
+.grp-t{font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--r)}
+.grp-badge{font-size:11px;font-weight:800;padding:3px 10px;border-radius:12px}
+.gb-ok{background:var(--gl);color:var(--g)}.gb-no{background:var(--r100);color:var(--r)}.gb-run{background:var(--yl);color:var(--y)}
+.row{padding:10px 14px;display:flex;align-items:flex-start;gap:10px;border-top:1px solid var(--bg)}
+.dot{width:20px;height:20px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.dot svg{width:11px;height:11px;stroke-width:3.2;fill:none}
+.dot.ok{background:var(--g)}.dot.ok svg{stroke:#fff}
+.dot.no{background:var(--r100)}.dot.no svg{stroke:var(--r)}
+.dot.run{background:var(--yl)}.dot.run svg{stroke:var(--y)}
+.rtxt{flex:1}.rlbl{font-size:13px;font-weight:700}.rdet{font-size:11px;color:var(--t2);margin-top:2px;line-height:1.5;word-break:break-word}
+.rdet.bad{color:var(--r700);font-weight:600}
+.foot{font-size:10px;color:var(--t3);text-align:center;margin-top:14px;line-height:1.6}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div>
+    <div class="title"><span>Red</span>Assistance — Health / Autoaudit</div>
+    <div class="sub">Verificare read-only a integritatii sistemului. Nu modifica nimic.</div>
+  </div>
+  <div class="btns">
+    <button class="b-back" onclick="location.assign('index.html')">← Panou</button>
+    <button class="b-run" id="runBtn" onclick="runAll()">↻ Verifica din nou</button>
+  </div>
+</div>
+
+<div class="summary">
+  <div class="sum-dot run" id="sumDot"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg></div>
+  <div class="sum-txt">
+    <div class="sum-h" id="sumH">Se verifica...</div>
+    <div class="sum-s" id="sumS">Rulez toate verificarile A / B / C</div>
+  </div>
+</div>
+
+<div id="groups"></div>
+
+<div class="foot">
+  Read-only: aceasta pagina doar CITESTE (select / list / fetch), nu scrie niciodata in baza de date.<br>
+  Sursa unica de adevar: <span class="mono" id="cfgLine">rpw-config.js</span>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+// RedAssistance Paint Workflow — HEALTH / AUTOAUDIT (Faza 3)
+// Read-only. Nu modifica niciun fisier, nu scrie in DB.
+// ─────────────────────────────────────────────────────────────
+var CANON={url:'https://pxypbbvqinbwesfikkdb.supabase.co',tbl:'rpw_jobs',bucket:'rpw-photos'};
+var PAGES=['index.html','rpw-recepcio.html','rpw-evaluare.html','rpw-reconstatare.html','rpw-tinichigerie.html','rpw-vopsitorie.html','rpw-control.html','rpw-inchidere.html','rpw-deviz.html','rpw-dosar.html','rpw-import.html','rpw-recovery.html'];
+var BAD_REF='zwsjfzqtskicrukidaog';   // proiectul vechi, arhivat
+var SCAN_N=20;                          // ultimele N lucrari scanate
+
+var sb=null;
+var ICO_CHK='<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
+var ICO_X='<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+var ICO_DOT='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/></svg>';
+
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+// egy sor allapota: 'ok' | 'no' | 'run'
+function mkRow(st,lbl,det,bad){
+  var ic=st==='ok'?ICO_CHK:st==='no'?ICO_X:ICO_DOT;
+  return '<div class="row"><div class="dot '+st+'">'+ic+'</div><div class="rtxt"><div class="rlbl">'+esc(lbl)+'</div>'+(det?'<div class="rdet'+(bad?' bad':'')+'">'+esc(det)+'</div>':'')+'</div></div>';
+}
+function renderGroup(id,title,rows){
+  var allOk=rows.every(function(r){return r.st==='ok'});
+  var anyRun=rows.some(function(r){return r.st==='run'});
+  var badge=anyRun?'<span class="grp-badge gb-run">…</span>':(allOk?'<span class="grp-badge gb-ok">OK</span>':'<span class="grp-badge gb-no">PROBLEMA</span>');
+  var h='<div class="grp"><div class="grp-h"><div class="grp-t">'+title+'</div>'+badge+'</div>';
+  rows.forEach(function(r){h+=mkRow(r.st,r.lbl,r.det,r.bad)});
+  h+='</div>';
+  return {html:h,ok:allOk,run:anyRun};
+}
+
+var RESULT={A:[],B:[],C:[]};
+
+function paint(){
+  var gA=renderGroup('A','A — Config & conexiune',RESULT.A);
+  var gB=renderGroup('B','B — Paza drift pagini (12)',RESULT.B);
+  var gC=renderGroup('C','C — Sanatate date (ultimele '+SCAN_N+')',RESULT.C);
+  document.getElementById('groups').innerHTML=gA.html+gB.html+gC.html;
+  var anyRun=gA.run||gB.run||gC.run;
+  var allOk=gA.ok&&gB.ok&&gC.ok;
+  var sd=document.getElementById('sumDot'),sh=document.getElementById('sumH'),ss=document.getElementById('sumS');
+  if(anyRun){sd.className='sum-dot run';sd.innerHTML=ICO_DOT;sh.textContent='Se verifica...';ss.textContent='Rulez verificarile A / B / C';}
+  else if(allOk){sd.className='sum-dot ok';sd.innerHTML=ICO_CHK;sh.textContent='Sistem sanatos';ss.textContent='Toate verificarile A / B / C au trecut.';}
+  else{sd.className='sum-dot no';sd.innerHTML=ICO_X;sh.textContent='Atentie — probleme detectate';ss.textContent='Vezi randurile rosii mai jos.';}
+}
+
+// ── GRUPA A ──────────────────────────────────────────────────
+async function checkA(){
+  RESULT.A=[
+    {st:'run',lbl:'A1 — rpw-config.js incarcat (RPW_CFG)'},
+    {st:'run',lbl:'A2 — RPW_CFG = valoare canonica'},
+    {st:'run',lbl:'A3 — Conexiune Supabase (rpw_jobs)'},
+    {st:'run',lbl:'A4 — Bucket rpw-photos accesibil'}
+  ];paint();
+
+  // A1
+  var hasCfg=(typeof window.RPW_CFG!=='undefined' && window.RPW_CFG && RPW_CFG.SB_URL);
+  RESULT.A[0]=hasCfg
+    ?{st:'ok',lbl:'A1 — rpw-config.js incarcat (RPW_CFG)',det:'RPW_CFG prezent.'}
+    :{st:'no',lbl:'A1 — rpw-config.js incarcat (RPW_CFG)',det:'RPW_CFG lipseste — pagina nu se poate conecta.',bad:true};
+  paint();
+  if(!hasCfg){RESULT.A[1]={st:'no',lbl:'A2 — RPW_CFG = valoare canonica',det:'Fara RPW_CFG.',bad:true};RESULT.A[2]={st:'no',lbl:'A3 — Conexiune Supabase (rpw_jobs)',det:'Fara config.',bad:true};RESULT.A[3]={st:'no',lbl:'A4 — Bucket rpw-photos accesibil',det:'Fara config.',bad:true};paint();return false;}
+
+  // A2
+  var okUrl=RPW_CFG.SB_URL===CANON.url, okBuk=RPW_CFG.BUCKET===CANON.bucket;
+  RESULT.A[1]=(okUrl&&okBuk)
+    ?{st:'ok',lbl:'A2 — RPW_CFG = valoare canonica',det:CANON.url+' / '+CANON.tbl+' / '+CANON.bucket}
+    :{st:'no',lbl:'A2 — RPW_CFG = valoare canonica',det:'Config diferit de canonic! URL:'+RPW_CFG.SB_URL+' bucket:'+RPW_CFG.BUCKET,bad:true};
+  paint();
+
+  // client
+  try{sb=supabase.createClient(RPW_CFG.SB_URL,RPW_CFG.SB_KEY);}catch(e){sb=null;}
+
+  // A3
+  try{
+    var q=await sb.from('rpw_jobs').select('id',{count:'exact',head:true});
+    if(q.error)throw q.error;
+    RESULT.A[2]={st:'ok',lbl:'A3 — Conexiune Supabase (rpw_jobs)',det:(q.count!=null?q.count:'?')+' lucrari pe server.'};
+  }catch(e){RESULT.A[2]={st:'no',lbl:'A3 — Conexiune Supabase (rpw_jobs)',det:'Eroare: '+(e.message||e),bad:true};}
+  paint();
+
+  // A4
+  try{
+    var l=await sb.storage.from(RPW_CFG.BUCKET).list('',{limit:1});
+    if(l.error)throw l.error;
+    RESULT.A[3]={st:'ok',lbl:'A4 — Bucket rpw-photos accesibil',det:'Storage raspunde.'};
+  }catch(e){RESULT.A[3]={st:'no',lbl:'A4 — Bucket rpw-photos accesibil',det:'Eroare: '+(e.message||e),bad:true};}
+  paint();
+  return RESULT.A.every(function(r){return r.st==='ok'});
+}
+
+// ── GRUPA B ──────────────────────────────────────────────────
+async function checkB(){
+  var reach=0,cfg=0,litBad=0,zwsjBad=0,fail=[];
+  RESULT.B=[{st:'run',lbl:'B — se descarca cele 12 pagini...'}];paint();
+  for(var idx=0;idx<PAGES.length;idx++){
+    var pg=PAGES[idx];
+    try{
+      var r=await fetch(pg,{cache:'no-store'});
+      if(!r.ok)throw new Error('HTTP '+r.status);
+      reach++;
+      var txt=await r.text();
+      if(txt.indexOf('rpw-config.js')>=0)cfg++;else fail.push(pg+' (fara config)');
+      if(txt.indexOf('pxypbbvqinbwesfikkdb')>=0){litBad++;fail.push(pg+' (URL beton)');}
+      if(txt.indexOf(BAD_REF)>=0){zwsjBad++;fail.push(pg+' (zwsj!)');}
+    }catch(e){fail.push(pg+' ('+(e.message||e)+')');}
+  }
+  RESULT.B=[
+    reach===PAGES.length?{st:'ok',lbl:'B1 — toate cele 12 pagini accesibile',det:reach+'/'+PAGES.length+' (200)'}:{st:'no',lbl:'B1 — toate cele 12 pagini accesibile',det:reach+'/'+PAGES.length+' accesibile',bad:true},
+    cfg===PAGES.length?{st:'ok',lbl:'B2 — toate incarca rpw-config.js',det:cfg+'/'+PAGES.length}:{st:'no',lbl:'B2 — toate incarca rpw-config.js',det:cfg+'/'+PAGES.length+' au include-ul',bad:true},
+    litBad===0?{st:'ok',lbl:'B3 — fara URL DB beton in HTML',det:'0 literal pxyp'}:{st:'no',lbl:'B3 — fara URL DB beton in HTML',det:litBad+' pagini cu URL beton (drift!)',bad:true},
+    zwsjBad===0?{st:'ok',lbl:'B4 — fara referinta zwsj (proiect vechi)',det:'0 referinte zwsj'}:{st:'no',lbl:'B4 — fara referinta zwsj (proiect vechi)',det:zwsjBad+' pagini cu zwsj — REGRESIE!',bad:true}
+  ];
+  if(fail.length)RESULT.B.push({st:'no',lbl:'Detalii probleme',det:fail.join(' · '),bad:true});
+  paint();
+  return RESULT.B.every(function(r){return r.st==='ok'});
+}
+
+// ── GRUPA C ──────────────────────────────────────────────────
+async function checkC(){
+  RESULT.C=[{st:'run',lbl:'C — se scaneaza ultimele '+SCAN_N+' lucrari...'}];paint();
+  if(!sb){RESULT.C=[{st:'no',lbl:'C — scanare date',det:'Fara conexiune (vezi A3).',bad:true}];paint();return false;}
+  try{
+    var q=await sb.from('rpw_jobs').select('id,data,updated_at').order('updated_at',{ascending:false}).limit(SCAN_N);
+    if(q.error)throw q.error;
+    var rows=q.data||[],n=rows.length,phBad=[],b64Bad=[];
+    rows.forEach(function(row){
+      var d=row.data||{};
+      var phOk=(typeof d.phase==='number'&&d.phase>=1&&d.phase<=7&&d.phases&&typeof d.phases==='object');
+      if(!phOk)phBad.push(row.id);
+      try{if(JSON.stringify(d).indexOf('data:image')>=0)b64Bad.push(row.id);}catch(e){}
+    });
+    RESULT.C=[
+      {st:'ok',lbl:'C0 — lucrari scanate',det:n+' lucrari (cele mai recente)'},
+      phBad.length===0?{st:'ok',lbl:'C1 — integritate faze (1–7)',det:'toate OK'}:{st:'no',lbl:'C1 — integritate faze (1–7)',det:phBad.length+' cu problema: '+phBad.join(', '),bad:true},
+      b64Bad.length===0?{st:'ok',lbl:'C2 — paza base64 (foto NU in JSON)',det:'0 lucrari cu data:image in blob'}:{st:'no',lbl:'C2 — paza base64 (foto NU in JSON)',det:b64Bad.length+' cu base64 in blob: '+b64Bad.join(', '),bad:true}
+    ];
+  }catch(e){RESULT.C=[{st:'no',lbl:'C — scanare date',det:'Eroare: '+(e.message||e),bad:true}];}
+  paint();
+  return RESULT.C.every(function(r){return r.st==='ok'});
+}
+
+async function runAll(){
+  var btn=document.getElementById('runBtn');btn.disabled=true;
+  RESULT={A:[{st:'run',lbl:'…'}],B:[{st:'run',lbl:'…'}],C:[{st:'run',lbl:'…'}]};paint();
+  try{await checkA();await checkB();await checkC();}
+  catch(e){console.error(e);}
+  btn.disabled=false;paint();
+}
+
+// init
+(function(){
+  if(typeof window.RPW_CFG!=='undefined'&&window.RPW_CFG&&RPW_CFG.SB_URL){
+    document.getElementById('cfgLine').textContent='rpw-config.js → '+RPW_CFG.SB_URL;
+  }
+  runAll();
+})();
+</script>
+</body>
+</html>
