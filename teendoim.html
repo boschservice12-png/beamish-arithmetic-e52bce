@@ -112,12 +112,32 @@ function fail(r){if(r&&r.error){if(/bad-key/.test(r.error.message)){logout();ret
 
 /* ───── BELÉPÉS: személyes iroda-kulcs (ugyanaz, mint a „Küldés a telefonra” kulcs) ───── */
 function loginScreen(msg){clearInterval(poll);
-  $('app').innerHTML='<form class="login" id="lf"><div class="eb">RedAssistance · iroda</div><h1>Teendőim</h1><div class="muted" style="font-size:14px">Add meg a személyes iroda-kulcsodat (Ferenc, Yvonne vagy David).</div>'+
-   '<input id="lk" type="password" autocomplete="current-password" placeholder="Iroda-kulcs" required><button class="btn pri" type="submit">Belépés</button><div class="err" id="le">'+esc(msg||'')+'</div></form>';
-  $('lk').focus();
-  $('lf').onsubmit=async function(e){e.preventDefault();var k=$('lk').value.trim();if(!k)return;var r=await sb.rpc('f_tf_ki',{p_key:k});
-    if(r.error||!r.data||!r.data[0]){$('le').textContent='Érvénytelen kulcs.';return;}
-    key=k;me=r.data[0];lsSet('ra_tf_key',k);start();};}
+  var box=function(inner){$('app').innerHTML='<form class="login" id="lf"><div class="eb">RedAssistance · iroda</div><h1>Teendőim</h1>'+inner+'<div class="err" id="le">'+esc(msg||'')+'</div></form>';};
+  var enter=function(k){key=k;lsSet('ra_tf_key',k);sb.rpc('f_tf_ki',{p_key:k}).then(function(r){if(r.error||!r.data||!r.data[0]){lsSet('ra_tf_key',null);key=null;loginScreen('Sikertelen belépés.');return;}me=r.data[0];start();});};
+  /* 1) Név */
+  box('<div class="muted" style="font-size:14px">Ki vagy?</div><div id="nl" style="display:grid;gap:8px"><div class="muted">…</div></div><a href="#" id="kk" class="muted" style="font-size:13px">Belépés iroda-kulccsal</a>');
+  sb.rpc('f_tf_irodasok').then(function(r){var L=r.data||[];$('nl').innerHTML=L.length?L.map(function(x){return '<button type="button" class="btn" data-ne="'+x.employee_id+'">'+esc(x.nev)+'</button>';}).join(''):'<div class="err">Nincs elérhető név.</div>';
+    $('nl').querySelectorAll('[data-ne]').forEach(function(b){b.onclick=function(){pinStep(b.getAttribute('data-ne'),b.textContent);};});});
+  $('kk').onclick=function(e){e.preventDefault();msg='';
+    box('<div class="muted" style="font-size:14px">Add meg a személyes iroda-kulcsodat.</div><input id="lk" type="password" autocomplete="current-password" placeholder="Iroda-kulcs" required><button class="btn pri" type="submit">Belépés</button>');
+    $('lk').focus();$('lf').onsubmit=async function(e){e.preventDefault();var k=$('lk').value.trim();if(!k)return;var r=await sb.rpc('f_tf_ki',{p_key:k});
+      if(r.error||!r.data||!r.data[0]){$('le').textContent='Érvénytelen kulcs.';return;}key=k;me=r.data[0];lsSet('ra_tf_key',k);start();};};
+  /* 2) PIN (induló: 1234) */
+  function pinStep(emp,nev){msg='';box('<div class="muted" style="font-size:14px">'+esc(nev)+' · PIN</div><input id="lp" type="password" inputmode="numeric" maxlength="4" autocomplete="current-password" placeholder="PIN" required><button class="btn pri" type="submit">Belépés</button><a href="#" id="bk" class="muted" style="font-size:13px">‹ Vissza</a>');
+    $('bk').onclick=function(e){e.preventDefault();loginScreen();};$('lp').focus();
+    $('lf').onsubmit=async function(e){e.preventDefault();var r=await sb.rpc('f_pin_login',{p_emp:emp,p_pin:$('lp').value.trim(),p_device:'teendoim'});
+      if(r.error||!r.data||!r.data[0]){$('le').textContent='Rossz PIN.';$('lp').value='';return;}
+      var tok=r.data[0].token, m=await sb.rpc('f_pin_must_change',{p_token:tok});
+      if(m.data===true)newPin(tok,nev);else enter(tok);};}
+  /* 3) Kötelező saját PIN az induló 1234 után */
+  function newPin(tok,nev){box('<div class="muted" style="font-size:14px">'+esc(nev)+' · Válassz új, saját PIN-t (4 számjegy, nem 1234)</div><input id="n1" type="password" inputmode="numeric" maxlength="4" autocomplete="new-password" placeholder="Új PIN" required><input id="n2" type="password" inputmode="numeric" maxlength="4" autocomplete="new-password" placeholder="Új PIN még egyszer" required><button class="btn pri" type="submit">Mentés és belépés</button>');
+    $('n1').focus();
+    $('lf').onsubmit=async function(e){e.preventDefault();var a=$('n1').value.trim(),b=$('n2').value.trim();
+      if(!/^[0-9]{4}$/.test(a)||a==='1234'){$('le').textContent='4 számjegy kell, és nem lehet 1234.';return;}
+      if(a!==b){$('le').textContent='A két PIN nem egyezik.';return;}
+      var r=await sb.rpc('f_change_own_pin',{p_token:tok,p_new:a});if(r.error){$('le').textContent='Hiba: '+r.error.message;return;}
+      enter(tok);};}
+}
 function logout(){lsSet('ra_tf_key',null);key=null;me=null;loginScreen('Kijelentkeztél.');}
 async function start(){$('app').innerHTML='<div class="wrap"><div class="empty">Betöltés…</div></div>';await refresh();clearInterval(poll);poll=setInterval(function(){if(!document.hidden&&!busy())refresh();},20000);}
 function busy(){var a=document.activeElement;return a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)&&a.value;}
