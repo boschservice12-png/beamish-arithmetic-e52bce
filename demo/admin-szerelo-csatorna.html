@@ -1,0 +1,446 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Admin ↔ szerelő csatorna</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: bal oldalt az admin számítógépes változat (Teendőim-kinézet), jobb oldalt a szerelő telefon */
+:root{
+  --red:#e31e24;--red2:#b5121f;--redsoft:#fff5f5;--redline:#ffc9c9;
+  --bg:#f5f6f8;--card:#fff;--ink:#1f2430;--ink2:#5c6571;--ink3:#8a929e;--line:#e6e9ef;--chip:#f1f2f4;
+  --green:#12a150;--greensoft:#e6f6ec;--amber:#b45309;--ambersoft:#fff4e0;--blue:#1c5fd4;--bluesoft:#e7f0ff;--violet:#7048e8;--violetsoft:#f3f0ff;
+  --frame:#12151c;--shadow:0 10px 30px rgba(15,23,42,.10);
+  --font:'Figtree','Segoe UI',system-ui,sans-serif;--mono:'Geist Mono',ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --red:#ff4a4f;--red2:#e31e24;--redsoft:#2a1416;--redline:#5a2327;
+  --bg:#121418;--card:#1b1e24;--ink:#e8eaee;--ink2:#a4acb8;--ink3:#737b88;--line:#2a2e36;--chip:#252932;
+  --green:#3ccf7e;--greensoft:#15291f;--amber:#f2b35a;--ambersoft:#2e2414;--blue:#7aa7ff;--bluesoft:#1a2740;--violet:#a58bff;--violetsoft:#231d38;
+  --frame:#000;--shadow:0 10px 30px rgba(0,0,0,.5);color-scheme:dark}}
+:root[data-theme="dark"]{
+  --red:#ff4a4f;--red2:#e31e24;--redsoft:#2a1416;--redline:#5a2327;
+  --bg:#121418;--card:#1b1e24;--ink:#e8eaee;--ink2:#a4acb8;--ink3:#737b88;--line:#2a2e36;--chip:#252932;
+  --green:#3ccf7e;--greensoft:#15291f;--amber:#f2b35a;--ambersoft:#2e2414;--blue:#7aa7ff;--bluesoft:#1a2740;--violet:#a58bff;--violetsoft:#231d38;
+  --frame:#000;--shadow:0 10px 30px rgba(0,0,0,.5);color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.45}
+button,select,input,textarea{font-family:inherit;font-size:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+.demo{background:var(--ambersoft);color:var(--amber);font-weight:600;font-size:13px;text-align:center;padding:8px 16px}
+.wrap{max-width:1320px;margin:0 auto;padding-block:20px 48px;padding-inline:16px;display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:24px;align-items:start}
+@media (max-width:980px){.wrap{grid-template-columns:minmax(0,1fr)}}
+.eb{color:var(--red);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.muted{color:var(--ink3)}
+
+/* ── ADMIN (számítógép) ── */
+.win{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+.win-bar{background:#7fb7c0;color:#10313a;padding:7px 14px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+.win-bar i{width:10px;height:10px;border-radius:50%;background:var(--red);display:inline-block}
+.ahdr{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px}
+.ahdr h1{margin:0;font-size:24px;font-weight:500}
+.who{margin-left:auto;display:flex;align-items:center;gap:6px;background:var(--chip);border-radius:10px;padding:4px}
+.who span{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);padding:0 6px}
+.who button{border:0;background:none;border-radius:7px;padding:6px 11px;font-weight:600;color:var(--ink2)}
+.who button.on{background:var(--card);color:var(--red);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;padding:10px 16px;border-bottom:1px solid var(--line)}
+.tab{border:1px solid transparent;background:none;border-radius:8px;padding:8px 13px;font-size:15px;display:flex;align-items:center;gap:8px;color:var(--ink)}
+.tab .c{background:var(--chip);color:var(--ink2);font-size:12px;font-weight:700;min-width:22px;height:22px;border-radius:11px;display:inline-grid;place-items:center;padding:0 6px}
+.tab.on{background:var(--redsoft);border-color:var(--redline);color:var(--red)}
+.tab .c.hot,.tab.on .c{background:var(--red);color:#fff}
+.apane{padding:16px 20px 22px;display:grid;gap:12px}
+.item{border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:6px 12px;align-items:center}
+.item .ico{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:20px;background:var(--chip)}
+.item .ico.hr{background:var(--violetsoft)}
+.item .ico.ws{background:var(--ambersoft)}
+.item .ico.ok{background:var(--greensoft)}
+.item .t{font-weight:600;overflow-wrap:anywhere}
+.item .m{font-size:13px;color:var(--ink3);display:flex;flex-wrap:wrap;gap:4px 10px}
+.item .acts{grid-column:2/-1;display:flex;flex-wrap:wrap;gap:8px}
+.item .note{grid-column:2/-1;background:var(--chip);border-radius:8px;padding:6px 10px;font-size:14px}
+.pill{border-radius:7px;padding:3px 9px;font-size:12px;font-weight:700;white-space:nowrap;background:var(--bluesoft);color:var(--blue)}
+.pill.ok{background:var(--greensoft);color:var(--green)}
+.pill.no{background:var(--redsoft);color:var(--red)}
+.pill.wait{background:var(--ambersoft);color:var(--amber)}
+.pill.hr{background:var(--violetsoft);color:var(--violet)}
+.btn{border-radius:8px;padding:8px 13px;font-weight:600;border:1px solid var(--line);background:var(--card)}
+.btn.pri{background:var(--red);border-color:var(--red);color:#fff}
+.btn.ok{background:var(--green);border-color:var(--green);color:#fff}
+.btn.out{border-color:var(--redline);color:var(--red)}
+.form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (max-width:620px){.form{grid-template-columns:minmax(0,1fr)}}
+.form label{display:grid;gap:4px;font-size:12.5px;font-weight:600;color:var(--ink3)}
+.form .full{grid-column:1/-1}
+.form input,.form select,.form textarea{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--bg);color:var(--ink);font-weight:500}
+.box{border:1px dashed var(--line);border-radius:14px;padding:14px}
+.reads{display:flex;flex-wrap:wrap;gap:6px;grid-column:2/-1}
+.reads span{font-size:12px;font-weight:600;padding:3px 8px;border-radius:12px;background:var(--chip);color:var(--ink3)}
+.reads span.y{background:var(--greensoft);color:var(--green)}
+.empty{color:var(--ink3);padding:10px 2px}
+.rule{font-size:13px;color:var(--ink2);background:var(--bg);border-radius:12px;padding:10px 14px}
+.chat{display:grid;gap:8px;max-height:280px;overflow:auto;padding:4px}
+.bub{max-width:78%;padding:8px 12px;border-radius:14px;font-size:14px}
+.bub small{display:block;font-size:11px;color:var(--ink3);margin-top:2px}
+.bub.me{justify-self:end;background:var(--redsoft)}
+.bub.them{justify-self:start;background:var(--chip)}
+.send{display:flex;gap:8px}
+.send input{flex:1;border:1px solid var(--line);border-radius:10px;padding:9px 12px;background:var(--bg);color:var(--ink);min-width:0}
+
+/* ── TELEFON ── */
+.phonecol{position:sticky;top:calc(12px + env(safe-area-inset-top,0px))}
+.phone{background:var(--frame);border-radius:42px;padding:11px;box-shadow:var(--shadow);max-width:380px;margin:0 auto}
+.scr{background:var(--card);border-radius:32px;height:760px;max-height:84vh;overflow:hidden;position:relative;display:flex;flex-direction:column}
+.p-top{background:linear-gradient(160deg,var(--red),var(--red2));color:#fff;padding:14px 16px 12px;display:flex;align-items:center;gap:10px}
+.p-top b{flex:1;text-align:center;letter-spacing:.12em;text-transform:uppercase;font-size:13px}
+.p-top select{background:rgba(255,255,255,.18);color:#fff;border:0;border-radius:8px;padding:4px 6px;font-weight:600}
+.p-top select option{color:#1f2430}
+.p-body{flex:1;display:flex;flex-direction:column;align-items:center;padding:12px 16px 6px;background:var(--card);overflow:hidden}
+.p-state{font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--green);font-size:14px}
+.ring{position:relative;width:160px;aspect-ratio:1;margin:6px 0 2px;max-width:60%}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .in{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:4px;text-align:center}
+.ring .pct{font-family:var(--mono);font-size:26px;font-weight:600;color:var(--red)}
+.ring .plate{font-family:var(--mono);font-weight:600;font-size:12px;background:var(--bg);border-radius:6px;padding:2px 8px}
+.ring .l{font-size:11.5px;color:var(--ink3)}
+.p-job{font-weight:600;font-size:14px;text-align:center}
+.p-grid{background:linear-gradient(180deg,var(--red),var(--red2));padding:12px 12px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.ic{position:relative;border:0;border-radius:16px;background:rgba(255,255,255,.14);color:#fff;aspect-ratio:1.15;display:grid;place-items:center;align-content:center;gap:5px;font-size:11.5px;font-weight:600;line-height:1.15;padding:6px}
+.ic .e{font-size:24px;line-height:1}
+.ic:active{background:rgba(255,255,255,.26)}
+.ic .bad{position:absolute;top:6px;right:6px;background:#fff;color:var(--red2);border-radius:999px;min-width:22px;height:22px;display:grid;place-items:center;font-size:12px;font-weight:700;padding:0 6px;font-family:var(--mono)}
+.shade{position:absolute;inset:0;background:rgba(15,23,42,.45);opacity:0;pointer-events:none;transition:opacity .2s}
+.shade.on{opacity:1;pointer-events:auto}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--card);border-radius:24px 24px 0 0;padding:12px 16px 20px;transform:translateY(105%);transition:transform .25s ease;max-height:82%;overflow:auto}
+.sheet.on{transform:none}
+@media (prefers-reduced-motion:reduce){.sheet,.shade{transition:none}}
+.grab{width:42px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 12px}
+.sheet h3{margin:0 0 10px;font-size:17px}
+.kinds{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.kinds button{border:1px solid var(--line);background:var(--bg);border-radius:14px;padding:12px 6px;display:grid;gap:4px;justify-items:center;font-size:12.5px;font-weight:600}
+.kinds button .e{font-size:22px}
+.kinds button.on{border-color:var(--red);background:var(--redsoft);color:var(--red)}
+.fld{display:grid;gap:4px;font-size:12.5px;font-weight:600;color:var(--ink3);margin-top:8px}
+.fld input,.fld textarea,.fld select{border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--bg);color:var(--ink);font-weight:500}
+.to{font-size:13px;margin-top:8px;color:var(--ink2)}
+.pbtn{width:100%;border:0;border-radius:14px;padding:14px;font-weight:700;font-size:16px;background:var(--red);color:#fff;margin-top:12px}
+.pbtn.gr{background:var(--green)}
+.pcard{border:1px solid var(--line);border-radius:14px;padding:11px 12px;display:grid;gap:6px;margin-bottom:8px}
+.pcard .t{font-weight:600}
+.pcard .m{font-size:12.5px;color:var(--ink3)}
+
+/* ── Telefon a RedAssistance-app mintájára ── */
+.r-top{display:flex;align-items:center;gap:8px;padding:14px 14px 8px;background:var(--card)}
+.r-logo{width:26px;height:26px;border-radius:50%;background:var(--red);box-shadow:inset 0 0 0 6px var(--card),inset 0 0 0 9px var(--red);flex:none}
+.r-brand{color:var(--red);font-weight:700;font-size:13px;flex:1}
+.r-bell{position:relative;border:0;background:none;font-size:18px;padding:4px}
+.r-bell .bad{position:absolute;top:-2px;right:-4px;background:var(--red);color:#fff;border-radius:999px;min-width:18px;height:18px;font-size:10.5px;font-weight:700;display:grid;place-items:center;padding:0 4px}
+.r-bell .bad:empty{display:none}
+.r-av{border:0;background:var(--chip);border-radius:999px;padding:5px 8px;font-weight:700;font-size:12px;color:var(--ink2)}
+.r-body{flex:1;overflow:auto;padding:4px 14px 14px;display:grid;gap:12px;align-content:start;background:var(--bg)}
+.att{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px 14px}
+.att .hi{font-size:12.5px;color:var(--ink3)}
+.att h2{margin:2px 0 8px;font-size:17px;line-height:1.25;font-weight:600}
+.att button{width:100%;display:flex;align-items:center;gap:10px;border:0;border-top:1px solid var(--line);background:none;padding:10px 0;text-align:left;font-weight:600;font-size:14px}
+.att button .chip{margin-left:auto;background:var(--redsoft);color:var(--red);border-radius:999px;padding:2px 9px;font-size:11.5px;font-weight:700}
+.att button .gt{color:var(--ink3)}
+.job{border-radius:18px;padding:14px;color:#fff;display:grid;gap:8px;transition:background .3s}
+.job.idle,.job.late{background:linear-gradient(150deg,#e31e24,#b5121f)}
+.job.run,.job.pause{background:linear-gradient(150deg,#f5b400,#d98a1c);color:#2b1d00}
+.job.ok{background:linear-gradient(150deg,#1eaa5c,#12863f)}
+.job .lab{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.9}
+.job .ttl{font-weight:700;font-size:16px;line-height:1.25}
+.job .pl{font-family:var(--mono);font-size:12px;font-weight:600;background:rgba(255,255,255,.22);border-radius:6px;padding:2px 7px;justify-self:start}
+.job .tm{font-family:var(--mono);font-size:30px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+.job .tm small{font-size:13px;font-weight:500;opacity:.85}
+.job .bar{height:6px;border-radius:3px;background:rgba(255,255,255,.3);overflow:hidden}
+.job .bar i{display:block;height:100%;background:currentColor;opacity:.9}
+.job .btns3{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.job .btns3 button{border:0;border-radius:12px;padding:11px 4px;font-weight:700;font-size:14px;background:#fff;color:#1f2430}
+.job .btns3 button:disabled{opacity:.4}
+.job .btns3 .go{color:#12863f}.job .btns3 .pz{color:#b45309}.job .btns3 .st{color:#b5121f}
+@media (prefers-reduced-motion:reduce){.job{transition:none}}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tl{position:relative;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px;text-align:left;display:grid;gap:4px;min-height:104px;align-content:start}
+.tl .ti{width:36px;height:36px;border-radius:10px;background:var(--bg);display:grid;place-items:center;font-size:18px;margin-bottom:4px}
+.tl b{font-size:13.5px;line-height:1.2}
+.tl span.s{font-size:11.5px;color:var(--ink3)}
+.tl .bad{position:absolute;top:10px;right:10px;background:var(--red);color:#fff;border-radius:999px;min-width:20px;height:20px;display:grid;place-items:center;font-size:11px;font-weight:700;padding:0 5px}
+.tl.wide{grid-column:1/-1;display:grid;grid-template-columns:36px minmax(0,1fr) auto;align-items:center;gap:10px;min-height:0}
+.tl.wide .ti{margin:0}
+.r-nav{display:flex;justify-content:space-around;align-items:center;border-top:1px solid var(--line);background:var(--card);padding:8px 6px 10px}
+.r-nav button{border:0;background:none;font-size:19px;padding:6px 10px;opacity:.6}
+.r-nav button.on{opacity:1}
+.grid4{display:grid;grid-template-columns:1fr 1fr;gap:3px;width:24px;height:24px}
+.grid4 i{background:var(--red);border-radius:2px}
+.sw3{display:flex;gap:4px;background:var(--bg);border-radius:10px;padding:3px;margin-bottom:10px}
+.sw3 button{flex:1;border:0;background:none;border-radius:8px;padding:8px;font-weight:700}
+.sw3 button.on{background:var(--card);color:var(--red);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.st3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.st3 div{background:var(--bg);border-radius:12px;padding:10px 6px;text-align:center}
+.st3 b{display:block;font-family:var(--mono);font-size:20px}
+.st3 span{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3)}
+.norm{margin-top:10px}
+.norm .bar{height:10px;border-radius:5px;background:var(--bg);overflow:hidden;margin-top:6px}
+.norm .bar i{display:block;height:100%;background:var(--green)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--card);padding:10px 16px;border-radius:12px;font-weight:600;z-index:30;max-width:calc(100% - 32px)}
+</style>
+
+<div class="demo">DEMÓ · példaadatok, semmi nem íródik az adatbázisba · élesítés csak jóváhagyás után</div>
+<div class="wrap">
+  <section>
+    <div class="win">
+      <div class="win-bar"><i></i> RedAssistance – Teendőim · számítógépes változat (letöltés az Admin Core-ból)</div>
+      <div class="ahdr">
+        <div><div class="eb">Admin · iroda</div><h1>Teendőim</h1></div>
+        <div class="who" role="group" aria-label="Ki van belépve"><span>Belépve</span><div id="who"></div></div>
+      </div>
+      <nav class="tabs" id="tabs"></nav>
+      <div class="apane" id="apane"></div>
+    </div>
+    <div class="rule" style="margin-top:14px">
+      <b>Szabály a demóban:</b> HR-kérés (szabadnap) → <b>Yvonne</b>. Műhelykérés (szerszám, segédeszköz) → <b>David</b>. Szabályt és útmutatót <b>Ferenc</b>, irányelvet és szabályt <b>Yvonne</b> ad ki. A csatorna csak admin ↔ szerelő, szerelő a szerelőnek nem ír. A „Szabályok és irányelvek” külön szekció, a javítási útmutatók külön. Mindkettőnél kötelező az „Elolvastam” gomb. A <b>munkalap</b> a szerelő feladat- és kötelességköre: Yvonne vagy Ferenc szerkeszti, a szerelő a telefonon veszi át.
+    </div>
+  </section>
+
+  <div class="phonecol">
+    <div class="eb" style="text-align:center;margin-bottom:8px">Szerelő telefon</div>
+    <div class="phone"><div class="scr" id="scr">
+      <div class="r-top"><span class="r-logo"></span><span class="r-brand">RedAssistance</span>
+        <button class="r-bell" data-p="att" aria-label="Notificări">🔔<span class="bad" id="bellN"></span></button>
+        <select id="mech" class="r-av" aria-label="Mecanic"></select></div>
+      <div class="r-body" id="rbody"></div>
+      <nav class="r-nav"><button data-p="tasks" aria-label="Sarcini">📋</button><button data-p="msg" aria-label="Mesaje">💬</button><button class="on" aria-label="Acasă"><span class="grid4"><i></i><i></i><i></i><i></i></span></button><button data-p="sheet" aria-label="Fișa mea">🗂</button><button data-p="stat" aria-label="Statistică">📊</button></nav>
+      <div class="shade" id="shade"></div>
+      <div class="sheet" id="sheet"></div>
+    </div></div>
+    <div style="text-align:center;margin-top:10px"><button class="btn" data-p="fast" id="fastBtn">⏩ Demó: idő gyorsítása ×60</button></div>
+  </div>
+</div>
+
+<script>
+const ADMINS={ferenc:'Ferenc',yvonne:'Yvonne',david:'David'};
+const MECH={arnold:'Tamás Arnold',gyuri:'Gyárfás György',botos:'Botos Szilárd',abin:'Abin Chanal',sunil:'Sunil Chaudary',ganes:'Ganes Kunmar'};
+const KIND={
+  off:{e:'🌴',hu:'Szabadnap',ro:'Zi liberă',to:'yvonne',cls:'hr',area:'HR'},
+  tool:{e:'🔧',hu:'Szerszám',ro:'Sculă',to:'david',cls:'ws',area:'Műhely'},
+  aid:{e:'🧰',hu:'Segédeszköz',ro:'Echipament',to:'david',cls:'ws',area:'Műhely'}
+};
+const ST={new:['Új','wait'],ok:['Jóváhagyva','ok'],no:['Elutasítva','no'],given:['Kiadva','ok']};
+let me='ferenc',tab='inbox',mech='arnold',rkind='off',wsel='arnold';
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $=id=>document.getElementById(id);
+const now=()=>new Date().toLocaleTimeString('ro-RO',{hour:'2-digit',minute:'2-digit'});
+function toast(s){const t=document.createElement('div');t.className='toast';t.textContent=s;document.body.appendChild(t);setTimeout(()=>t.remove(),2300)}
+
+// Példaadatok (a munkaposzt-adatok valósak: MEC · 4.2 · RG-ATL-01 / MAN-MEC-01 · helyettesek)
+const req=[
+  {id:1,from:'botos',kind:'off',title:'2026.10.09 (péntek), 1 nap',why:'Családi ügy',st:'new',at:'08:12'},
+  {id:2,from:'abin',kind:'tool',title:'Nyomatékkulcs 40–200 Nm',why:'Rampa 2 – a régi pontatlan',st:'new',at:'09:40'},
+  {id:3,from:'sunil',kind:'aid',title:'Új festőmaszk + szűrőbetét',why:'',st:'given',at:'tegnap',ans:'Kiadva a raktárból'}
+];
+// cat: 'rule' = szabályok és irányelvek · 'guide' = javítási útmutatók
+const docs=[
+  {id:1,cat:'guide',by:'ferenc',type:'Javítási útmutató',title:'KM-ELE-ZARLAT001 · ismétlődő biztosítékkiégés',to:'all',read:['gyuri','arnold'],at:'09.28'},
+  {id:2,cat:'rule',by:'yvonne',type:'Irányelv',title:'IRD-ATL-04 · Rend és tisztaság a rampánál',to:'all',read:['gyuri','botos','abin','arnold','sunil'],at:'09.25'},
+  {id:3,cat:'rule',by:'ferenc',type:'Szabály',title:'RG-PROD-01 · Extra munka csak jóváhagyás után indul',to:'all',read:['gyuri'],at:'09.20'}
+];
+const POST={kod:'MEC',nev:'Szerelő · Mecanic auto',dept:'4.2 Javítás',alt:'RG-ATL-01 műhelyszabályzat',spec:'MAN-MEC-01 szerelői kézikönyv'};
+const HELY={arnold:'abin',gyuri:'arnold',botos:'gyuri',abin:'arnold',sunil:'ganes',ganes:'sunil'};
+const DUTY=[
+  'A kiosztott munkát a telefonon indítja és zárja (START / SZÜNET / KÉSZ) – az idő mért, nem beírt.',
+  'Megálláskor mindig megadja a szünet okát (alkatrész, szerszám, dokumentáció…).',
+  'Extra munkát csak a recepció jóváhagyása után kezd el.',
+  'A kész munkát végellenőrzésre adja – más személy ellenőrzi, mért értékkel.',
+  'A műszak végén a rampát és a szerszámokat rendben, a helyükön hagyja.',
+  'Hibát, balesetveszélyt, hiányt azonnal jelez az irodának a telefonon.',
+  'Hiányzásnál a helyettese veszi át a munkáját; szabadnapot előre kér (Yvonne).'
+];
+const sheets={};Object.keys(MECH).forEach(k=>sheets[k]={duties:DUTY.slice(),signed:k==='gyuri'?'09.21':null,sent:true});
+const msgs={arnold:[{f:'david',t:'Arnold, a CJ 27 EBR után jöhet a revízió.',at:'08:05'},{f:'arnold',t:'Rendben.',at:'08:07'}]};
+const tasks=[{id:1,from:'ferenc',to:'arnold',title:'Kompresszor-szűrők cseréje',st:'sent'}];
+
+function myReqs(){return req.filter(r=>KIND[r.kind].to===me)}
+function renderWho(){$('who').innerHTML=Object.entries(ADMINS).map(([k,v])=>`<button class="${k===me?'on':''}" data-who="${k}">${v}</button>`).join('')}
+function renderTabs(){
+  const nNew=myReqs().filter(r=>r.st==='new').length, nUns=Object.values(sheets).filter(x=>!x.signed).length;
+  const T=[['inbox','📥 Kérések',myReqs().length,nNew>0],['rule','📕 Szabályok és irányelvek',docs.filter(d=>d.cat==='rule').length,false],['guide','🛠 Javítási útmutatók',docs.filter(d=>d.cat==='guide').length,false],['sheet','🗂 Munkalapok',nUns,false],['msg','💬 Üzenetek',Object.values(msgs).flat().length,false],['task','👥 Kiadott',tasks.length,false]];
+  $('tabs').innerHTML=T.map(([k,l,c,h])=>`<button class="tab ${k===tab?'on':''}" data-tab="${k}">${l}<span class="c ${h?'hot':''}">${c}</span></button>`).join('');
+}
+function reqItem(r){const K=KIND[r.kind],[sl,sc]=ST[r.st];return `<div class="item">
+  <div class="ico ${K.cls}">${K.e}</div>
+  <div><div class="t">${K.hu}: ${esc(r.title)}</div><div class="m"><span>${esc(MECH[r.from])}</span><span>${r.at}</span><span class="pill ${K.cls==='hr'?'hr':'wait'}">${K.area}</span></div></div>
+  <span class="pill ${sc}">${sl}</span>
+  ${r.why?`<div class="note">${esc(r.why)}</div>`:''}
+  ${r.ans?`<div class="note">↩ ${esc(r.ans)}</div>`:''}
+  ${r.st==='new'?`<div class="acts"><button class="btn ok" data-r="ok" data-id="${r.id}">✓ Jóváhagyom</button><button class="btn out" data-r="no" data-id="${r.id}">Elutasítom</button>${r.kind!=='off'?`<button class="btn" data-r="given" data-id="${r.id}">Kiadva</button>`:''}</div>`:''}
+</div>`}
+function docsPane(cat){
+  const types=cat==='guide'?(me==='ferenc'?['Javítási útmutató']:[]):(me==='ferenc'?['Szabály']:me==='yvonne'?['Irányelv','Szabály']:[]);
+  const who=cat==='guide'?'Javítási útmutatót Ferenc ad ki.':'Szabályt Ferenc, irányelvet és szabályt Yvonne ad ki.';
+  return (types.length?`<div class="box"><div class="form">
+      <label>Típus<select id="rType">${types.map(x=>`<option>${x}</option>`).join('')}</select></label>
+      <label>Kinek<select id="rTo"><option value="all">Minden szerelő</option>${Object.entries(MECH).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></label>
+      <label class="full">Cím<input id="rTitle" value="${cat==='guide'?'DSG olajcsere – lépések és nyomaték':me==='yvonne'?'Irányelv · védőfelszerelés a festőkabinban':'Szabály · kerékcsavar nyomatékkulccsal, mindig'}"></label>
+      </div><div style="margin-top:10px"><button class="btn pri" data-a="pub" data-cat="${cat}">${cat==='guide'?'🛠':'📕'} Kiadás a telefonokra</button></div></div>`
+    :`<div class="muted">${who} Itt látod, ki olvasta el.</div>`)+
+    docs.filter(d=>d.cat===cat).map(d=>{const w=d.to==='all'?Object.keys(MECH):[d.to],n=d.read.filter(x=>w.includes(x)).length;return `<div class="item"><div class="ico ${d.by==='yvonne'?'hr':'ws'}">${cat==='guide'?'🛠':'📕'}</div>
+      <div><div class="t">${esc(d.type)}: ${esc(d.title)}</div><div class="m"><span>${ADMINS[d.by]} adta ki</span><span>${d.at}</span></div></div>
+      <span class="pill ${n>=w.length?'ok':'wait'}">${n}/${w.length} olvasta</span>
+      <div class="reads">${w.map(k=>`<span class="${d.read.includes(k)?'y':''}">${d.read.includes(k)?'✓ ':''}${esc(MECH[k].split(' ').pop())}</span>`).join('')}</div></div>`}).join('');
+}
+function sheetPane(){const S=sheets[wsel],canEdit=me==='yvonne'||me==='ferenc';
+  return `<div class="form"><label>Munkalap<select id="wSel">${Object.entries(MECH).map(([k,v])=>`<option value="${k}"${k===wsel?' selected':''}>${v}${sheets[k].signed?' ✓':''}</option>`).join('')}</select></label>
+    <label>Állapot<span class="pill ${S.signed?'ok':'wait'}" style="justify-self:start;margin-top:6px">${S.signed?'Átvette és elfogadta · '+S.signed:'Még nem vette át'}</span></label></div>
+  <div class="item" style="grid-template-columns:44px minmax(0,1fr)"><div class="ico">🗂</div><div>
+    <div class="t">${esc(MECH[wsel])} · ${POST.nev}</div>
+    <div class="m"><span>Poszt: ${POST.kod}</span><span>Alosztály: ${POST.dept}</span><span>Szerep: elvégző</span><span>Helyettes: ${esc(MECH[HELY[wsel]])}</span></div>
+    <div class="m" style="margin-top:4px"><span>Általános szabályzat: ${POST.alt}</span><span>Szakmai: ${POST.spec}</span></div></div></div>
+  <div class="box"><div class="t" style="font-weight:600;margin-bottom:8px">Feladat- és kötelességkör</div>
+    <ol style="margin:0;padding-left:20px;display:grid;gap:6px">${S.duties.map((d,i)=>`<li>${esc(d)}${canEdit?` <button class="btn" style="padding:2px 8px;font-size:12px" data-a="deld" data-i="${i}">✕</button>`:''}</li>`).join('')}</ol>
+    ${canEdit?`<div class="send" style="margin-top:10px"><input id="dNew" placeholder="Új kötelesség hozzáadása…"><button class="btn" data-a="addd">+ Hozzáad</button></div>
+    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" data-a="sendsheet">🗂 Kiadás átvételre a telefonra</button><span class="muted" style="font-size:13px;align-self:center">Módosítás után újra át kell vennie.</span></div>`
+    :'<div class="muted" style="margin-top:8px;font-size:13px">A munkalapot Yvonne (HR) vagy Ferenc szerkeszti.</div>'}</div>
+  <div class="muted" style="font-size:13px">Ez lesz a hiányzó fișa postului: a munkaposztból (MEC) és a szabályzatokból áll össze, a szerelő a telefonján veszi át – mint a nyomtatott átvételi aláírás.</div>`;
+}
+function renderPane(){
+  const P=$('apane');
+  if(tab==='inbox'){const L=myReqs();
+    P.innerHTML=`<div class="muted">${me==='yvonne'?'Neked a HR-kérések jönnek (szabadnap).':me==='david'?'Neked a műhelykérések jönnek (szerszám, segédeszköz).':'Neked most nincs címzett kérés. Válts Yvonne-ra (HR) vagy Davidre (műhely).'}</div>`+
+      (L.length?L.map(reqItem).join(''):'<div class="empty">Nincs kérés.</div>');}
+  if(tab==='rule')P.innerHTML=docsPane('rule');
+  if(tab==='guide')P.innerHTML=docsPane('guide');
+  if(tab==='sheet')P.innerHTML=sheetPane();
+  if(tab==='msg'){const th=msgs[mech]||[];
+    P.innerHTML=`<div class="form"><label>Beszélgetés ezzel a szerelővel<select id="mSel">${Object.entries(MECH).map(([k,v])=>`<option value="${k}"${k===mech?' selected':''}>${v}</option>`).join('')}</select></label></div>
+      <div class="chat">${th.length?th.map(m=>`<div class="bub ${m.f in ADMINS?'me':'them'}">${esc(m.t)}<small>${m.f in ADMINS?ADMINS[m.f]:MECH[m.f].split(' ').pop()} · ${m.at}</small></div>`).join(''):'<div class="empty">Még nincs üzenet.</div>'}</div>
+      <div class="send"><input id="mTxt" placeholder="Üzenet ${esc(MECH[mech])} telefonjára…"><button class="btn pri" data-a="msg">Küldés</button></div>
+      <div class="muted" style="font-size:13px">Szerelőnként egy közös szál – David, Yvonne és Ferenc ugyanazt látja.</div>`;}
+  if(tab==='task'){P.innerHTML=tasks.map(t=>`<div class="item"><div class="ico">📋</div><div><div class="t">${esc(t.title)}</div><div class="m"><span>${ADMINS[t.from]} → ${esc(MECH[t.to])}</span></div></div><span class="pill ${t.st==='acc'?'ok':''}">${t.st==='acc'?'Elfogadva':'Elküldve'}</span></div>`).join('')+'<div class="muted" style="font-size:13px">Ez a ma élesített „📱 Küldés a telefonra” út.</div>';}
+}
+function renderAdmin(){renderWho();renderTabs();renderPane()}
+
+// ── telefon ──
+function unread(cat){return docs.filter(d=>d.cat===cat&&(d.to==='all'||d.to===mech)&&!d.read.includes(mech))}
+function myTasks(){return tasks.filter(t=>t.to===mech&&t.st==='sent')}
+function newMsgs(){return (msgs[mech]||[]).filter(m=>m.f in ADMINS&&!m.seen).length}
+// munkakártya-állapot: idle → run → pause → done (ok / late)
+const JOB={plate:'MS 22 AHA',car:'VW Golf V',title:'Diagnoză lambda P1103 / P2251',norm:72*60};
+let jst='idle',jsec=0,speed=1;
+const NEXT=[{plate:'CJ 27 EBR',title:'Siguranță EMS 40 A',n:'0:48'},{plate:'MS 10 SZK',title:'Revizie + filtre',n:'1:30'}];
+const mmss=s=>{s=Math.max(0,Math.round(s));return Math.floor(s/3600)+':'+String(Math.floor(s/60)%60).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
+function jobClass(){if(jst==='idle')return'idle';if(jst==='done')return jsec<=JOB.norm?'ok':'late';if(jsec>JOB.norm)return'late';return jst==='pause'?'pause':'run'}
+function jobLabel(){const c=jobClass();return jst==='idle'?'Următoarea lucrare':jst==='done'?(c==='ok'?'✓ Gata la timp':'⚠ Gata cu întârziere'):c==='late'?'⚠ Întârziere – peste normă':jst==='pause'?'⏸ Pauză':'▶ În lucru'}
+function jobHTML(){const c=jobClass(),p=Math.min(100,jsec/JOB.norm*100);
+  return `<div class="job ${c}" id="job"><div class="lab">${jobLabel()}</div><div class="ttl">${JOB.car} · ${JOB.title}</div><span class="pl">${JOB.plate}</span>
+   <div class="tm" id="jt">${mmss(jsec)} <small>/ ${mmss(JOB.norm)} normă</small></div><div class="bar"><i id="jb" style="width:${p}%"></i></div>
+   <div class="btns3"><button class="go" data-j="start" ${jst==='run'||jst==='done'?'disabled':''}>▶ ${jst==='pause'?'Continuă':'Start'}</button><button class="pz" data-j="pause" ${jst!=='run'?'disabled':''}>⏸ Pauză</button><button class="st" data-j="stop" ${jst==='idle'||jst==='done'?'disabled':''}>■ Stop</button></div></div>`}
+function attItems(){const L=[];
+  if(myTasks().length)L.push(['tasks','📋','Sarcini primite',myTasks().length+' nou']);
+  const r=unread('rule').length,g=unread('guide').length;
+  if(r)L.push(['rule','📕','Reguli și directive',r+' necitit']);
+  if(g)L.push(['guide','🛠','Ghiduri de reparație',g+' necitit']);
+  if(!sheets[mech].signed)L.push(['sheet','🗂','Fișa postului','de semnat']);
+  if(newMsgs())L.push(['msg','💬','Mesaje birou',newMsgs()+' nou']);
+  return L}
+function renderPhone(){
+  $('mech').innerHTML=Object.entries(MECH).map(([k,v])=>`<option value="${k}"${k===mech?' selected':''}>${v.split(' ').map(x=>x[0]).join('')}</option>`).join('');
+  const A=attItems();$('bellN').textContent=A.length||'';
+  const b=n=>n?`<span class="bad">${n}</span>`:'';
+  const myReq=req.filter(r=>r.from===mech);
+  $('rbody').innerHTML=`<div class="att"><div class="hi">Bună, ${esc(MECH[mech].split(' ').pop())}</div>
+    <h2>${A.length?`${A.length} ${A.length===1?'lucru are':'lucruri au'} nevoie de atenția ta`:'Totul e la zi ✓'}</h2>
+    ${A.map(x=>`<button data-p="${x[0]}">${x[1]} ${x[2]}<span class="chip">${x[3]}</span><span class="gt">›</span></button>`).join('')}</div>
+   ${jobHTML()}
+   <div class="tiles">
+    <button class="tl" data-p="tasks">${b(myTasks().length)}<span class="ti">📋</span><b>Sarcini primite</b><span class="s">${myTasks().length} noi</span></button>
+    <button class="tl" data-p="req"><span class="ti">🙋</span><b>Cerere</b><span class="s">zi liberă · sculă · echipament${myReq.length?' · '+myReq.length+' trimise':''}</span></button>
+    <button class="tl" data-p="rule">${b(unread('rule').length)}<span class="ti">📕</span><b>Reguli și directive</b><span class="s">${docs.filter(d=>d.cat==='rule').length} documente</span></button>
+    <button class="tl" data-p="guide">${b(unread('guide').length)}<span class="ti">🛠</span><b>Ghiduri de reparație</b><span class="s">${docs.filter(d=>d.cat==='guide').length} ghiduri</span></button>
+    <button class="tl" data-p="sheet">${b(sheets[mech].signed?0:1)}<span class="ti">🗂</span><b>Fișa mea</b><span class="s">${sheets[mech].signed?'semnată '+sheets[mech].signed:'de semnat'}</span></button>
+    <button class="tl" data-p="msg">${b(newMsgs())}<span class="ti">💬</span><b>Mesaje birou</b><span class="s">Ferenc · Yvonne · David</span></button>
+    <button class="tl" data-p="next"><span class="ti">🚗</span><b>Următoarele lucrări</b><span class="s">${NEXT.length} azi</span></button>
+    <button class="tl" data-p="stat"><span class="ti">📊</span><b>Statistică producție</b><span class="s">zi · lună · an</span></button>
+   </div>`;
+}
+let statP='zi';
+const STAT={zi:{p:'6.5',m:'4.1',f:'3.2',l:3},luna:{p:'148',m:'96',f:'71',l:58},an:{p:'1 420',m:'1 130',f:'860',l:612}};
+function statSheet(){const S=STAT[statP];
+  open(`<h3>📊 Statistică producție</h3><div class="sw3">${[['zi','Zi'],['luna','Lună'],['an','An']].map(([k,l])=>`<button class="${k===statP?'on':''}" data-st="${k}">${l}</button>`).join('')}</div>
+   <div class="st3"><div><b>${S.p}h</b><span>Programat</span></div><div><b>${S.m}h</b><span>Lucrat (măsurat)</span></div><div><b>${S.f}h</b><span>Facturat</span></div></div>
+   <div class="pcard" style="margin-top:10px"><div class="t">${S.l} lucrări</div><div class="m">${statP==='zi'?'azi':statP==='luna'?'în octombrie':'în 2026'}</div></div>
+   ${statP==='luna'?`<div class="norm"><div class="t" style="font-weight:600">Ore normă lucrate: 96 / 140</div><div class="bar"><i style="width:${96/140*100}%"></i></div><div class="m" style="font-size:12px;color:var(--ink3);margin-top:4px">Minimul lunar este 140 de ore normă, proporțional cu prezența.</div></div>`:''}
+   <div class="m" style="font-size:12px;color:var(--ink3);margin-top:8px">Fără valori în lei – doar ore și lucrări.</div>`)}
+function nextSheet(){open(`<h3>🚗 Următoarele lucrări</h3>`+NEXT.map(n=>`<div class="pcard"><div class="t">${n.title}</div><div class="m">${n.plate} · normă ${n.n}</div></div>`).join(''))}
+function attSheet(){const A=attItems();open(`<h3>🔔 Au nevoie de atenția ta</h3>`+(A.map(x=>`<button class="pcard" style="width:100%;text-align:left;background:none" data-p="${x[0]}"><div class="t">${x[1]} ${x[2]}</div><div class="m">${x[3]}</div></button>`).join('')||'<div class="empty">Totul e la zi.</div>'))}
+setInterval(()=>{if(jst!=='run')return;jsec+=speed;const t=$('jt'),bb=$('jb'),j=$('job');
+  if(t)t.firstChild.textContent=mmss(jsec)+' ';if(bb)bb.style.width=Math.min(100,jsec/JOB.norm*100)+'%';
+  if(j&&!j.classList.contains(jobClass())){renderPhone()}},1000);
+function open(html){$('sheet').innerHTML='<div class="grab"></div>'+html;$('sheet').classList.add('on');$('shade').classList.add('on')}
+function close(){$('sheet').classList.remove('on');$('shade').classList.remove('on')}
+function reqSheet(){const K=KIND[rkind];
+  const mine=req.filter(r=>r.from===mech);
+  open(`<h3>🙋 Cerere nouă</h3><div class="kinds">${Object.entries(KIND).map(([k,v])=>`<button class="${k===rkind?'on':''}" data-k="${k}"><span class="e">${v.e}</span>${v.ro}</button>`).join('')}</div>
+   ${rkind==='off'?`<div class="fld">Ziua / perioada<input id="qT" value="2026.10.16, 1 zi"></div>`:`<div class="fld">Ce îți trebuie?<input id="qT" value="${rkind==='tool'?'Set chei tubulare 1/2&quot;':'Cărucior hidraulic'}"></div>`}
+   <div class="fld">Motiv (opțional)<textarea id="qW" rows="2"></textarea></div>
+   <div class="to">Merge la: <b>${ADMINS[K.to]}</b> (${K.to==='yvonne'?'HR':'atelier'})</div>
+   <button class="pbtn" data-p="sendreq">Trimite cererea</button>
+   ${mine.length?`<h3 style="margin-top:16px">Cererile mele</h3>`+mine.map(r=>`<div class="pcard"><div class="t">${KIND[r.kind].e} ${esc(r.title)}</div><div class="m">${ST[r.st][0]}${r.ans?' · '+esc(r.ans):''}</div></div>`).join(''):''}`);}
+function docSheet(cat){const L=docs.filter(d=>d.cat===cat&&(d.to==='all'||d.to===mech));
+  open(`<h3>${cat==='guide'?'🛠 Ghiduri de reparație':'📕 Reguli și directive'}</h3>`+(L.map(d=>`<div class="pcard"><div class="t">${esc(d.title)}</div><div class="m">${esc(d.type)} · ${ADMINS[d.by]} · ${d.at}</div>
+   ${d.read.includes(mech)?'<div class="m" style="color:var(--green);font-weight:700">✓ Citit</div>':`<button class="pbtn gr" data-p="read" data-id="${d.id}" data-cat="${cat}" style="margin-top:4px">Am citit și am înțeles</button>`}</div>`).join('')||'<div class="empty">Nimic nou.</div>'));}
+function sheetSheet(){const S=sheets[mech];
+  open(`<h3>🗂 Fișa mea</h3><div class="pcard"><div class="t">${POST.nev}</div><div class="m">${POST.dept} · înlocuitor: ${esc(MECH[HELY[mech]])}</div><div class="m">${POST.alt} · ${POST.spec}</div></div>
+   <div class="pcard"><div class="t">Sarcini și obligații</div><ol style="margin:0;padding-left:18px;display:grid;gap:5px;font-size:14px">${S.duties.map(d=>`<li>${esc(d)}</li>`).join('')}</ol></div>
+   ${S.signed?`<div class="m" style="color:var(--green);font-weight:700">✓ Primit și acceptat · ${S.signed}</div>`:`<button class="pbtn gr" data-p="sign">Am primit și accept</button>`}
+   <div class="m" style="font-size:12px;color:var(--ink3);margin-top:6px">Demó: a szöveg élesben a szerelő nyelvén jelenik meg.</div>`);}
+function msgSheet(){const th=msgs[mech]||[];th.forEach(m=>m.seen=true);
+  open(`<h3>💬 Mesaje cu biroul</h3><div class="chat">${th.map(m=>`<div class="bub ${m.f===mech?'me':'them'}">${esc(m.t)}<small>${m.f in ADMINS?ADMINS[m.f]:'Eu'} · ${m.at}</small></div>`).join('')||'<div class="empty">Niciun mesaj.</div>'}</div>
+   <div class="send" style="margin-top:8px"><input id="pTxt" placeholder="Scrie biroului…"><button class="btn pri" data-p="pmsg">Trimite</button></div>
+   <div class="m" style="font-size:12px;color:var(--ink3);margin-top:6px">Mesajul ajunge la birou (Ferenc, Yvonne, David). Colegilor din atelier nu se poate scrie de aici.</div>`);renderPhone();}
+function taskSheet(){const L=myTasks();
+  open(`<h3>📋 Sarcini primite</h3>`+(L.length?L.map(t=>`<div class="pcard"><div class="t">${esc(t.title)}</div><div class="m">de la ${ADMINS[t.from]}</div><button class="pbtn gr" data-p="acc" data-id="${t.id}">✓ Accept</button></div>`).join(''):'<div class="empty">Nu ai sarcini noi.</div>'));}
+
+document.addEventListener('change',e=>{
+  if(e.target.id==='mech'){mech=e.target.value;close();renderPhone()}
+  if(e.target.id==='mSel'){mech=e.target.value;renderAdmin();renderPhone()}
+  if(e.target.id==='wSel'){wsel=e.target.value;renderPane()}
+});
+document.addEventListener('click',e=>{
+  const w=e.target.closest('[data-who]');if(w){me=w.dataset.who;renderAdmin();return}
+  const tb=e.target.closest('[data-tab]');if(tb){tab=tb.dataset.tab;renderAdmin();return}
+  const r=e.target.closest('[data-r]');if(r){const q=req.find(x=>x.id==r.dataset.id);q.st=r.dataset.r;q.ans=r.dataset.r==='ok'?`Jóváhagyta: ${ADMINS[me]}`:r.dataset.r==='no'?`Elutasította: ${ADMINS[me]} – beszéljük meg`:`Kiadta: ${ADMINS[me]}`;toast(`${MECH[q.from]} telefonján azonnal látszik`);renderAdmin();return}
+  const a=e.target.closest('[data-a]');if(a){const A=a.dataset.a;
+    if(A==='pub'){docs.unshift({id:Date.now(),cat:a.dataset.cat,by:me,type:$('rType').value,title:$('rTitle').value,to:$('rTo').value,read:[],at:'most'});toast('Kiadva – a telefonokon piros szám jelzi');renderAdmin();renderPhone()}
+    if(A==='msg'){const v=$('mTxt').value.trim();if(!v)return;(msgs[mech]=msgs[mech]||[]).push({f:me,t:v,at:now()});renderAdmin();renderPhone();toast(`Elküldve ${MECH[mech]} telefonjára`)}
+    if(A==='addd'){const v=$('dNew').value.trim();if(!v)return;sheets[wsel].duties.push(v);sheets[wsel].signed=null;renderAdmin();renderPhone()}
+    if(A==='deld'){sheets[wsel].duties.splice(+a.dataset.i,1);sheets[wsel].signed=null;renderAdmin();renderPhone()}
+    if(A==='sendsheet'){sheets[wsel].signed=null;mech=wsel;renderAdmin();renderPhone();toast(`Munkalap kiadva ${MECH[wsel]} telefonjára átvételre`)}
+    return}
+  if(e.target.id==='shade'){close();return}
+  const k=e.target.closest('[data-k]');if(k){rkind=k.dataset.k;reqSheet();return}
+  const jb=e.target.closest('[data-j]');if(jb&&!jb.disabled){const J=jb.dataset.j;
+    if(J==='start'){jst='run';toast('Pornítva – a kártya sárga')}
+    if(J==='pause'){jst='pause';toast('Pauză – szünetkódot élesben kér')}
+    if(J==='stop'){jst='done';toast(jsec<=JOB.norm?'Kész időben – zöld':'Kész, de késéssel – piros')}
+    renderPhone();return}
+  const sp=e.target.closest('[data-st]');if(sp){statP=sp.dataset.st;statSheet();return}
+  const p=e.target.closest('[data-p]');if(!p)return;const P=p.dataset.p;
+  if(P==='t'){toast('Demó: élesben a mostani funkció');return}
+  if(P==='stat'){statSheet();return}
+  if(P==='next'){nextSheet();return}
+  if(P==='att'){attSheet();return}
+  if(P==='fast'){speed=speed===1?60:1;$('fastBtn').textContent=speed===1?'⏩ Demó: idő gyorsítása ×60':'⏸ Demó: normál sebesség';return}
+  if(P==='req')reqSheet();
+  if(P==='rule'||P==='guide')docSheet(P);
+  if(P==='sheet')sheetSheet();
+  if(P==='msg')msgSheet();
+  if(P==='tasks')taskSheet();
+  if(P==='sendreq'){const K=KIND[rkind];req.unshift({id:Date.now(),from:mech,kind:rkind,title:$('qT').value,why:$('qW').value.trim(),st:'new',at:now()});close();me=K.to;tab='inbox';renderAdmin();renderPhone();toast(`Elküldve ${ADMINS[K.to]}nak – a bal oldalon már látszik`)}
+  if(P==='read'){docs.find(d=>d.id==p.dataset.id).read.push(mech);docSheet(p.dataset.cat);renderPhone();renderAdmin();toast('Rögzítve: elolvasta')}
+  if(P==='sign'){sheets[mech].signed=new Date().toLocaleDateString('ro-RO',{day:'2-digit',month:'2-digit'});sheetSheet();renderPhone();wsel=mech;tab='sheet';renderAdmin();toast('Munkalap átvéve – az iroda látja')}
+  if(P==='pmsg'){const v=$('pTxt').value.trim();if(!v)return;(msgs[mech]=msgs[mech]||[]).push({f:mech,t:v,at:now()});msgSheet();tab='msg';renderAdmin()}
+  if(P==='acc'){tasks.find(t=>t.id==p.dataset.id).st='acc';taskSheet();renderPhone();renderAdmin()}
+});
+renderAdmin();renderPhone();
+</script>
+
+</body></html>
