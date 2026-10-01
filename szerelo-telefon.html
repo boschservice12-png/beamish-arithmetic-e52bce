@@ -130,7 +130,7 @@ textarea,.sheet input,.sheet select{width:100%;font:inherit;border:1px solid var
 var SB_URL='https://zwsjfzqtskicrukidaog.supabase.co', SB_KEY='sb_publishable_Yu-prB2M7ZUtWiWxeV8LDg_6LINloIU';
 var sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:false}});
 var T={
- ro:{who:'Cine ești?',pin:'PIN-ul tău',wrong:'PIN greșit',out:'Ieșire',hello:'Bună',att1:'lucru are nevoie de atenția ta',attN:'lucruri au nevoie de atenția ta',attOk:'Totul e la zi ✓',
+ ro:{who:'Cine ești?',pin:'PIN-ul tău',wrong:'PIN greșit',newPin:'Alege PIN-ul tău nou (4 cifre)',newPin2:'Repetă PIN-ul nou',pinMis:'Nu se potrivesc, încearcă din nou',pinBad:'PIN invalid (nu 1234)',out:'Ieșire',hello:'Bună',att1:'lucru are nevoie de atenția ta',attN:'lucruri au nevoie de atenția ta',attOk:'Totul e la zi ✓',
    shopProd:'Producția atelierului azi',myProd:'Producția mea azi',prog:'Programat',lucrat:'Lucrat',fact:'Facturat',measured:'timp măsurat, nu introdus',
    run:'lucrează',pz:'pauză',free:'liber',
    jNext:'Următoarea lucrare',jRun:'▶ În lucru',jPause:'⏸ Pauză',jLate:'⚠ Întârziere – peste normă',jOk:'✓ Gata la timp',jLateDone:'⚠ Gata cu întârziere',jNone:'Nicio lucrare alocată azi',jWait:'Așteaptă aprobarea recepției',
@@ -147,7 +147,7 @@ var T={
    fT:'Sarcini primite',fFrom:'de la',fDue:'Termen',fAcc:'✓ Accept',fDone:'✓ Gata',fBack:'↩ Trimit înapoi',fBackN:'De ce o trimiți înapoi? (opțional)',fSend:'Trimite înapoi',fProg:'Progres',fSave:'Salvează progresul',fNone:'Nu ai sarcini primite.',fNom:'Nu intră în timpul măsurat.',fNew:'NOU',close:'Închide',
    day:'Zi',month:'Lună',year:'An',jobsN:'lucrări',norm140:'Ore normă lucrate',norm140n:'Minimul lunar este 140 de ore normă, proporțional cu prezența.',noLei:'Fără valori în lei – doar ore și lucrări.',
    bl:{'BL-01':'Lipsă piesă','BL-02':'Lipsă sculă','BL-04':'Lipsă documentație','BL-03':'Lipsă aparat măsură','BL-05':'Fără aprobare scrisă','BL-06':'Risc de siguranță','BL-07':'Fără lucrare alocată','BL-08':'Sarcină internă / instruire','BL-09':'Garanție proprie','BL-10':'Aștept alt departament'}},
- hu:{who:'Ki vagy?',pin:'A PIN-ed',wrong:'Rossz PIN',out:'Kilépés',hello:'Szia',att1:'dolog vár rád',attN:'dolog vár rád',attOk:'Minden rendben ✓',
+ hu:{who:'Ki vagy?',pin:'A PIN-ed',wrong:'Rossz PIN',newPin:'Válassz új, saját PIN-t (4 számjegy)',newPin2:'Ismételd meg az új PIN-t',pinMis:'Nem egyezik, próbáld újra',pinBad:'Érvénytelen PIN (nem lehet 1234)',out:'Kilépés',hello:'Szia',att1:'dolog vár rád',attN:'dolog vár rád',attOk:'Minden rendben ✓',
    shopProd:'A műhely mai termelése',myProd:'Mai termelésem',prog:'Programozott',lucrat:'Letermelt',fact:'Számlázott',measured:'mért idő, nem beírt',
    run:'dolgozik',pz:'szünet',free:'szabad',
    jNext:'Következő munka',jRun:'▶ Folyamatban',jPause:'⏸ Szünet',jLate:'⚠ Késés – a norma felett',jOk:'✓ Időben kész',jLateDone:'⚠ Késéssel kész',jNone:'Ma nincs kiosztott munka',jWait:'A recepció jóváhagyására vár',
@@ -168,7 +168,7 @@ var T={
    bl:{'BL-01':'पार्ट छैन','BL-02':'औजार छैन','BL-04':'कागजात छैन','BL-03':'नाप्ने उपकरण छैन','BL-05':'लिखित स्वीकृति छैन','BL-06':'सुरक्षा जोखिम','BL-07':'काम तोकिएको छैन','BL-08':'आन्तरिक काम / तालिम','BL-09':'आफ्नै ग्यारेन्टी','BL-10':'अर्को विभाग पर्खँदै'}}
 };
 T.en=T.ro;
-var lang=localStorage.getItem('ra_lang')||'ro', S=null, sel=null, pinBuf='', tasks=[], per=null, fel=[], docs=[], reqs=[], ws=null, msgs=[], tick=null, poll=null, statP='zi';
+var lang=localStorage.getItem('ra_lang')||'ro', S=null, sel=null, pinBuf='', pinMode='login', pend=null, pin1='', tasks=[], per=null, fel=[], docs=[], reqs=[], ws=null, msgs=[], tick=null, poll=null, statP='zi';
 var t=function(k){return (T[lang]&&T[lang][k]!==undefined)?T[lang][k]:T.ro[k];};
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 function hh(m){return (Math.round((m||0)/6)/10).toFixed(1)+'h';}
@@ -182,7 +182,7 @@ function fDate(s){try{return new Date(s).toLocaleString(lang==='hu'?'hu-HU':'ro-
 function sheet(inner){var b=document.createElement('div');b.className='back';b.innerHTML='<div class="sheet"><div class="grab"></div>'+inner+'</div>';document.body.appendChild(b);b.addEventListener('click',function(e){if(e.target===b){b.remove();refresh();}});return b;}
 
 /* ───── ÉLŐLAP: a műhely mai termelése + nevek ───── */
-async function login(){sel=null;pinBuf='';clearInterval(poll);clearInterval(tick);
+async function login(){sel=null;pinBuf='';pinMode='login';pend=null;pin1='';clearInterval(poll);clearInterval(tick);
   app().innerHTML='<div class="top"><span class="logo"></span><div class="brand">RedAssistance<small>Szkaliczki Service · Atelier</small></div>'+langBar()+'</div><div class="wrap" id="lw"><div class="empty">…</div></div>';
   var r=await sb.rpc('f_szerelok'), a=await sb.rpc('f_atelier_azi');
   var L=(r.data||[]).filter(function(e){return e.has_pin;}), A={};(a.data||[]).forEach(function(x){A[x.employee_id]=x;});
@@ -194,13 +194,24 @@ async function login(){sel=null;pinBuf='';clearInterval(poll);clearInterval(tick
    '<div class="muted" style="font-weight:600;margin:2px 2px 0">'+t('who')+'</div><div class="names">'+L.map(function(e){var x=A[e.id]||{programat_min:0,produs_min:0};
      var st=x.fut?'run':x.szunet?'pause':'';return '<button data-emp="'+e.id+'" data-name="'+esc(e.name)+'">'+(x.uj_feladat?'<span class="bad">'+x.uj_feladat+'</span>':'')+
      '<span class="ini">'+initials(e.name)+'</span><b>'+esc(e.name)+'</b><span class="st '+st+'"><i></i>'+(st==='run'?t('run'):st==='pause'?t('pz'):t('free'))+'</span><span class="h">'+hh(x.produs_min)+' / '+hh(x.programat_min)+'</span></button>';}).join('')+'</div>';}
-function pinScreen(){app().innerHTML='<div class="top"><button class="out" id="back">‹</button><div class="brand">'+esc(sel.name)+'<small>'+t('pin')+'</small></div>'+langBar()+'</div><div class="wrap"><div class="pinbox" id="pb"></div><div class="pad">'+
+function pinScreen(){app().innerHTML='<div class="top"><button class="out" id="back">‹</button><div class="brand">'+esc(sel.name)+'<small>'+t(pinMode==='new1'?'newPin':pinMode==='new2'?'newPin2':'pin')+'</small></div>'+langBar()+'</div><div class="wrap"><div class="pinbox" id="pb"></div><div class="pad">'+
   [1,2,3,4,5,6,7,8,9,'',0,'⌫'].map(function(k){return k===''?'<span></span>':'<button data-k="'+k+'">'+k+'</button>';}).join('')+'</div><div class="err" id="perr"></div></div>';drawPin();}
 function drawPin(){document.getElementById('pb').innerHTML=[0,1,2,3].map(function(i){return '<i class="'+(i<pinBuf.length?'f':'')+'"></i>';}).join('');}
 async function tryLogin(){var r=await sb.rpc('f_pin_login',{p_emp:sel.id,p_pin:pinBuf,p_device:navigator.userAgent.slice(0,60)});
   if(r.error||!r.data||!r.data[0]){pinBuf='';drawPin();document.getElementById('perr').textContent=t('wrong');if(navigator.vibrate)navigator.vibrate(120);return;}
-  S=r.data[0];localStorage.setItem('ra_sess',JSON.stringify(S));main();}
-function logout(){localStorage.removeItem('ra_sess');S=null;clearInterval(poll);clearInterval(tick);login();}
+  gate(r.data[0]);}
+/* Induló PIN (1234) után kötelező saját PIN — a munkamenet csak csere után aktív */
+async function gate(s){var m=await sb.rpc('f_pin_must_change',{p_token:s.token});
+  if(m.error&&/munkamenet|session/i.test(m.error.message)){logout();return;}
+  if(m.data===true){S=null;pend=s;sel=sel||{id:s.employee_id,name:s.name};pinMode='new1';pin1='';pinBuf='';pinScreen();return;}
+  S=s;localStorage.setItem('ra_sess',JSON.stringify(S));main();}
+async function newPinStep(){var err=function(k){pinBuf='';drawPin();document.getElementById('perr').textContent=t(k);if(navigator.vibrate)navigator.vibrate(120);};
+  if(pinMode==='new1'){if(pinBuf==='1234'){err('pinBad');return;}pin1=pinBuf;pinBuf='';pinMode='new2';pinScreen();return;}
+  if(pinBuf!==pin1){pinMode='new1';pin1='';pinBuf='';pinScreen();document.getElementById('perr').textContent=t('pinMis');return;}
+  var r=await sb.rpc('f_change_own_pin',{p_token:pend.token,p_new:pinBuf});
+  if(r.error){pinMode='new1';pin1='';pinBuf='';pinScreen();document.getElementById('perr').textContent=t('pinBad');return;}
+  var s=pend;pend=null;pinMode='login';pin1='';S=s;localStorage.setItem('ra_sess',JSON.stringify(S));main();}
+function logout(){localStorage.removeItem('ra_sess');S=null;pend=null;clearInterval(poll);clearInterval(tick);login();}
 
 /* ───── ADATOK ───── */
 async function main(){await refresh();clearInterval(poll);poll=setInterval(refresh,20000);clearInterval(tick);tick=setInterval(liveTick,1000);}
@@ -356,8 +367,8 @@ function openKind(k){if(k==='fel')felSheet();else if(k==='req')reqSheet();else i
 document.addEventListener('click',async function(e){
   var l=e.target.closest('[data-lang]');if(l){lang=l.getAttribute('data-lang');localStorage.setItem('ra_lang',lang);if(S)render();else if(sel)pinScreen();else login();return;}
   var n=e.target.closest('[data-emp]');if(n){sel={id:n.getAttribute('data-emp'),name:n.getAttribute('data-name')};pinBuf='';pinScreen();return;}
-  if(e.target.id==='back'){sel=null;login();return;}
-  var k=e.target.closest('[data-k]');if(k){var v=k.getAttribute('data-k');if(v==='⌫')pinBuf=pinBuf.slice(0,-1);else if(pinBuf.length<4)pinBuf+=v;drawPin();if(pinBuf.length===4)tryLogin();return;}
+  if(e.target.id==='back'){sel=null;localStorage.removeItem('ra_sess');login();return;}
+  var k=e.target.closest('[data-k]');if(k){var v=k.getAttribute('data-k');if(v==='⌫')pinBuf=pinBuf.slice(0,-1);else if(pinBuf.length<4)pinBuf+=v;drawPin();if(pinBuf.length===4){if(pinMode==='login')tryLogin();else newPinStep();}return;}
   if(e.target.closest('#fOut')){logout();return;}
   var o=e.target.closest('[data-open]');if(o){openKind(o.getAttribute('data-open'));return;}
   var a=e.target.closest('[data-act]');if(a&&!a.disabled){var kind=a.getAttribute('data-act'),id=a.getAttribute('data-id');
@@ -365,7 +376,7 @@ document.addEventListener('click',async function(e){
     else if(kind==='pause')pauseSheet(id);else if(kind==='done')doneSheet(id);}
 });
 document.addEventListener('visibilitychange',function(){if(!document.hidden){if(S)refresh();else if(!sel)login();}});
-S=load();if(S)main();else login();
+var s0=load();if(s0)gate(s0);else login();
 })();
 </script>
 </body>
