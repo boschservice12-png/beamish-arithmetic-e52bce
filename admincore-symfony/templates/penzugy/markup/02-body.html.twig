@@ -1,0 +1,267 @@
+{% verbatim %}
+
+</head>
+<body>
+
+<div class="header-bar">
+  <div class="logo-wrap">
+    <div class="logo-circle">
+      <svg viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg>
+    </div>
+    <div>
+      <div class="logo-text"><span>Red</span>Assistance</div>
+      <div class="logo-sub">Panou de control operațional</div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="btn-import" onclick="openAsmImport()">📥 Import ASM</button>
+    <button class="btn-reset" onclick="if(confirm('Sigur vrei sa stergi TOATE datele salvate?')){localStorage.removeItem('redassistance-panel-v16');location.reload();}">Reset</button>
+    <span class="save-badge" id="saveStatus"></span>
+  </div>
+</div>
+
+<div class="container">
+  <div class="period-nav">
+    <button onclick="setPeriod('zi')">Zi</button>
+    <button onclick="setPeriod('saptamana')">Săptămână</button>
+    <button onclick="setPeriod('luna')" class="active">Lună</button>
+    <button onclick="setPeriod('an')">An</button>
+  </div>
+
+  <!-- 7 FŐCSOPORT NAVIGÁCIÓ (új) -->
+  <div class="group-nav">
+    <button onclick="showGroup('cegvezetes', this)" class="active">Cégvezetés</button>
+    <button onclick="showGroup('hr', this)">HR</button>
+    <button onclick="showGroup('marketing', this)">Marketing</button>
+    <button onclick="showGroup('penzugy', this)">Pénzügy</button>
+    <button onclick="showGroup('termeles', this)">Termelés</button>
+    <button onclick="showGroup('felulvizsgalat', this)">Felülvizsgálat</button>
+    <button onclick="showGroup('ertekesites', this)">Értékesítés</button>
+  </div>
+
+  <!-- ALTAB SÁV (csak Pénzügynél töltődik) -->
+  <div class="sub-nav" id="subNav" style="display:none"></div>
+
+  <!-- Régi main-nav megmarad mint fallback (CSS-sel elrejtve, JS-ből még működik) -->
+  <div class="main-nav">
+    <button onclick="showPage('sumar')" class="active">Dashboard</button>
+    <button onclick="showPage('venituri')">Venituri</button>
+    <button onclick="showPage('cheltuieli')">Cheltuieli</button>
+    <button onclick="showPage('salarii')">Personal</button>
+    <button onclick="showPage('programare')">Programare</button>
+    <button onclick="showPage('cashflow')">Cash Flow</button>
+    <button onclick="showPage('evzaras')">Evzárás</button>
+  </div>
+
+  <!-- SUMAR PAGE — EFFICIENCY DASHBOARD -->
+  <div id="sumar" class="page active">
+    <!-- TOP BAR -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <div>
+        <div style="font-size:1.4rem;font-weight:900;color:var(--dark);">RedAssistance Dashboard</div>
+        <div style="font-size:.72rem;color:var(--muted);font-weight:500;">Panou de control operațional — SC Szkaliczki Service SRL</div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <button onclick="openCegConfig()" style="padding:8px 18px;background:var(--white);color:var(--red);border:2px solid var(--red);border-radius:20px;font-weight:700;font-size:.78rem;cursor:pointer;font-family:inherit;white-space:nowrap;">Configurare Firma</button>
+      </div>
+    </div>
+
+    <!-- RIASZTÁSOK -->
+    <div id="sumarAlerts" style="margin-bottom:10px;"></div>
+
+    <!-- MUNKANAPOK -->
+    <div style="background:var(--white);border-radius:12px;border:1px solid var(--border);border-bottom:3px solid var(--red);padding:8px 16px;margin-bottom:12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+        <div style="font-size:.72rem;font-weight:800;color:var(--red);text-transform:uppercase;letter-spacing:.04em;">ZILE LUCRĂTOARE</div>
+        <div style="display:flex;gap:3px;flex-wrap:wrap;" id="munkanapokRow"></div>
+      </div>
+    </div>
+
+    <!-- SECȚIUNEA 1: PROFIT + FORGALOM -->
+    <div class="ebitda-card">
+      <div class="ebitda-title">PROFIT NET · <span id="period-label">LUNA</span></div>
+      <div style="font-size:2.5rem;font-weight:900;margin:6px 0;" id="profit-hero">0 RON</div>
+      <div style="font-size:.82rem;color:var(--muted);" id="profit-sub">Venituri − Cheltuieli</div>
+    </div>
+
+    <!-- SECȚIUNEA 1.5: KÉT TENGELYES ÖSSZEHASONLÍTÁS -->
+    <div id="sumarTwoAxis" style="margin-bottom:14px;"></div>
+
+    <!-- SECȚIUNEA 2: VENITURI / CHELTUIELI / PIPELINE -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:14px;" id="sumar3groups"></div>
+
+    <!-- SECȚIUNEA 3: FORECAST — Previziuni -->
+    <div class="card" id="forecastSection" style="margin-bottom:14px;"></div>
+
+    <!-- SECȚIUNEA 4: KAPACITÁS & KIHASZNÁLTSÁG -->
+    <div class="card" id="kapacitasSection" style="margin-bottom:14px;"></div>
+
+    <!-- SECȚIUNEA 5: BREAK-EVEN + COST/REVENUE -->
+    <div class="card" id="breakevenSection" style="margin-bottom:14px;"></div>
+
+    <!-- SECȚIUNEA 6: PREDICȚIE PER PERIOADĂ -->
+    <div class="card" id="sumarTable"></div>
+  </div>
+
+  <!-- PROGRAMARE PAGE — Gantt -->
+  <div id="programare" class="page">
+    <!-- Header -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
+      <div>
+        <div style="font-size:.72rem;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.05em;">PROGRAMARE ATELIER</div>
+        <div style="font-size:1.1rem;font-weight:800;color:var(--dark);" id="ganttDateTitle"></div>
+      </div>
+      <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;">
+        <div style="display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden;">
+          <button onclick="setGanttView('zi')" id="gvZi" style="padding:5px 12px;background:var(--red);color:#fff;border:none;cursor:pointer;font-size:.72rem;font-weight:700;font-family:inherit;">Zi</button>
+          <button onclick="setGanttView('sapt')" id="gvSapt" style="padding:5px 12px;background:var(--white);color:var(--dark);border:none;border-left:1px solid var(--border);cursor:pointer;font-size:.72rem;font-weight:700;font-family:inherit;">Săpt</button>
+          <button onclick="setGanttView('luna')" id="gvLuna" style="padding:5px 12px;background:var(--white);color:var(--dark);border:none;border-left:1px solid var(--border);cursor:pointer;font-size:.72rem;font-weight:700;font-family:inherit;">Lună</button>
+        </div>
+        <button onclick="ganttPrev()" style="padding:5px 10px;background:var(--white);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:.85rem;font-weight:700;">&larr;</button>
+        <button onclick="ganttToday()" style="padding:5px 12px;background:var(--red);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:.72rem;font-weight:700;font-family:inherit;">Azi</button>
+        <button onclick="ganttNext()" style="padding:5px 10px;background:var(--white);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:.85rem;font-weight:700;">&rarr;</button>
+        <input type="date" id="ganttDatePicker" onchange="ganttDate=new Date(this.value+'T12:00:00');renderGantt();" style="padding:4px 8px;font-size:.72rem;border:1px solid var(--border);border-radius:5px;font-family:inherit;">
+      </div>
+    </div>
+    <!-- Legenda -->
+    <div style="display:flex;gap:10px;margin-bottom:8px;font-size:.65rem;font-weight:600;align-items:center;flex-wrap:wrap;">
+      <span style="color:var(--muted);">LEGENDA:</span>
+      <span style="display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#fef3c7;border:1px solid #f59e0b;"></span> Lefoglalt</span>
+      <span style="display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#fed7aa;border:1px solid #ea580c;"></span> Kiosztott</span>
+      <span style="display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#fecaca;border:1px solid #dc2626;"></span> Lezárt</span>
+      <span style="display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#c4b5a0;border:1px solid #78350f;"></span> Leszámlázott</span>
+      <span style="display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#334155;border:1px solid #0f172a;"></span> Kész</span>
+    </div>
+    <!-- KPI -->
+    <div id="ganttKPI"></div>
+    <!-- GANTT -->
+    <div id="ganttGrid" style="margin-top:8px;overflow-x:auto;"></div>
+    <!-- Alerts -->
+    <div id="ganttAlerts" style="margin-top:8px;"></div>
+    <!-- Comenzi lista -->
+    <div id="ganttList" style="margin-top:10px;"></div>
+  </div>
+
+    <!-- VENITURI PAGE -->
+  <div id="venituri" class="page">
+    <div id="venituri-list"></div>
+  </div>
+
+  <!-- CHELTUIELI PAGE -->
+  <div id="cheltuieli" class="page">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+      <div>
+        <div style="font-size:.78rem;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.06em;">CHELTUIELI</div>
+        <div style="font-size:1.4rem;font-weight:800;color:var(--dark);">Costuri operaționale</div>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+        <div style="display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden;">
+          <button onclick="setCheltFilter('all')" id="cfAll" style="padding:5px 12px;background:var(--red);color:#fff;border:none;cursor:pointer;font-size:.68rem;font-weight:700;font-family:inherit;">Toate</button>
+          <button onclick="setCheltFilter('fix')" id="cfFix" style="padding:5px 12px;background:var(--white);color:var(--dark);border:none;border-left:1px solid var(--border);cursor:pointer;font-size:.68rem;font-weight:700;font-family:inherit;">Fix</button>
+          <button onclick="setCheltFilter('flex')" id="cfFlex" style="padding:5px 12px;background:var(--white);color:var(--dark);border:none;border-left:1px solid var(--border);cursor:pointer;font-size:.68rem;font-weight:700;font-family:inherit;">Flex</button>
+        </div>
+        <select id="cheltMonthSelect" onchange="setMonth(parseInt(this.value))" style="padding:8px 16px;font-size:.85rem;border-radius:8px;min-width:160px;">
+        </select>
+        <button class="btn btn-primary" onclick="addFactura()">+ Adaugă</button>
+      </div>
+    </div>
+    <div class="dept-grid" id="dept-buttons"></div>
+    <div id="facturi-list"></div>
+    <div id="achizitii-list" style="margin-top:14px;"></div>
+  </div>
+
+  <!-- PERSONAL PAGE -->
+  <div id="salarii" class="page">
+    <div id="salarii-list"></div>
+  </div>
+
+  <!-- CASHFLOW PAGE -->
+  <div id="cashflow" class="page">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <div>
+        <div style="font-size:.78rem;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.06em;">CASH FLOW</div>
+        <div style="font-size:1.4rem;font-weight:800;color:var(--dark);">Sold și plăți</div>
+      </div>
+      <select id="cfMonthSelect" onchange="setMonth(parseInt(this.value))" style="padding:8px 16px;font-size:.85rem;border-radius:8px;min-width:160px;">
+      </select>
+    </div>
+    <div id="cashflow-list"></div>
+  </div>
+
+  <!-- EVZARAS PAGE -->
+  <div id="evzaras" class="page">
+    <div style="margin-bottom: 3rem; text-align: center;">
+      <h1 style="font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem;">
+        📋 Închidere Anuală (Évzárás)
+      </h1>
+      <p style="color: #94a3b8; font-size: 1rem;">Raport Financiar Complet - Anul <span id="evz-year">2024</span></p>
+    </div>
+
+    <div class="card" style="border: 2px solid rgba(59, 130, 246, 0.4);">
+      <h2 style="font-size: 1.5rem; font-weight: 700; color: #3b82f6; margin-bottom: 2rem;">1️⃣ Situație Financiară Generală</h2>
+      <div class="grid-3" style="margin-bottom: 2rem;">
+        <div style="background: rgba(16, 185, 129, 0.2); padding: 2rem; border-radius: 16px; border: 2px solid rgba(16, 185, 129, 0.4);">
+          <div style="color: #94a3b8; font-size: 0.875rem; margin-bottom: 0.5rem;">💰 Total Venituri Anuale</div>
+          <div style="font-size: 2.5rem; font-weight: 800; color: #10b981;" id="evz-ven">0 RON</div>
+        </div>
+        <div style="background: rgba(239, 68, 68, 0.2); padding: 2rem; border-radius: 16px; border: 2px solid rgba(239, 68, 68, 0.4);">
+          <div style="color: #94a3b8; font-size: 0.875rem; margin-bottom: 0.5rem;">💸 Total Costuri Anuale</div>
+          <div style="font-size: 2.5rem; font-weight: 800; color: #ef4444;" id="evz-cost">0 RON</div>
+        </div>
+        <div id="evz-profit-card" style="background: rgba(16, 185, 129, 0.2); padding: 2rem; border-radius: 16px; border: 2px solid rgba(16, 185, 129, 0.4);">
+          <div style="color: #94a3b8; font-size: 0.875rem; margin-bottom: 0.5rem;" id="evz-profit-label">✅ Profit</div>
+          <div style="font-size: 2.5rem; font-weight: 800; color: #10b981;" id="evz-profit">0 RON</div>
+          <div style="color: #94a3b8; font-size: 0.75rem; margin-top: 0.5rem;">Marjă: <span id="evz-margin">0</span>%</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="border: 2px solid rgba(139, 92, 246, 0.4); margin-top: 2rem;">
+      <h2 style="font-size: 1.5rem; font-weight: 700; color: #8b5cf6; margin-bottom: 1rem;">3️⃣ Producție pe Angajați</h2>
+      <div style="background: rgba(139, 92, 246, 0.1); padding: 1rem; border-radius: 12px; margin-bottom: 2rem; border: 1px solid rgba(139, 92, 246, 0.3);">
+        <div style="color: #cbd5e1; font-size: 0.875rem; line-height: 1.6;">
+          📊 <strong>Calcul Ore Așteptate pe An:</strong><br/>
+          • Standard: 140 ore/lună × 12 luni = <strong>1,680 ore/an</strong><br/>
+          • MINUS 35 zile concediu (35 × 8 ore) = <strong>280 ore</strong><br/>
+          • <strong style="color: #8b5cf6; font-size: 1rem;">AȘTEPTAT: 1,400 ore/an/angajat</strong>
+        </div>
+      </div>
+      <div id="evz-angajati-list"></div>
+    </div>
+  </div>
+
+  <!-- ═══════ ÚJ ÜRES OLDALAK (3 főcsoport placeholder) ═══════ -->
+
+  <!-- MARKETING -->
+  <div id="marketing" class="page">
+    <div class="placeholder-card">
+      <div class="placeholder-icon">📣</div>
+      <div class="placeholder-title">Marketing</div>
+      <div class="placeholder-text">Modulul de marketing va fi disponibil în versiunea următoare</div>
+      <div class="placeholder-soon">Coming soon</div>
+    </div>
+  </div>
+
+  <!-- FELÜLVIZSGÁLAT -->
+  <div id="felulvizsgalat" class="page">
+    <div class="placeholder-card">
+      <div class="placeholder-icon">🔍</div>
+      <div class="placeholder-title">Felülvizsgálat</div>
+      <div class="placeholder-text">AI elemzés · megoldás építés · admin validálás · lezárás</div>
+      <div class="placeholder-soon">Construcție în curs</div>
+    </div>
+  </div>
+
+  <!-- ÉRTÉKESÍTÉS -->
+  <div id="ertekesites" class="page">
+    <div class="placeholder-card">
+      <div class="placeholder-icon">💼</div>
+      <div class="placeholder-title">Értékesítés</div>
+      <div class="placeholder-text">Modulul de vânzări va fi disponibil în versiunea următoare</div>
+      <div class="placeholder-soon">Coming soon</div>
+    </div>
+  </div>
+
+</div>
+
+{% endverbatim %}

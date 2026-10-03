@@ -186,4 +186,17 @@ final class PinGatewayTest extends WebTestCase
         $this->client->request('GET', '/teendoim.html');
         self::assertResponseRedirects('/teendoim', 301);
     }
+
+    public function testFinancePanelPageAndAdminCoreButtonRedirect(): void
+    {
+        $this->client->request('GET', '/penzugy');
+        self::assertResponseIsSuccessful();
+        $html = $this->client->getResponse()->getContent();
+        self::assertStringContainsString('<title>RedAssistance — Panou de control operațional</title>', $html);
+        self::assertStringContainsString('<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>', $html);
+        self::assertMatchesRegularExpression('#<script src="/assets/penzugy/js/01-app\.js\?v=\w{10}"></script>#', $html);
+
+        $this->client->request('GET', '/finance-dashboard.html');
+        self::assertResponseRedirects('/penzugy', 301);
+    }
 }

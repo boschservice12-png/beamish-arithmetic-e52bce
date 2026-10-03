@@ -1,0 +1,379 @@
+
+:root {
+  --red: #E53935;
+  --red-light: #FFEBEE;
+  --red-hover: #C62828;
+  --dark: #1e293b;
+  --text: #475569;
+  --muted: #94a3b8;
+  --border: #e8ecf1;
+  --bg: #f8fafb;
+  --white: #ffffff;
+  --green: #10b981;
+  --blue: #3b82f6;
+  --purple: #8b5cf6;
+  --pink: #ec4899;
+  --orange: #f59e0b;
+  --cyan: #06b6d4;
+  --danger: #ef4444;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --shadow: 0 1px 3px rgba(0,0,0,.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.06);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Montserrat', sans-serif;
+  background: var(--bg);
+  color: var(--dark);
+  min-height: 100vh;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+.container { max-width: 1500px; margin: 0 auto; padding: 0 24px 32px; }
+
+/* === HEADER === */
+.header-bar {
+  background: var(--white);
+  border-bottom: none;
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(200,64,64,.06);
+}
+.header-bar::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--red) 0%, #e85d5d 40%, var(--border) 100%);
+}
+.logo-wrap { display: flex; align-items: center; gap: 10px; }
+.logo-circle {
+  width: 38px; height: 38px;
+  border: 3px solid var(--red);
+  border-radius: 50%;
+  position: relative;
+  flex-shrink: 0;
+}
+.logo-circle::after {
+  content: '';
+  position: absolute;
+  width: 12px; height: 12px;
+  background: var(--red);
+  border-radius: 50%;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
+.logo-circle svg { display: none; }
+.logo-text { font-size: 1.25rem; font-weight: 800; color: var(--dark); letter-spacing: -.02em; line-height: 1.1; }
+.logo-text span { color: var(--red); }
+.logo-sub { font-size: .68rem; color: var(--muted); font-weight: 500; }
+.header-actions { display: flex; align-items: center; gap: 8px; }
+.btn-import {
+  padding: 8px 20px; background: var(--red); color: #fff; border: none;
+  border-radius: 20px; font-weight: 700; font-size: .82rem; cursor: pointer;
+  transition: .15s; font-family: inherit;
+}
+.btn-import:hover { background: var(--red-hover); box-shadow: 0 4px 12px rgba(200,64,64,.2); }
+.btn-reset {
+  padding: 7px 14px; background: transparent; color: var(--muted);
+  border: 1.5px solid var(--border); border-radius: 20px;
+  font-weight: 600; font-size: .78rem; cursor: pointer; transition: .15s; font-family: inherit;
+}
+.btn-reset:hover { border-color: var(--danger); color: var(--danger); }
+.save-badge { font-size: .72rem; color: var(--muted); font-weight: 500; }
+
+/* === PERIOD NAV === */
+.period-nav {
+  display: flex; gap: 4px; justify-content: flex-end;
+  margin: 14px 0 6px; flex-wrap: wrap;
+}
+.period-nav button {
+  padding: 5px 14px; background: transparent; border: 1.5px solid var(--border);
+  border-radius: 7px; color: var(--muted); cursor: pointer;
+  font-weight: 600; font-size: .75rem; transition: .15s; font-family: inherit;
+}
+.period-nav button:hover { border-color: var(--red); color: var(--red); }
+.period-nav button.active { background: var(--red-light); color: var(--red); border-color: var(--red); }
+
+/* === MAIN NAV (tab style) === */
+.main-nav {
+  display: flex; gap: 0; margin-bottom: 18px;
+  background: var(--white); padding: 0 8px;
+  border-bottom: 2px solid var(--border); flex-wrap: wrap;
+  border-radius: 12px 12px 0 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,.02);
+}
+.main-nav button {
+  flex: 0 1 auto; padding: 13px 22px; font-size: .82rem; font-weight: 600;
+  background: transparent; color: var(--muted); border: none;
+  border-bottom: 3px solid transparent; cursor: pointer;
+  transition: all .2s; font-family: inherit; margin-bottom: -2px;
+  letter-spacing: .01em;
+}
+.main-nav button.active { color: var(--red); border-bottom-color: var(--red); font-weight: 800; background: rgba(200,64,64,.03); }
+.main-nav button:not(.active):hover { color: var(--dark); background: rgba(0,0,0,.02); }
+
+/* === PAGES === */
+.page { display: none; }
+.page.active { display: block; }
+
+/* === CARDS === */
+.card {
+  background: var(--white); border-radius: var(--radius-lg);
+  padding: 18px; margin-bottom: 12px;
+  box-shadow: var(--shadow); border: 1px solid var(--border);
+}
+
+/* === PROFIT HERO === */
+.ebitda-card {
+  background: linear-gradient(135deg, var(--white) 0%, #fef8f8 100%);
+  border-radius: 16px;
+  padding: 28px; margin-bottom: 16px; text-align: center;
+  border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(200,64,64,.06);
+  position: relative; overflow: hidden;
+}
+.ebitda-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, var(--red) 0%, #e85d5d 50%, var(--green) 100%);
+}
+.ebitda-title {
+  color: var(--red); font-size: .8rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px;
+}
+
+/* === GRIDS === */
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+/* === STAT VALUES === */
+.stat-label {
+  color: var(--muted); font-size: .72rem; margin-bottom: 4px;
+  font-weight: 600; text-transform: uppercase; letter-spacing: .04em;
+}
+.stat-value { font-size: 1.6rem; font-weight: 800; color: var(--dark); }
+.stat-value.negative { color: var(--danger); }
+.stat-value.positive { color: var(--green); }
+
+/* === VENITURI CARDS === */
+.ven-card {
+  background: var(--white); border-radius: var(--radius-lg);
+  padding: 16px; margin-bottom: 10px;
+  display: grid; grid-template-columns: auto 1fr auto;
+  gap: 16px; align-items: center;
+  box-shadow: var(--shadow); border: 1px solid var(--border); transition: .15s;
+}
+.ven-card:hover { border-color: var(--red); box-shadow: var(--shadow-md); }
+.ven-icon-box { display: flex; align-items: center; gap: 10px; }
+.ven-icon {
+  font-size: 1.8rem; width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center; border-radius: 10px;
+}
+.ven-title { font-size: 1rem; font-weight: 700; color: var(--dark); }
+.ven-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* === GLOBAL INPUTS === */
+label { display: block; color: var(--text); font-size: .72rem; margin-bottom: 4px; font-weight: 600; }
+input[type="number"], input[type="text"], select, textarea {
+  width: 100%; padding: 8px 10px; background: var(--white);
+  border: 1.5px solid var(--border); border-radius: 8px;
+  color: var(--dark); font-size: .9rem; font-weight: 600;
+  outline: none; font-family: inherit; transition: .15s;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--red); box-shadow: 0 0 0 3px rgba(200,64,64,.06);
+}
+.dif-box { text-align: right; min-width: 120px; }
+.dif-value { font-size: 1.2rem; font-weight: 800; color: var(--dark); }
+.dif-value.positive { color: var(--green); }
+.dif-value.negative { color: var(--danger); }
+.dif-label { color: var(--text); font-size: .7rem; }
+
+/* === DEPARTMENT GRID === */
+.dept-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px; margin-bottom: 16px;
+}
+.dept-btn {
+  padding: 10px; background: var(--white); border: 1.5px solid var(--border);
+  border-radius: var(--radius); color: var(--text); cursor: pointer;
+  font-size: .82rem; font-weight: 600; text-align: center; transition: .15s; font-family: inherit;
+}
+.dept-btn:hover { border-color: var(--red); color: var(--red); }
+.dept-btn.active { background: var(--red); color: #fff; border-color: var(--red); }
+.dept-icon { font-size: 1.2rem; margin-bottom: 4px; display: block; }
+
+/* === BUTTONS === */
+.btn {
+  padding: 8px 18px; border: none; border-radius: 20px; color: #fff;
+  font-weight: 700; cursor: pointer; font-family: inherit; font-size: .82rem; transition: .15s;
+}
+.btn:hover { box-shadow: 0 4px 12px rgba(0,0,0,.1); }
+.btn-primary { background: var(--red); }
+.btn-primary:hover { background: var(--red-hover); }
+.btn-success { background: var(--green); }
+.btn-danger { background: var(--danger); color: #fff; font-size: .85rem; padding: 6px 14px; }
+
+/* === FACTURA ROWS === */
+.factura-row {
+  display: grid; grid-template-columns: 200px 140px 140px 140px 70px;
+  gap: 10px; padding: 10px 12px; background: var(--bg); border-radius: 8px;
+  margin-bottom: 6px; align-items: center; border: 1px solid var(--border);
+}
+.factura-row input[type="number"], .factura-row input[type="text"] { padding: 6px 8px; font-size: .82rem; }
+.factura-dif {
+  padding: 6px; border-radius: 8px; font-weight: 800; text-align: right;
+  display: flex; align-items: center; justify-content: flex-end; gap: 4px; font-size: .85rem;
+}
+.factura-dif.ok { background: rgba(16,185,129,.1); color: var(--green); }
+.factura-dif.over { background: rgba(239,68,68,.1); color: var(--danger); }
+.factura-total {
+  display: grid; grid-template-columns: 200px 140px 140px 140px 70px;
+  gap: 10px; padding: 10px 12px; border-radius: 8px; margin-top: 8px;
+  align-items: center; font-weight: 800; font-size: .9rem;
+  background: var(--bg); border: 2px solid var(--border);
+}
+.factura-total.ok { background: rgba(16,185,129,.08); border-color: rgba(16,185,129,.3); color: var(--green); }
+.factura-total.over { background: rgba(239,68,68,.08); border-color: rgba(239,68,68,.3); color: var(--danger); }
+.empty-state { text-align: center; padding: 2.5rem; color: var(--muted); font-style: italic; }
+.positive { color: var(--green); }
+.negative { color: var(--danger); }
+.success { color: var(--green); }
+.error { color: var(--danger); }
+.warning { color: var(--orange); }
+#period-label { color: var(--red); font-weight: 700; }
+
+/* === ASM IMPORT MODAL === */
+.asm-ov{position:fixed;inset:0;background:rgba(15,23,42,.4);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;animation:aIn .2s}
+.asm-mod{background:var(--white);border-radius:18px;padding:22px;width:min(740px,95vw);max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.15);animation:aUp .25s}
+.asm-drop{border:2px dashed #cbd5e1;border-radius:var(--radius-lg);padding:36px 16px;text-align:center;cursor:pointer;background:var(--bg);position:relative;transition:.2s}
+.asm-drop.over{border-color:var(--red);background:var(--red-light);transform:scale(1.005)}
+.asm-drop input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.asm-files{margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.asm-file{padding:8px 12px;border-radius:8px;border:1.5px solid var(--border);font-size:.8rem;display:flex;align-items:center;gap:6px}
+.asm-file.loaded{border-color:var(--green);background:rgba(16,185,129,.05)}
+.asm-file.missing{border-color:var(--border);background:var(--bg);color:var(--muted)}
+.asm-file .ico{font-size:1.1rem}
+.asm-file .fname{font-weight:700;color:var(--dark)}
+.asm-file.missing .fname{color:var(--muted)}
+.asm-res{margin-top:14px;border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.asm-res-h{background:var(--bg);padding:8px 14px;font-weight:700;font-size:.84rem;color:var(--text)}
+.asm-res-b{padding:10px 14px}
+.asm-r{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f1f5f9;font-size:.82rem}
+.asm-r:last-child{border:none}
+.asm-r .l{color:var(--text);font-weight:600}.asm-r .v{font-weight:800}
+.asm-big{font-size:1.1rem;padding:10px;background:var(--red-light);border-radius:8px;margin:4px 0}
+.asm-acts{display:flex;gap:8px;margin-top:12px;justify-content:flex-end}
+.asm-msg{margin-top:8px;padding:10px 12px;border-radius:8px;font-size:.82rem;font-weight:600;display:none}
+.asm-msg.ok{display:block;background:rgba(16,185,129,.1);color:#15803d}
+.asm-msg.err{display:block;background:rgba(239,68,68,.1);color:#991b1b}
+.asm-cat{margin-top:10px}.asm-cat label{font-size:.78rem;font-weight:700;color:var(--text);display:block;margin-bottom:3px}
+.asm-cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.asm-opt{padding:6px 8px;border:1.5px solid var(--border);border-radius:7px;cursor:pointer;font-weight:600;font-size:.78rem;text-align:center;transition:.15s}
+.asm-opt:hover{border-color:var(--red);background:var(--red-light)}
+.asm-opt.sel{background:var(--red);color:#fff;border-color:var(--red)}
+.asm-summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:8px}
+.asm-card{padding:10px;border-radius:8px;border:1.5px solid var(--border);text-align:center}
+.asm-card .num{font-size:1.1rem;font-weight:800;margin-top:2px}
+.asm-card .lbl{font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase}
+@keyframes aIn{from{opacity:0}to{opacity:1}}
+@keyframes aUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+/* === TABLES (global) === */
+table { font-family: inherit; }
+th { font-family: inherit; }
+td { font-family: inherit; }
+
+/* === 7 CSOPORTOS NAV (felső, fő) === */
+.group-nav {
+  display: flex; gap: 2px; margin: 14px 0 0;
+  background: var(--white); padding: 6px 8px;
+  border-radius: 12px 12px 0 0;
+  border-bottom: 2px solid var(--border);
+  box-shadow: 0 1px 4px rgba(0,0,0,.02);
+  flex-wrap: wrap;
+}
+.group-nav button {
+  flex: 1 1 auto; padding: 11px 16px;
+  font-size: .82rem; font-weight: 700;
+  background: transparent; color: var(--muted);
+  border: none; border-radius: 8px;
+  cursor: pointer; font-family: inherit;
+  transition: all .15s;
+  letter-spacing: .01em;
+}
+.group-nav button:hover:not(.active) {
+  background: rgba(0,0,0,.03); color: var(--dark);
+}
+.group-nav button.active {
+  background: var(--red);
+  color: #fff;
+  font-weight: 800;
+  box-shadow: 0 2px 6px rgba(229,57,53,.25);
+}
+
+/* === ALTAB SÁV (csak Pénzügy alatt jelenik meg) === */
+.sub-nav {
+  display: flex; gap: 4px;
+  margin: 8px 0 14px;
+  flex-wrap: wrap;
+}
+.sub-nav button {
+  padding: 7px 14px;
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 18px;
+  color: var(--muted); cursor: pointer;
+  font-weight: 600; font-size: .78rem;
+  font-family: inherit; transition: .15s;
+}
+.sub-nav button:hover:not(.active) {
+  border-color: var(--red); color: var(--red);
+}
+.sub-nav button.active {
+  background: var(--red-light);
+  color: var(--red);
+  border-color: var(--red);
+  font-weight: 700;
+}
+
+/* === PLACEHOLDER OLDALAK (Marketing, Felülvizsg., Értékes.) === */
+.placeholder-card {
+  background: var(--white); border-radius: 16px;
+  padding: 80px 40px; margin: 20px 0;
+  text-align: center;
+  border: 2px dashed var(--border);
+}
+.placeholder-icon {
+  font-size: 4rem; opacity: 0.3;
+  margin-bottom: 16px;
+}
+.placeholder-title {
+  font-size: 1.5rem; font-weight: 800;
+  color: var(--dark); margin-bottom: 8px;
+}
+.placeholder-text {
+  font-size: .95rem; color: var(--muted);
+  font-weight: 500;
+}
+.placeholder-soon {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 6px 16px;
+  background: var(--red-light);
+  color: var(--red);
+  border-radius: 16px;
+  font-size: .8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+/* Eredeti .main-nav elrejtése — átkerült subnavba */
+.main-nav { display: none !important; }

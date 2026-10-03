@@ -29,6 +29,20 @@ final class AdminCoreController extends AbstractController
         return $this->render('teendoim/index.html.twig');
     }
 
+    /** Pénzügyi panel (Panou de control operațional, 2026-04 modell) — fejlesztés alatt. */
+    #[Route('/penzugy', name: 'penzugy_index', methods: ['GET', 'HEAD'])]
+    public function penzugy(): Response
+    {
+        return $this->render('penzugy/index.html.twig');
+    }
+
+    /** Az AdminCore „Pénzügy ↗” gombja relatív címen nyitja: finance-dashboard.html. */
+    #[Route('/finance-dashboard.html', name: 'penzugy_legacy', methods: ['GET', 'HEAD'])]
+    public function penzugyLegacy(): Response
+    {
+        return $this->redirectToRoute('penzugy_index', [], Response::HTTP_MOVED_PERMANENTLY);
+    }
+
     /** A Netlify-os fájlnevek → új címek (régi könyvjelzők, kiosztott QR-kódok). */
     #[Route('/szerelo-telefon.html', name: 'szerelo_legacy', methods: ['GET', 'HEAD'])]
     public function szereloLegacy(): Response

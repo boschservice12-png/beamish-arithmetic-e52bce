@@ -6,6 +6,7 @@ Használat (a projekt gyökeréből):
     python3 tools/split_legacy.py admincore legacy/AdminCore_Szervezesi_tabla_33_3.html
     python3 tools/split_legacy.py szerelo   legacy/szerelo-telefon.html
     python3 tools/split_legacy.py teendoim  legacy/teendoim.html
+    python3 tools/split_legacy.py penzugy   legacy/penzugy-panou-2026-04.html
 
 Mit csinál:
   * minden inline <style>  -> public/assets/<app>/css/NN-nev.css   + <link> a sablonban
@@ -90,6 +91,8 @@ APPS = {
     'admincore': {'names': ADMINCORE_NAMES, 'markup': ADMINCORE_MARKUP},
     'szerelo': {'names': ['app', None, 'app'], 'markup': ['head', 'screens']},
     'teendoim': {'names': ['app', None, 'app'], 'markup': ['head', 'screens']},
+    # '@keep' = külső <script src> (nem a Supabase SDK): szó szerint a sablonban marad
+    'penzugy': {'names': ['@keep', 'app', 'app'], 'markup': ['head', 'body']},
 }
 
 
@@ -120,6 +123,10 @@ def main(app, src, root='.'):
         else:
             tpl.append(twig_raw(chunk))
         pos = e
+
+        if NAMES[idx] == '@keep':  # egyéb külső könyvtár: változatlanul
+            tpl.append(twig_raw(t[s:e]))
+            continue
 
         if NAMES[idx] is None:  # külső SDK
             env['ADMINCORE_SUPABASE_SDK'] = SDK_RE.match(t[s:e]).group(1)

@@ -23,6 +23,7 @@ final class VerifyLegacyCommand
         'admincore' => ['admincore/index.html.twig', 'legacy/AdminCore_Szervezesi_tabla_33_3.html'],
         'szerelo' => ['szerelo/index.html.twig', 'legacy/szerelo-telefon.html'],
         'teendoim' => ['teendoim/index.html.twig', 'legacy/teendoim.html'],
+        'penzugy' => ['penzugy/index.html.twig', 'legacy/penzugy-panou-2026-04.html'],
     ];
 
     /**
@@ -32,6 +33,7 @@ final class VerifyLegacyCommand
     public const KNOWN_FIXES = [
         'szerelo' => [],
         'teendoim' => [],
+        'penzugy' => [],
         'admincore' => [
         // FIX-001 (21-production.js): a "Panou Operațional" menügomb ellenőrzése a [data-adm4]-et kereste,
         // amit a gomb létrehozás után elveszít → minden újrarajzolásnál új gomb + a NAV_SHIM figyelője
@@ -50,7 +52,7 @@ final class VerifyLegacyCommand
 
     public function __invoke(
         SymfonyStyle $io,
-        #[Argument('Csak ez az app (admincore|szerelo|teendoim); üresen mind')]
+        #[Argument('Csak ez az app (admincore|szerelo|teendoim|penzugy); üresen mind')]
         ?string $app = null,
     ): int {
         $failed = 0;

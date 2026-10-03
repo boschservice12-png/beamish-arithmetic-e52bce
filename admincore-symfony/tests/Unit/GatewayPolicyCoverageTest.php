@@ -42,6 +42,13 @@ final class GatewayPolicyCoverageTest extends TestCase
         self::assertSame([], array_values(array_diff($called, self::allRpcs())), $app.' hív olyan függvényt, ami nincs a GatewayPolicy-ben');
     }
 
+    public function testFinancePanelHasNoSupabaseAccessYet(): void
+    {
+        // A 2026-04-es pénzügyi modell böngésző-tárhelyen dolgozik. Ha Supabase-hívás kerül bele,
+        // a GatewayPolicy-t és ezt a tesztet tudatosan kell bővíteni.
+        self::assertDoesNotMatchRegularExpression('/\.rpc\(|createClient\(|supabase/i', self::js('penzugy'));
+    }
+
     public function testPhoneAppsUseNoTablesOrSupabaseAuthDirectly(): void
     {
         // A telefonos appok csak munkamenet-tokenes függvényeket hívnak — ha ez változik, a policyt át kell gondolni.
@@ -85,7 +92,8 @@ final class GatewayPolicyCoverageTest extends TestCase
     public function testNoDynamicTableAccessBeyondKnownHelper(): void
     {
         // Az egyetlen nem-literál .from() hívás a 13-ra-loop.js q(t) segédje, ami literálokkal hívódik.
-        preg_match_all('/\.from\(\s*[a-zA-Z_]\w*\s*\)/', self::js(), $m);
+        // (Csak az AdminCore: a pénzügyi panel Array.from(fileList)-je nem Supabase-hívás.)
+        preg_match_all('/\.from\(\s*[a-zA-Z_]\w*\s*\)/', self::js('admincore'), $m);
         self::assertSame(['.from(t)'], $m[0]);
     }
 }

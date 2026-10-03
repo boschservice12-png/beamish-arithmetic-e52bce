@@ -7,12 +7,18 @@ Három, eddig önálló HTML-fájl egy Symfony-alkalmazásban, egy közös Supab
 | `/` | `AdminCore_Szervezesi_tabla_33_3.html` (505 KB) | vezetés / iroda — Supabase-bejelentkezés |
 | `/szerelo` | `szerelo-telefon.html` | szerelők telefonja — név + 4 jegyű PIN |
 | `/teendoim` | `teendoim.html` | iroda ↔ szerelő-telefon csatorna — név + PIN vagy iroda-kulcs |
+| `/penzugy` | `panou … (2026-04 modell)` — „Panou de control operațional” | pénzügy / vezetés — fejlesztés alatt; az AdminCore „Pénzügy ↗” gombja (`finance-dashboard.html`) ide visz |
 
-A régi fájlnevek (`/szerelo-telefon.html`, `/teendoim.html`, `/AdminCore_…html`) 301-gyel az új címre visznek,
+A régi fájlnevek (`/szerelo-telefon.html`, `/teendoim.html`, `/finance-dashboard.html`, `/AdminCore_…html`) 301-gyel az új címre visznek,
 így a kiosztott linkek és QR-kódok működnek.
 
 **A felületek és a működés változatlanok**: ugyanaz a HTML, CSS és JS, ugyanaz a Supabase-adatbázis,
-ugyanaz a bejelentkezés — mindhárom oldal bájtra azonos az eredetivel (`app:verify-legacy`).
+ugyanaz a bejelentkezés — mind a négy oldal bájtra azonos az eredetivel (`app:verify-legacy`).
+
+**Pénzügyi panel — ismert korlát:** a 2026-04-es modell minden adatot a böngésző saját tárhelyén
+(`localStorage`, kulcs: `redassistance-panel-v16`) tárol, a Supabase-hez nem kapcsolódik. Új címen (domainen)
+a böngésző a régi tárhely adatait nem látja. Következő fejlesztési lépés: mentés/betöltés az adatbázis
+`finance_*` tábláiba, és automatikus havi jelentés.
 Ami változott: szétbontott, kereshető fájlok, verziózott cache, konfiguráció `.env`-ben, Supabase-kapu
 engedélylistával, auditnaplóval és PIN-fékkel.
 
@@ -27,6 +33,7 @@ admincore-symfony/
 ├── public/assets/admincore/{css,js}/  (6 + 22)   01-base, 12-supabase-adapter, 21-production, 23-verif, …
 ├── public/assets/szerelo/{css,js}/    (1 + 1)
 ├── public/assets/teendoim/{css,js}/   (1 + 1)
+├── public/assets/penzugy/{css,js}/    (1 + 1)   a 255 KB-os JS egyben — modulokra bontás a fejlesztés része
 ├── src/
 │   ├── Controller/AdminCoreController.php        /  ·  /szerelo  ·  /teendoim  ·  /health  ·  régi fájlnevek → 301
 │   ├── Controller/SupabaseGatewayController.php  /sb/... → Supabase (engedélylista + auditnapló)
@@ -49,7 +56,7 @@ ne cseréld fel őket az `index.html.twig`-ben.
 ```bash
 composer install
 php bin/console app:verify-legacy     # bájtra azonos-e mind a 3 app az eredetivel
-php bin/phpunit                       # 42 teszt
+php bin/phpunit                       # 45 teszt
 php -S 127.0.0.1:8000 -t public       # http://127.0.0.1:8000/
 ```
 
