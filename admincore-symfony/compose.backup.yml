@@ -1,0 +1,38 @@
+# RedAssistance — éjszakai adatbázis-mentés (titkosított) + automatikus visszaállítási próba minden mentés után
+#   docker compose -f compose.yml -f compose.monitoring.yml -f compose.backup.yml --env-file .env.prod up -d
+#   azonnali mentés:  docker compose … run --rm backup run-now
+# Titkok: ops/secrets/backup_db_url (Supabase Session pooler / direct URL), ops/secrets/age_recipient (age1… NYILVÁNOS kulcs)
+services:
+  backup:
+    build:
+      context: ./ops/backup
+    image: ${BACKUP_IMAGE:-ghcr.io/boschservice12-png/redassistance-backup}:${APP_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      TZ: Europe/Bucharest
+      BACKUP_TIME: ${BACKUP_TIME:-03:15}
+      BACKUP_DB_URL_FILE: /run/secrets/backup_db_url
+      AGE_RECIPIENT_FILE: /run/secrets/age_recipient
+      RCLONE_REMOTE: ${BACKUP_RCLONE_REMOTE:-}
+      RCLONE_CONFIG: /run/secrets/rclone_conf
+    secrets: [backup_db_url, age_recipient, rclone_conf]
+    volumes:
+      - backups:/backups
+      - backup-metrics:/metrics
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+
+secrets:
+  backup_db_url:
+    file: ./ops/secrets/backup_db_url
+  age_recipient:
+    file: ./ops/secrets/age_recipient
+  rclone_conf:
+    file: ${BACKUP_RCLONE_CONF:-./ops/backup/rclone.conf.empty}
+
+volumes:
+  backups:
+  backup-metrics:
