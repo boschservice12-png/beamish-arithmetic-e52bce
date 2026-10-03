@@ -124,8 +124,13 @@ jobs:
           docker run --rm -v "$PWD/ops/monitoring/blackbox:/etc/blackbox:ro" prom/blackbox-exporter:v0.27.0 --config.file=/etc/blackbox/blackbox.yml --config.check
       - name: Grafana-dashboard JSON
         run: python3 -c "import json; d=json.load(open('ops/monitoring/grafana/dashboards/redassistance.json')); assert d['uid'] and d['panels']"
+      - name: HTTPS-kapu (saját szerver)
+        run: |
+          docker run --rm -e PUBLIC_DOMAIN=szerviz.example.ro -e ACME_EMAIL=a@example.ro -v "$PWD/docker/edge/Caddyfile:/etc/caddy/Caddyfile:ro" caddy:2.10-alpine caddy validate --config /etc/caddy/Caddyfile
+          printf 'PUBLIC_DOMAIN=szerviz.example.ro\nACME_EMAIL=a@example.ro\n' >> .env.prod
+          docker compose -f compose.yml -f compose.edge.yml -f compose.monitoring.yml -f compose.backup.yml --env-file .env.prod config -q
       - name: Shell-szkriptek (shellcheck)
-        run: shellcheck -S warning ops/deploy.sh ops/backup/*.sh tests/e2e/run.sh
+        run: shellcheck -S warning ops/deploy.sh ops/backup/*.sh ops/install/bootstrap.sh tests/e2e/run.sh
 
   backup:
     name: Mentés → titkosítás → visszaállítási próba

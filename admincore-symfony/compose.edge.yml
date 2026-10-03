@@ -1,0 +1,35 @@
+# RedAssistance — HTTPS-kapu saját szerverhez (fix IP + domain, a routeren 80 és 443 a szerverre továbbítva)
+#   docker compose -f compose.yml -f compose.edge.yml [-f compose.monitoring.yml -f compose.backup.yml] --env-file .env.prod up -d
+# .env.prod: PUBLIC_DOMAIN=szerviz.pelda.ro  ACME_EMAIL=ferenc@pelda.ro  TRUSTED_PROXIES=REMOTE_ADDR
+# (REMOTE_ADDR biztonságos: az appot rajtam kívül senki nem éri el, a portja csak 127.0.0.1-en van)
+services:
+  app:
+    # az app csak a belső hálón érhető el; kívülről kizárólag a HTTPS-kapun át
+    ports: !override
+      - "127.0.0.1:${APP_PORT:-8080}:8080"
+
+  edge:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    depends_on: [app]
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      PUBLIC_DOMAIN: ${PUBLIC_DOMAIN:?PUBLIC_DOMAIN kell (pl. szerviz.pelda.ro)}
+      ACME_EMAIL: ${ACME_EMAIL:?ACME_EMAIL kell (tanúsítvány-értesítésekhez)}
+    volumes:
+      - ./docker/edge/Caddyfile:/etc/caddy/Caddyfile:ro
+      - edge-data:/data
+      - edge-config:/config
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    cap_add: [NET_BIND_SERVICE]
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "5"}
+
+volumes:
+  edge-data:
+  edge-config:

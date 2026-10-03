@@ -1,0 +1,30 @@
+# RedAssistance — HTTPS-kapu (Let's Encrypt automatikus tanúsítvány, megújítás magától)
+{
+	email {$ACME_EMAIL}
+	admin off
+	# NINCS trusted_proxies: a kapu a szél, a kliens IP-címét maga állapítja meg (nem hamisítható X-Forwarded-For-ral)
+}
+
+{$PUBLIC_DOMAIN} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Permissions-Policy "camera=(self), microphone=(), geolocation=()"
+		-Server
+	}
+
+	# a belső végpontok kívülről nem érhetők el (Prometheus a belső hálón olvassa)
+	@internal path /metrics /metrics/*
+	respond @internal 404
+
+	reverse_proxy app:8080 {
+		header_up X-Forwarded-Proto https
+	}
+
+	log {
+		output stdout
+		format json
+	}
+}

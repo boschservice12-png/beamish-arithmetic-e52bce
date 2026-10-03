@@ -16,6 +16,8 @@ if [ "${WITH_OPS:-1}" = 1 ]; then   # monitoring + mentés csak az éles projekt
   [ -f ops/secrets/metrics_token ] && FILES="$FILES -f compose.monitoring.yml"
   [ -f ops/secrets/backup_db_url ] && FILES="$FILES -f compose.backup.yml"
 fi
+# saját szerver HTTPS-kapuval: ha az env-fájlban van PUBLIC_DOMAIN, a kapu is része a stacknek
+grep -q '^PUBLIC_DOMAIN=.' "$ENV_FILE" 2>/dev/null && FILES="$FILES -f compose.edge.yml"
 [ -n "${EXTRA_COMPOSE:-}" ] && FILES="$FILES -f $EXTRA_COMPOSE"
 PORT=$(sed -n 's/^APP_PORT=//p' "$ENV_FILE" 2>/dev/null | tail -1); PORT=${PORT:-8080}
 PORT=${DEPLOY_PORT:-$PORT}   # staging: DEPLOY_PORT=8081
@@ -40,7 +42,11 @@ ready() {
 
 log "telepítés: ${CUR:-(semmi)} → $TAG"
 # shellcheck disable=SC2086
-APP_TAG=$TAG docker compose $FILES --env-file "$ENV_FILE" pull app || { log "HIBA: a $TAG kép nem tölthető le"; exit 1; }
+APP_TAG=$TAG docker compose $FILES --env-file "$ENV_FILE" pull app 2>/dev/null || {
+  # shellcheck disable=SC2086
+  IMG=$(APP_TAG=$TAG docker compose $FILES --env-file "$ENV_FILE" config --images 2>/dev/null | grep -m1 admincore)
+  docker image inspect "$IMG" >/dev/null 2>&1 && log "helyben épített kép: $IMG" || { log "HIBA: a $TAG kép nem tölthető le"; exit 1; }
+}
 # shellcheck disable=SC2086
 APP_TAG=$TAG docker compose $FILES --env-file "$ENV_FILE" pull --ignore-pull-failures --quiet 2>/dev/null || true
 # shellcheck disable=SC2086
