@@ -6,7 +6,7 @@
 'use strict';
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 function sb(){return window.RA_SB&&window.RA_SB.client;}
-var view=false, ho=null, honapok=[], kpi=[], szerelok=[], koteg=null, lastErr='', busy=false;
+var view=false, ho=null, honapok=[], kpi=[], szerelok=[], koteg=null, lastErr='', busy=false, piros='';
 var DIV={1:'Szervezet, HR',2:'Marketing, értékesítés',3:'Pénzügy és kontroll',4:'Termelés',5:'Minőség',6:'Ügyfélkapcsolat',7:'Ügyvezetés'};
 var LAMPA={zold:['● rendben','ok'],sarga:['● figyelni','warn'],piros:['● beavatkozni','bad'],nincs_cel:['nincs kért érték',''],nincs_adat:['nincs adat',''],nem_termelo:['nem termelő','']};
 var HONAP=['jan.','febr.','márc.','ápr.','máj.','jún.','júl.','aug.','szept.','okt.','nov.','dec.'];
@@ -15,7 +15,7 @@ function n(v,dig){if(v==null||v==='')return '—';var x=Number(v);return x.toLoc
 
 function injectNav(){var b0=window.RA_NAV&&window.RA_NAV.box&&window.RA_NAV.box();if(!b0||b0.querySelector('[data-adm9]'))return;
   var b=document.createElement('button');b.type='button';b.className='adm-item';b.setAttribute('data-adm9','1');
-  b.innerHTML='<span>KPI · mért</span><span class="adm-b" id="kpiB"></span>';b0.appendChild(b);}
+  b.innerHTML='<span>KPI · mért</span><span class="adm-b" id="kpiB">'+esc(piros)+'</span>';b0.appendChild(b);}
 
 async function load(){var s=sb();if(!s){lastErr='nincs kapcsolat';return;}lastErr='';
   try{
@@ -36,7 +36,9 @@ async function load(){var s=sb();if(!s){lastErr='nincs kapcsolat';return;}lastEr
     var errs=r.map(function(x,i){return x&&x.error?('#'+i+' '+x.error.message):null;}).filter(Boolean);if(errs.length)lastErr=errs.join(' | ');
     kpi=r[0].data||[];szerelok=r[1].data||[];koteg=(r[2].data||[])[0]||null;
   }catch(ex){lastErr=String(ex&&ex.message||ex);}
-  var b=document.getElementById('kpiB');if(b)b.textContent=kpi.filter(function(x){return x.allapot==='piros';}).length||'';
+  // a menü újrarajzolása új gombot készít → a számot megjegyezzük, az injectNav innen tölti
+  piros=String(kpi.filter(function(x){return x.allapot==='piros';}).length||'');
+  var b=document.getElementById('kpiB');if(b)b.textContent=piros;
 }
 
 function tag(a){var t=LAMPA[a]||[a||'—',''];return '<span class="adm-tag '+t[1]+'">'+esc(t[0])+'</span>';}
@@ -86,6 +88,8 @@ document.addEventListener('click',async function(e){
     if(r.error)lastErr='Újraszámolás: '+r.error.message;
     await load();paint();}
 });
-function boot(){if(!document.getElementById('adminNav')){setTimeout(boot,500);return;}if(window.RA_NAV&&window.RA_NAV.add)window.RA_NAV.add(injectNav);injectNav();}
+// belépés után egyszer a háttérben is betölt → a „beavatkozni” jelvény a nézet megnyitása nélkül is látszik
+function prefetch(){if(!sb()){setTimeout(prefetch,1500);return;}if(!view&&!honapok.length)load();}
+function boot(){if(!document.getElementById('adminNav')){setTimeout(boot,500);return;}if(window.RA_NAV&&window.RA_NAV.add)window.RA_NAV.add(injectNav);injectNav();prefetch();}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();

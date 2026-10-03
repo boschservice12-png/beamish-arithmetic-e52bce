@@ -1,0 +1,251 @@
+# RedAssistance AdminCore — CI/CD
+#  minden push / PR:  PHP-ellenőrzések + egységtesztek + byte-azonosság · böngészős e2e · ops-konfigurációk ·
+#                     mentés→visszaállítás lánc · Docker-kép build + füstteszt
+#  main ág:           képek a GHCR-be (sha-… és latest) → staging telepítés (ha be van állítva)
+#  admincore-v* tag:  verziózott kép → éles telepítés (a "production" környezet jóváhagyásával)
+# Beállítás: admincore-symfony/OPERATIONS.md → CI/CD
+name: AdminCore CI/CD
+
+on:
+  push:
+    branches: [main, 'claude/**']
+    tags: ['admincore-v*']
+    paths: ['admincore-symfony/**', '.github/workflows/admincore.yml']
+  pull_request:
+    paths: ['admincore-symfony/**', '.github/workflows/admincore.yml']
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Telepítés (a jelenlegi commit képével)'
+        type: choice
+        options: [nincs, staging, production]
+        default: nincs
+  schedule:
+    - cron: '17 4 * * 1'   # hetente: függőség-sérülékenységek + mentési lánc friss képekkel
+
+concurrency:
+  group: admincore-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+env:
+  APP_IMAGE: ghcr.io/${{ github.repository_owner }}/redassistance-admincore
+  BACKUP_IMAGE: ghcr.io/${{ github.repository_owner }}/redassistance-backup
+
+defaults:
+  run:
+    working-directory: admincore-symfony
+
+jobs:
+  php:
+    name: PHP · tesztek · byte-azonosság
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+          tools: composer:v2
+      - name: Composer-gyorsítótár
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer
+          key: composer-${{ hashFiles('admincore-symfony/composer.lock') }}
+      - run: composer validate --strict --no-check-publish
+      - run: composer install --no-interaction --no-progress --prefer-dist
+      - name: Ismert sérülékenységek a függőségekben
+        run: composer audit --no-interaction
+      - name: PHP-szintaxis
+        run: find src tests bin config public -name '*.php' -print0 | xargs -0 -n1 -P4 php -l > /dev/null
+      - name: Symfony-ellenőrzések (konténer, YAML, Twig, útvonalak)
+        run: |
+          php bin/console lint:container --no-interaction
+          php bin/console lint:yaml config --parse-tags
+          php bin/console lint:twig templates
+          php bin/console debug:router --env=prod > /dev/null
+      - name: Egység- és funkcionális tesztek
+        run: vendor/bin/phpunit
+      - name: A régi alkalmazásokkal byte-azonos kimenet
+        run: php bin/console app:verify-legacy
+
+  e2e:
+    name: Böngészős e2e
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: shivammathur/setup-php@v2
+        with: {php-version: '8.3', coverage: none, tools: 'composer:v2'}
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: admincore-symfony/tests/e2e/package-lock.json
+      - run: composer install --no-interaction --no-progress --prefer-dist
+      - working-directory: admincore-symfony/tests/e2e
+        run: |
+          npm ci --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - working-directory: admincore-symfony/tests/e2e
+        run: sh run.sh
+      - if: failure()
+        working-directory: admincore-symfony/tests/e2e
+        run: tail -50 php.log upstream.log || true
+
+  ops:
+    name: Ops-konfigurációk (monitoring, riasztás, compose, shell)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - name: Próba-titkok és env a compose-ellenőrzéshez
+        run: |
+          for f in metrics_token smtp_password grafana_admin_password backup_db_url age_recipient; do printf x > ops/secrets/$f; done
+          cp .env.prod.example .env.prod; cp .env.staging.example .env.staging
+      - name: Compose-fájlok
+        run: |
+          docker compose -f compose.yml -f compose.monitoring.yml -f compose.backup.yml config -q
+          docker compose -p redassistance-staging -f compose.yml -f compose.staging.yml --env-file .env.staging config -q
+      - name: Prometheus (konfiguráció + 21 riasztási szabály)
+        run: docker run --rm -v "$PWD/ops/monitoring/prometheus:/etc/prometheus:ro" -v "$PWD/ops/secrets/metrics_token:/run/secrets/metrics_token:ro" --entrypoint promtool prom/prometheus:v3.5.0 check config /etc/prometheus/prometheus.yml
+      - name: Alertmanager
+        run: |
+          # shellcheck disable=SC2016  # a ${…} helyőrzőket szándékosan szó szerint cseréljük
+          sed -e 's|${SMTP_SMARTHOST}|smtp.example.ro:587|;s|${ALERT_EMAIL_FROM}|a@example.ro|;s|${SMTP_USER}|a@example.ro|;s|${ALERT_EMAIL_TO}|b@example.ro|' ops/monitoring/alertmanager/alertmanager.yml > /tmp/am.yml
+          docker run --rm -v /tmp/am.yml:/am.yml:ro -v "$PWD/ops/secrets/smtp_password:/run/secrets/smtp_password:ro" --entrypoint amtool prom/alertmanager:v0.28.1 check-config /am.yml
+      - name: Loki, Alloy, Blackbox
+        run: |
+          docker run --rm -v "$PWD/ops/monitoring/loki:/etc/loki:ro" grafana/loki:3.5.3 -config.file=/etc/loki/loki.yml -verify-config
+          docker run --rm -v "$PWD/ops/monitoring/alloy:/etc/alloy:ro" grafana/alloy:v1.10.1 fmt /etc/alloy/config.alloy > /dev/null
+          docker run --rm -v "$PWD/ops/monitoring/blackbox:/etc/blackbox:ro" prom/blackbox-exporter:v0.27.0 --config.file=/etc/blackbox/blackbox.yml --config.check
+      - name: Grafana-dashboard JSON
+        run: python3 -c "import json; d=json.load(open('ops/monitoring/grafana/dashboards/redassistance.json')); assert d['uid'] and d['panels']"
+      - name: Shell-szkriptek (shellcheck)
+        run: shellcheck -S warning ops/deploy.sh ops/backup/*.sh tests/e2e/run.sh
+
+  backup:
+    name: Mentés → titkosítás → visszaállítási próba
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: docker/setup-buildx-action@v3
+      - name: Mentő-kép
+        uses: docker/build-push-action@v6
+        with:
+          context: admincore-symfony/ops/backup
+          load: true
+          tags: redassistance-backup:ci
+          cache-from: type=gha,scope=backup
+          cache-to: type=gha,scope=backup,mode=max
+      - name: Teljes lánc egy Supabase-szerű próbaadatbázison (pozitív + negatív próbák)
+        run: ops/backup/ci-test.sh
+
+  image:
+    name: Docker-kép · füstteszt · GHCR
+    needs: [php, e2e, ops, backup]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v5
+      - id: tag
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/admincore-v* ]]; then echo "tag=${GITHUB_REF#refs/tags/admincore-}" >> "$GITHUB_OUTPUT";
+          else echo "tag=sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"; fi
+      - uses: docker/setup-buildx-action@v3
+      - name: Alkalmazás-kép
+        uses: docker/build-push-action@v6
+        with:
+          context: admincore-symfony
+          load: true
+          tags: ${{ env.APP_IMAGE }}:${{ steps.tag.outputs.tag }}
+          build-args: APP_VERSION=${{ steps.tag.outputs.tag }}
+          cache-from: type=gha,scope=app
+          cache-to: type=gha,scope=app,mode=max
+      - name: Füstteszt a kész képen (nem root, egészség, kapu, metrics, lefaragott jogok)
+        env:
+          IMG: ${{ env.APP_IMAGE }}:${{ steps.tag.outputs.tag }}
+        run: |
+          set -eu
+          docker network create smoke
+          docker run -d --name stub --network smoke python:3-alpine sh -c "mkdir -p /s/auth/v1 && echo ok > /s/auth/v1/health && cd /s && python -m http.server 8000"
+          docker run -d --name app --network smoke -p 8080:8080 --cap-drop ALL --security-opt no-new-privileges:true \
+            -e APP_SECRET=ci-smoke -e ADMINCORE_SUPABASE_URL=http://stub:8000 -e METRICS_TOKEN=ci-token "$IMG"
+          for _ in $(seq 1 30); do curl -sf -o /dev/null localhost:8080/health && break; sleep 1; done
+          test "$(docker exec app id -u)" != 0
+          curl -sf localhost:8080/health | grep -q '"status":"ok"'
+          curl -sf localhost:8080/health/ready | grep -q '"status":"ok"'
+          curl -sf localhost:8080/ | grep -q 'window.ADMINCORE_CFG'
+          test "$(curl -s -o /dev/null -w '%{http_code}' localhost:8080/sb/rest/v1/nem_engedelyezett)" = 403
+          test "$(curl -s -o /dev/null -w '%{http_code}' localhost:8080/metrics)" = 401
+          curl -sf -H 'Authorization: Bearer ci-token' localhost:8080/metrics | grep -q '^ra_ready 1'
+          curl -sfI localhost:8080/ | grep -qi '^x-content-type-options: nosniff'
+          for _ in $(seq 1 40); do [ "$(docker inspect -f '{{.State.Health.Status}}' app)" = healthy ] && break; sleep 2; done
+          test "$(docker inspect -f '{{.State.Health.Status}}' app)" = healthy
+      - if: failure()
+        run: docker logs app | tail -80
+      - name: GHCR-belépés
+        if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/admincore-v') || github.event_name == 'workflow_dispatch')
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Képek feltöltése (alkalmazás + mentő)
+        if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/admincore-v') || github.event_name == 'workflow_dispatch')
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          docker push "$APP_IMAGE:$TAG"
+          if [ "$GITHUB_REF" = refs/heads/main ]; then docker tag "$APP_IMAGE:$TAG" "$APP_IMAGE:latest" && docker push "$APP_IMAGE:latest"; fi
+          docker build -t "$BACKUP_IMAGE:$TAG" ops/backup && docker push "$BACKUP_IMAGE:$TAG"
+
+  deploy-staging:
+    name: Telepítés → staging
+    needs: image
+    if: vars.STAGING_HOST != '' && ((github.event_name == 'push' && github.ref == 'refs/heads/main') || inputs.deploy == 'staging')
+    runs-on: ubuntu-24.04
+    environment: staging
+    timeout-minutes: 10
+    steps:
+      - name: SSH-kulcs
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ vars.DEPLOY_KNOWN_HOSTS }}
+      - name: Telepítés (sikertelen egészség-ellenőrzésnél automatikus visszaállás)
+        run: |
+          ssh "${{ vars.DEPLOY_USER }}@${{ vars.STAGING_HOST }}" "set -e; cd '${{ vars.DEPLOY_PATH }}' && git fetch -q origin '${{ github.sha }}' && git checkout -q '${{ github.sha }}' && cd admincore-symfony && \
+            COMPOSE_PROJECT_NAME=redassistance-staging ENV_FILE=.env.staging APP_ENV_FILE=.env.staging EXTRA_COMPOSE=compose.staging.yml WITH_OPS=0 DEPLOY_PORT=8081 ops/deploy.sh '${{ needs.image.outputs.tag }}'"
+
+  deploy-production:
+    name: Telepítés → éles
+    needs: image
+    if: vars.PRODUCTION_HOST != '' && (startsWith(github.ref, 'refs/tags/admincore-v') || inputs.deploy == 'production')
+    runs-on: ubuntu-24.04
+    environment: production   # GitHub → Settings → Environments → production → Required reviewers: Ferenc
+    timeout-minutes: 10
+    steps:
+      - name: SSH-kulcs
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ vars.DEPLOY_KNOWN_HOSTS }}
+      - name: Telepítés (sikertelen egészség-ellenőrzésnél automatikus visszaállás)
+        run: |
+          ssh "${{ vars.DEPLOY_USER }}@${{ vars.PRODUCTION_HOST }}" "set -e; cd '${{ vars.DEPLOY_PATH }}' && git fetch -q origin '${{ github.sha }}' && git checkout -q '${{ github.sha }}' && cd admincore-symfony && ops/deploy.sh '${{ needs.image.outputs.tag }}'"

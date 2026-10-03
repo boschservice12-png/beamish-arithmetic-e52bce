@@ -101,7 +101,7 @@ function filt(list,keyFn){var f=window.ADMIN&&window.ADMIN.filter;if(!f||!f.code
 function filterBar(){var f=window.ADMIN&&window.ADMIN.filter;if(!f||!f.code)return '';var d=A.depts.find(function(x){return x.dept_code===f.code;});return '<div class="adm-filter">Szűrve: <b>'+esc(f.code+(d?' · '+d.title_hu:''))+'</b> <button type="button" class="adm-btn ghost" id="admFilterOff" style="padding:3px 10px;font-size:12px">× összes</button></div>';}
 function render(){
   renderNav();
-  var root=document.getElementById('adminRoot'); if(!root)return;
+  var root=document.getElementById('adminRoot'); if(!root||!view)return;
   
   var map={emps:vEmps,fise:vFise,km:function(){var f=window.ADMIN&&window.ADMIN.filter;return window.ADMIN_CRAI.view(A,f&&f.code);},ncr:vNcr,dir:function(){return window.ADMIN_DOCS.list(Object.assign({},A,{docs:filt(A.docs,function(d){return d.dept_code;})}),/direct|instruc|proced/i,'Irányelvek és utasítások','directiva');},reg:function(){return window.ADMIN_DOCS.list(Object.assign({},A,{docs:filt(A.docs,function(d){return d.dept_code;})}),/regul/i,'Szabályzatok','regulament');},kpi:vKpi,pts:vPts,i18n:function(){return window.RA_I18N.view(A,window.RA_SB&&window.RA_SB.client);}};
   root.innerHTML='<div class="adm-h"><span class="adm-eb">ADMIN CORE</span><h2>'+esc((MENU.find(function(m){return m[0]===view;})||[])[lang()==='ro'?3:2]||'')+'</h2></div>'+map[view]();

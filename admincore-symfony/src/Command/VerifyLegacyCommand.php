@@ -50,6 +50,10 @@ final class VerifyLegacyCommand
         // amit a gomb létrehozás után elveszít → minden újrarajzolásnál új gomb + a NAV_SHIM figyelője
         // újrarajzol → végtelen ciklus, a böngészőfül betöltéskor lefagyott.
         "if(!n||n.querySelector('[data-adm4]'))return;" => "if(!n||n.querySelector('[data-adm4],[data-powin]'))return;",
+        // FIX-002 (11-admin-nav.js): ha a belépés utáni adatbetöltés KÖZBEN modulgombra kattintanak, a RA_NAV.open
+        // view=null-ra állítja a nézetet, a betöltés végén az ADMIN.render() pedig map[null]()-t hív → TypeError,
+        // és a menü-kiegészítések (jelvények, modulgombok) aznap nem frissülnek. Null nézetnél a modul rajzol, az alap nem.
+        "var root=document.getElementById('adminRoot'); if(!root)return;\n  \n  var map={emps:" => "var root=document.getElementById('adminRoot'); if(!root||!view)return;\n  \n  var map={emps:",
         ],
     ];
 

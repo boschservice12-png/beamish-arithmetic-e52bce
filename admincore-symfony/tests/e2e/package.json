@@ -1,0 +1,11 @@
+{
+  "name": "admincore-e2e",
+  "private": true,
+  "type": "module",
+  "description": "Böngészős végponttól-végpontig teszt: a valódi Symfony-alkalmazás egy Supabase-utánzat előtt",
+  "scripts": { "test": "sh run.sh" },
+  "devDependencies": {
+    "playwright": "1.56.1",
+    "@supabase/supabase-js": "2.117.2"
+  }
+}
