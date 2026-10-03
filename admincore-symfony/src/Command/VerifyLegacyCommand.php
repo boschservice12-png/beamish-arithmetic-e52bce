@@ -33,6 +33,8 @@ final class VerifyLegacyCommand
     public const ADDITIONS = [
         // Pénzügyi panel → adatbázis-szinkron (finance_panel_state), 2026-10-03
         'penzugy' => ['#<!-- penzugy-db:begin -->.*?<!-- penzugy-db:end -->#s'],
+        // Admin Core → mért KPI nézet (v_kpi_honap, v_szerelo_kpi_honap), 2026-10-03
+        'admincore' => ['#<!-- admincore-kpi:begin -->.*?<!-- admincore-kpi:end -->#s'],
     ];
 
     /**

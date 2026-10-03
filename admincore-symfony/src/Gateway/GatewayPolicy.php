@@ -20,6 +20,7 @@ final class GatewayPolicy
         'prod_task', 'tel_feladat',
         'finance_panel_state',   // pénzügyi panel (iroda), verziózott állapot
         'asm_import_batch',      // ASM-import kötegek (iroda olvassa; írni csak az f_asm_import ír)
+        'v_kpi_honap', 'v_szerelo_kpi_honap', // mért KPI (iroda; bizalmas sorok csak ownernek — RLS)
         'v_2_2_felveteli_kpi', 'v_termeles_utolso_ho', 'v_verif_ma',
     ];
 
@@ -27,6 +28,7 @@ final class GatewayPolicy
     public const WRITE_RPCS = [
         'f_iranyelv_uj', 'f_jelszo_csere_kesz', 'f_set_pin',
         'f_tf_iroda_kapcsol', 'f_tf_iroda_visszavon', 'f_verif_generalas',
+        'f_stat_szamol',         // KPI újraszámolás (kért/elért) — iroda
         'f_asm_import',          // pénzügyi panel: ASM-import → köteg + havi jelentés + szerelő-KPI
     ];
 

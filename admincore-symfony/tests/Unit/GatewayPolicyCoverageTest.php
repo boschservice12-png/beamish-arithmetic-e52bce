@@ -27,7 +27,7 @@ final class GatewayPolicyCoverageTest extends TestCase
 
     public static function apps(): iterable
     {
-        yield 'admincore' => ['admincore', 12];
+        yield 'admincore' => ['admincore', 13];
         yield 'szerelo' => ['szerelo', 22];
         yield 'teendoim' => ['teendoim', 16];
         yield 'penzugy' => ['penzugy', 1];
