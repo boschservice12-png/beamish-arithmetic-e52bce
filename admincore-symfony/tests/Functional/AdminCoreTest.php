@@ -22,7 +22,8 @@ final class AdminCoreTest extends WebTestCase
         self::assertSame(22, preg_match_all('#<script src="/admincore/js/\d\d-[\w-]+\.js\?v=\w{10}"></script>#', $html));
         self::assertSame(6, preg_match_all('#<link rel="stylesheet"(?: id="\w+")? href="/admincore/css/\d\d-[\w-]+\.css\?v=\w{10}">#', $html));
         // A konfiguráció a Supabase SDK ELŐTT kerül a lapra.
-        self::assertLessThan(strpos($html, 'supabase-js'), strpos($html, 'window.ADMINCORE_CFG={"supabaseUrl":"https://'));
+        self::assertGreaterThan(0, strpos($html, 'window.ADMINCORE_CFG={"supabaseUrl":"http://localhost/sb"'));
+        self::assertLessThan(strpos($html, 'supabase-js'), (int) strpos($html, 'window.ADMINCORE_CFG={"supabaseUrl":"http://localhost/sb"'));
     }
 
     public function testRenderedPageIsByteIdenticalToLegacyV33(): void

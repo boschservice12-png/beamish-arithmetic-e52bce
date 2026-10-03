@@ -72,7 +72,7 @@ final class VerifyLegacyCommand
     public function reassemble(string $html): string
     {
         $public = $this->projectDir.'/public/';
-        $cfg = $this->config->getClientConfig();
+        $cfg = ['supabaseUrl' => $this->config->getUpstreamUrl()] + $this->config->getClientConfig();
 
         $html = preg_replace('#<script>window\.ADMINCORE_CFG=.*?;</script>#', '', $html, 1);
         $html = preg_replace_callback(
