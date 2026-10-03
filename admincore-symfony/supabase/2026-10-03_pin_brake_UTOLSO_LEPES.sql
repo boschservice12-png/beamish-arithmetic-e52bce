@@ -9,46 +9,6 @@
 -- A végén lévő ellenőrzés 1 sort ad: pin_login_uj = true.
 -- =====================================================================
 
-create or replace function public.f_pin_login" blokk + az utána álló grant/revoke.
---
--- Miért: a 4 jegyű PIN (10 000 kombináció) a nyilvános kulccsal a Supabase-en
--- KÖZVETLENÜL is végigpróbálható volt — a Symfony-kapu fékje ezt nem fedi.
---
--- Szabály (ugyanaz, mint a kapuban):
---   * 5 egymást követő hibás PIN → a dolgozó 15 percre zárolva (helyes PIN-nel sem lép be)
---   * sikeres belépés → számláló nulláz
---   * owner/admin új PIN-t ad (f_set_pin) → számláló + zárolás törlődik (azonnali feloldás)
---   * minden próbálkozás naplózva: pin_login_naplo (180 napig)
---
--- Viselkedés: API-n át (szerelő-telefon, Teendőim) hibás PIN-re ÜRES választ ad
--- kivétel helyett — a hibaszámlálónak ez kell (kivétel visszagörgetné). Mindkét app
--- az üres választ ugyanúgy "Rossz PIN"-ként kezeli. Közvetlen SQL-hívásra (pl.
--- f_prod_selftest) a régi módon kivételt dob.
---
--- Mellékjavítások:
---   * f_set_pin: közvetlen SQL-ből (nem API-ból) újra hívható — az előző javítás óta
---     az f_prod_selftest elbukott volna rajta
---   * f_prod_selftest: bejelentkezés NÉLKÜL is futtatható volt, és Tamás Arnold PIN-jét
---     törli → API-ról letiltva (csak SQL-szerkesztőből fut)
--- =====================================================================
-
-create table if not exists public.pin_login_naplo (
-  id          bigserial primary key,
-  employee_id uuid not null,
-  at          timestamptz not null default now(),
-  ok          boolean not null,
-  zarolva     boolean not null default false,
-  device      text
-);
-create index if not exists pin_login_naplo_emp_at on public.pin_login_naplo (employee_id, at desc);
-alter table public.pin_login_naplo enable row level security;   -- nincs policy: csak a definer függvények írják
-revoke all on public.pin_login_naplo from anon, authenticated;
-comment on table public.pin_login_naplo is 'PIN-belépési próbálkozások (szerelő-telefon, Teendőim). 180 napig őrizve.';
-
-alter table public.employees
-  add column if not exists pin_fail_count   integer not null default 0,
-  add column if not exists pin_locked_until timestamptz;
-
 create or replace function public.f_pin_login(p_emp uuid, p_pin text, p_device text default null::text)
  returns table(token uuid, employee_id uuid, name text, expires_at timestamp with time zone)
  language plpgsql
