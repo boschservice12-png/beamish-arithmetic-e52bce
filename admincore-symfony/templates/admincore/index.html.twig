@@ -1,0 +1,57 @@
+{{ include('admincore/markup/01-head.html.twig') }}<script>window.ADMINCORE_CFG={{ admincore.clientConfig|json_encode(constant('JSON_HEX_TAG') b-or constant('JSON_UNESCAPED_SLASHES'))|raw }};</script><script src="{{ admincore.supabaseSdk }}"></script>
+
+<!-- v33 javítás: file:// detektáló + látható hibasor -->
+<script src="{{ asset('admincore/js/00-boot-guard.js') }}"></script>
+
+<link rel="stylesheet" href="{{ asset('admincore/css/01-base.css') }}">{{ include('admincore/markup/02-board.html.twig') }}<script src="{{ asset('admincore/js/02-standalone-model.js') }}"></script>
+<script src="{{ asset('admincore/js/03-hr-storage-alias.js') }}"></script>
+<link rel="stylesheet" href="{{ asset('admincore/css/04-module-body.css') }}">{{ include('admincore/markup/03-module-dialog.html.twig') }}<link rel="stylesheet" id="browserDesign" href="{{ asset('admincore/css/05-browser-design.css') }}">
+<script src="{{ asset('admincore/js/06-integrated-modules.js') }}"></script>
+<script src="{{ asset('admincore/js/07-orgboard-models.js') }}"></script>{{ include('admincore/markup/04-admin-shell.html.twig') }}<link rel="stylesheet" href="{{ asset('admincore/css/08-admin-nav.css') }}">
+<script src="{{ asset('admincore/js/09-admincore-policies.js') }}"></script>
+<script src="{{ asset('admincore/js/10-orgboard-chain.js') }}"></script>
+<script src="{{ asset('admincore/js/11-admin-nav.js') }}"></script>
+<script src="{{ asset('admincore/js/12-supabase-adapter.js') }}"></script>
+<script src="{{ asset('admincore/js/13-ra-loop.js') }}"></script>
+
+<link rel="stylesheet" id="acFullStyle" href="{{ asset('admincore/css/14-admincore-fullscreen.css') }}">
+<script src="{{ asset('admincore/js/15-admincore-fullscreen.js') }}"></script>
+
+<link rel="stylesheet" href="{{ asset('admincore/css/16-intake-sheet.css') }}">
+<div id="ikSheet"></div>
+<script src="{{ asset('admincore/js/17-intake-sheet.js') }}"></script>
+
+<script src="{{ asset('admincore/js/18-finance-window.js') }}"></script>
+
+
+<script src="{{ asset('admincore/js/19-nav-shim.js') }}"></script>
+
+<!-- ==== RA_PIN — Szerelő PIN beállítása (Admin Core, owner/admin) ==== -->
+<script src="{{ asset('admincore/js/20-pin.js') }}"></script>
+
+
+<!-- ==== RA_PROD — Termelés (kiosztás + élő státusz + K6) az Admin Core-ban — a Termelési ablak magja ==== -->
+<script src="{{ asset('admincore/js/21-production.js') }}"></script>
+
+<script src="{{ asset('admincore/js/22-production-window.js') }}"></script>
+
+<!-- ==== RA_VERIF — Munkaposztok + verifikáló lista (HR lap) ==== -->
+<script src="{{ asset('admincore/js/23-verif.js') }}"></script>
+
+
+<!-- ==== RA_TMJ — Teljes munkatársi javaslat (Bázis 2 / 8. lap) ==== -->
+<script src="{{ asset('admincore/js/24-tmj.js') }}"></script>
+
+
+<!-- ==== RA_GYULES — Heti munkatársi gyűlés · hétfő 12:30 (Bázis 2 / 17. lap) ==== -->
+<script src="{{ asset('admincore/js/25-gyules.js') }}"></script>
+
+
+<!-- ==== RA_TELF — Feladatok a telefonra (Teendőim → szerelő telefon postaláda) · 2026-09-30 ==== -->
+<script src="{{ asset('admincore/js/26-telefon-feladat.js') }}"></script>
+
+
+<script src="{{ asset('admincore/js/27-launch.js') }}"></script>
+
+</body>
+</html>

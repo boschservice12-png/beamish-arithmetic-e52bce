@@ -1,0 +1,2 @@
+
+var HRLS=standaloneStorageKey;

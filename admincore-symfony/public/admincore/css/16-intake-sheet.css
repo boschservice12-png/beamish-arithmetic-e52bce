@@ -1,0 +1,70 @@
+
+/* ==== 2.2 Felvételi lap (diktálás) — a szervezési tábla modulja ==== */
+.chain-n.ik-n{border-color:var(--red)!important;color:var(--red700)!important}
+.chain-n.ik-n i{font-style:normal;margin-left:4px;background:var(--red);color:#fff;border-radius:999px;padding:0 6px;font-size:10.5px}
+#ikOpen{border-color:var(--red)!important;color:var(--red)!important;display:inline-flex;align-items:center;gap:4px}
+#ikOpen:hover{background:var(--red)!important;color:#fff!important}
+.chain-l.ik-l{border-color:var(--red)!important;color:var(--red700)!important}
+.ik-scrim{position:fixed;inset:0;background:rgba(15,20,26,.45);z-index:9990}
+.ik-panel{position:fixed;inset:3vh 3vw;z-index:9991;background:var(--paper);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.25);display:flex;flex-direction:column;overflow:hidden;font-family:var(--sans);color:var(--ink900)}
+@media(max-width:700px){.ik-panel{inset:0;border-radius:0}}
+.ik-head{background:#fff;border-bottom:1px solid var(--ink100);padding:14px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.ik-head .t{flex:1;min-width:220px}
+.ik-head .k{color:var(--red);font-weight:800;font-size:12px;letter-spacing:.06em}
+.ik-head h2{margin:2px 0 0;font-size:20px;font-weight:700}
+.ik-head .sub{color:var(--ink500);font-size:12.5px}
+.ik-kpi{display:flex;gap:8px;flex-wrap:wrap}
+.ik-kpi span{border:1px solid var(--ink200);border-radius:10px;padding:5px 10px;font-size:12px;color:var(--ink600);background:#fff}
+.ik-kpi b{color:var(--ink900);font-size:15px;margin-left:4px}
+.ik-kpi .hot{border-color:var(--red);color:var(--red700)}
+.ik-body{flex:1;overflow:auto;padding:16px 20px 24px}
+.ik-tabs{display:flex;gap:8px;margin-bottom:14px}
+.ik-tab,.ik-btn{font:inherit;font-weight:700;font-size:14px;border:1px solid var(--ink200);background:#fff;border-radius:9px;padding:8px 14px;cursor:pointer;color:var(--ink800)}
+.ik-tab.on{border-color:var(--red);color:var(--red)}
+.ik-btn.p{background:var(--red);border-color:var(--red);color:#fff}
+.ik-btn.s{padding:5px 10px;font-size:12.5px}
+.ik-btn:disabled{opacity:.45;cursor:not-allowed}
+.ik-x{font:inherit;font-size:22px;border:0;background:none;cursor:pointer;color:var(--ink500);padding:4px 8px}
+.ik-card{background:#fff;border:1px solid var(--ink100);border-radius:12px;padding:16px;margin-bottom:12px}
+.ik-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+.ik-panel label{display:block;font-size:12px;font-weight:600;color:var(--ink500);margin-bottom:3px}
+.ik-panel input,.ik-panel select,.ik-panel textarea{width:100%;box-sizing:border-box;font:inherit;font-size:14.5px;border:1px solid var(--ink200);border-radius:8px;padding:9px 11px;background:#fff;color:var(--ink900)}
+.ik-panel input:focus,.ik-panel select:focus,.ik-panel textarea:focus,.ik-panel button:focus-visible{outline:3px solid rgba(225,29,46,.3);border-color:var(--red)}
+.ik-con{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center}
+@media(max-width:600px){.ik-con{grid-template-columns:1fr;justify-items:center;text-align:center}}
+.ik-mic{position:relative;width:96px;height:96px;border-radius:50%;border:0;background:var(--ink900);color:#fff;cursor:pointer;display:grid;place-items:center}
+.ik-mic svg{width:36px;height:36px}.ik-mic.on{background:var(--red)}
+.ik-mic .r{position:absolute;inset:-6px;border-radius:50%;border:4px solid var(--red);opacity:0}
+.ik-mic.on .r{opacity:1;animation:ikp 1.4s ease-in-out infinite}
+@keyframes ikp{50%{transform:scale(1.08);opacity:.3}}
+@media(prefers-reduced-motion:reduce){.ik-mic.on .r{animation:none}}
+.ik-live{min-height:2.4em;color:var(--ink500);border-top:1px dashed var(--ink200);margin-top:6px;padding-top:6px}
+.ik-hint{color:var(--ink500);font-size:12px;margin:4px 0 0}
+.ik-items{list-style:none;counter-reset:n;margin:0;padding:0}
+.ik-items li{counter-increment:n;display:grid;grid-template-columns:1.8em 1fr auto;gap:8px;align-items:start;padding:7px 0;border-bottom:1px solid var(--ink100)}
+.ik-items li::before{content:counter(n) ".";font-weight:800;color:var(--red);padding-top:8px}
+.ik-items textarea{min-height:40px;resize:vertical}
+.ik-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ik-end{justify-content:flex-end}
+.ik-msg{border-radius:8px;padding:9px 12px;margin-bottom:12px;font-size:13.5px}
+.ik-msg.err{background:var(--red50);color:var(--red700)}.ik-msg.ok{background:#E8F6EE;color:#15703C}
+.ik-lock{background:#FFF4E0;color:#8A5300;border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:13.5px}
+.ik-pill{border-radius:999px;padding:2px 9px;font-size:11.5px;font-weight:700;white-space:nowrap}
+.ik-st-draft{background:var(--ink100)}.ik-st-printed{background:#FFF4E0;color:#8A5300}.ik-st-signed{background:#E6EEFB;color:#1D4ED8}.ik-st-verified{background:#E8F6EE;color:#15703C}.ik-st-cancelled{background:#F1F1F1;color:#888;text-decoration:line-through}
+.ik-tbl{overflow-x:auto}
+.ik-tbl table{width:100%;border-collapse:collapse;font-size:13.5px}
+.ik-tbl th{color:var(--red);text-align:left;font-size:11.5px;padding:7px;border-bottom:2px solid var(--ink100)}
+.ik-tbl td{padding:8px 7px;border-bottom:1px solid var(--ink100);vertical-align:top}
+.ik-empty{color:var(--ink500);padding:12px 0}
+#ikSheet{display:none}
+@media print{
+  body.ik-printing>*:not(#ikSheet){display:none!important}
+  body.ik-printing #ikSheet{display:block!important;color:#000;font-family:var(--sans)}
+  #ikSheet .h{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid #000;padding-bottom:6px;margin-bottom:12px}
+  #ikSheet h3{margin:0;font-size:18pt}#ikSheet .no{font-size:14pt;font-weight:800}#ikSheet .firm{font-size:9pt;color:#333}
+  #ikSheet .m{display:grid;grid-template-columns:1fr 1fr;gap:3px 24px;font-size:11pt;margin-bottom:14px}
+  #ikSheet .m b{display:inline-block;min-width:110px}
+  #ikSheet ol{font-size:12pt;padding-left:1.4em}#ikSheet li{padding:6px 0;border-bottom:1px solid #999;page-break-inside:avoid}
+  #ikSheet .s{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:48px;font-size:10pt}#ikSheet .s div{border-top:1px solid #000;padding-top:4px}
+  #ikSheet .f{margin-top:20px;font-size:8.5pt;color:#444}
+}

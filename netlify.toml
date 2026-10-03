@@ -5,3 +5,10 @@
   for = "/*"
   [headers.values]
     Access-Control-Allow-Origin = "*"
+
+# A Symfony-alkalmazás forrása PHP-tárhelyre való, a Netlify ne szolgálja ki statikus fájlként.
+[[redirects]]
+  from = "/admincore-symfony/*"
+  to = "/404.html"
+  status = 404
+  force = true

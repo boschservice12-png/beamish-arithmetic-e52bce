@@ -1,0 +1,102 @@
+{% verbatim %}
+</head>
+<body data-layout="readable">
+<div class="top">
+  <a class="back" href="#" onclick="return false" style="cursor:default"><svg class="ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg><span id="backLabel">Predare HR</span></a>
+  <a class="back" id="adminOpen" href="#" onclick="return false" style="margin-left:8px"><svg class="ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Admin Core</span> <span class="adm-cnt" id="adminCnt"></span></a>
+  <a class="back" id="finOpen" href="#" data-finwin="1" style="margin-left:8px;border-color:var(--red);color:var(--red)"><svg class="ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/></svg><span id="finLabel">Financiar</span> <span style="opacity:.6;font-size:11px">↗</span></a>
+  <a class="back" id="poOpen" href="#" data-powin="1" style="margin-left:8px;border-color:#1E9D55;color:#1E9D55"><svg class="ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Panou Operațional</span> <span style="opacity:.6;font-size:11px">↗</span></a>
+  <div class="brand">
+    <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="38" cy="44" r="29" stroke="#7A828F" stroke-width="6" fill="none"/><path d="M58 23 C 57 14, 70 -2, 76 6 C 82 16, 66 30, 60 28 Z" fill="#7A828F"/><circle cx="38" cy="44" r="13" fill="#E11D2E"/></svg>
+    <div><div class="n"><b>Red</b><span class="g">Assistance</span></div><div class="sub" id="brandSub">Tablă de organizare</div></div>
+  </div>
+  <div class="langs" aria-label="Language"><button type="button" class="active" data-app-lang="ro">RO</button><button type="button" data-app-lang="hu">HU</button><button type="button" data-app-lang="en">EN</button></div>
+</div>
+
+<div class="wrap">
+  <div class="htitle"><h1 id="pageTitle">Szervezési tábla</h1><p id="pageSub">Sistem organizațional cu 7 divizii · 21 departamente · circuit închis 1→2→3→4→5→6</p></div>
+  <div class="hr-red"></div>
+  <div class="model-switch standalone-model" id="modelSwitch" aria-label="Autószerviz modell"><span class="mn">3</span><span class="model-label" id="standaloneModelName">Autószerviz modell</span></div>
+  <details class="model-details"><summary id="modelInfoLabel">A modellről</summary><div class="model-context" id="modelContext"></div></details>
+  <div class="board-toolbar">
+    <div><strong id="boardMode">Panorámás szervezési tábla</strong><span id="boardHint">A teljes szervezet egy összefüggő nézetben</span></div>
+    <div class="view-controls" id="viewControls" role="group" aria-label="Nézet"><button type="button" data-board-view="readable" id="readableView">Munkanézet</button><button type="button" data-board-view="panorama" id="panoramaView">Teljes tábla</button></div>
+    <div class="zoom-controls" id="panoramaZoom"><button type="button" id="zoomOut" aria-label="Kicsinyítés">−</button><span id="zoomValue">100%</span><button type="button" id="zoomIn" aria-label="Nagyítás">+</button><button type="button" id="zoomFit">Illesztés</button></div>
+  </div>
+  <div class="board-shell">
+  <aside class="division-sidebar"><h2 id="divisionNavTitle">Divíziók</h2><nav id="divisionNav" aria-label="Divíziók"></nav><p id="divisionNavNote"></p></aside>
+  <div class="board-main">
+  <div class="mobile-division"><label for="divisionSelect" id="divisionSelectLabel">Divízió</label><select id="divisionSelect"></select></div>
+  <main class="org-viewport" id="orgViewport" tabindex="-1">
+    <div class="org-canvas" id="orgCanvas">
+      <div class="hierarchy" id="hierarchy"></div>
+      <div class="grid" id="grid"></div>
+    </div>
+  </main>
+  </div>
+  </div>
+
+  <details class="principles-panel"><summary id="principlesLabel">Működési alapelvek</summary><div class="info" id="info">
+    <div class="ibox"><h3>Működési elv</h3>
+      <div class="ck"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>7 divízió — 21 osztály</div>
+      <div class="ck"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Minden divízió 3 osztályból áll</div>
+      <div class="ck"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Minden osztálynak van felelőse, VFP-je és KPI-ja</div>
+      <div class="ck"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>A rendszer zárt körű: 1→2→3→4→5→6</div>
+      <div class="ck"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>A 7. divízió felülről hangolja össze az egész rendszert</div>
+    </div>
+    <div class="ibox"><h3>Alap működési ciklus (1→2→3→4→5→6)</h3>
+      <div class="cyc">
+        <div class="n"><span class="c"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg></span>Emberek<br>(1)</div>
+        <span class="a">→</span>
+        <div class="n"><span class="c"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"/></svg></span>Ügyfél<br>igény (2)</div>
+        <span class="a">→</span>
+        <div class="n"><span class="c"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/></svg></span>Pénzügyi<br>jóváh. (3)</div>
+        <span class="a">→</span>
+        <div class="n"><span class="c"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0 5.2 5.2L21 8a5.5 5.5 0 0 1-7.5 7.5l-7 7a2.1 2.1 0 0 1-3-3l7-7A5.5 5.5 0 0 1 18 5z"/></svg></span>Megvaló-<br>sítás (4)</div>
+        <span class="a">→</span>
+        <div class="n"><span class="c"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg></span>Minőség<br>(5)</div>
+        <span class="a">→</span>
+        <div class="n"><span class="c"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 17a4 4 0 0 1-8 0V7a2 2 0 0 1 2-2h2"/><path d="M7 5a2 2 0 0 1 2-2h2l3 3 3-3h2a2 2 0 0 1 2 2v10a4 4 0 0 1-8 0"/></svg></span>Ügyfél<br>elég. (6)</div>
+      </div>
+    </div>
+    <div class="ibox"><h3>Irányítási fegyelem</h3>
+      <div class="ck"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Heti statisztikai jelentések minden osztálytól</div>
+      <div class="ck"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Havi vezetői felülvizsgálat</div>
+      <div class="ck"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Probléma → Ok → Megoldás → Ellenőrzés</div>
+      <div class="ck"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Folyamatos fejlesztés (Kaizen)</div>
+    </div>
+  </div></details>
+
+  <div class="goal" id="goal">SCOP: <b>CALITATE</b> — <b>EFICIENȚĂ</b> — <b>SATISFACȚIA CLIENTULUI</b> — <b>CREȘTERE PROFITABILĂ</b></div>
+</div>
+
+<div class="pm-back" id="pmBack"><section class="pm" role="dialog" aria-modal="true" aria-labelledby="pmTitle">
+  <div class="pm-h"><span class="no" id="pmNo">·</span><div><div class="t" id="pmTitle">—</div><div class="d" id="pmDep">—</div></div><button class="x" id="pmX" type="button">×</button></div>
+  <div class="pm-b">
+    <div class="pm-fl"><label id="lblTaskName" for="pmTaskName">Denumirea responsabilității</label><input id="pmTaskName" maxlength="240" autocomplete="off" required></div>
+    <div class="pm-section" id="secResp">Responsabilitate</div>
+    <div class="pm-fl"><label id="lblMain">Responsabil principal</label><input id="pmWho" placeholder="Nume"></div>
+    <details class="pm-details"><summary id="pmDefaultsLabel">Alapértelmezett végrehajtó és ellenőrző</summary><div class="pm-details-body">
+    <div class="pm-fl"><label id="lblAssigned">Persoană desemnată de HR<span class="hint" id="hintAssigned">Cine execută administrativ activitatea?</span></label><input id="pmAssigned" placeholder="Nume"></div>
+    <div class="pm-fl"><label id="lblReviewer" for="pmReviewer">Verificator</label><input id="pmReviewer" autocomplete="off"></div>
+    </div></details>
+    <section class="work-section" aria-labelledby="pmOrdersTitle"><h3 id="pmOrdersTitle"></h3><p class="pm-note" id="pmOrdersHint"></p><div id="pmOrders"></div><button class="secondary-action" id="pmAddOrder" type="button"></button></section>
+    <details class="pm-details"><summary id="pmDefinitionLabel">Cél, eredmény, leírás és KPI</summary><div class="pm-details-body">
+    <p class="pm-note" id="pmLanguageNote"></p>
+    <div class="pm-fl"><label id="lblPurpose">Scopul activității<span class="hint" id="hintPurpose">De ce există această activitate?</span></label><textarea id="pmPurpose"></textarea></div>
+    <div class="pm-fl"><label id="lblFinal">Produsul final valoros<span class="hint" id="hintFinal">Rezultatele concrete și verificabile, câte unul pe rând</span></label><textarea id="pmFinal"></textarea></div>
+    <div class="pm-fl"><label id="lblEval">Evaluare<span class="hint" id="hintEval">Criteriile după care rezultatul este acceptat</span></label><textarea id="pmEvaluation"></textarea></div>
+    <div class="pm-fl"><label id="lblJob">Descrierea postului<span class="hint" id="hintJob">Ce trebuie să execute această poziție?</span></label><textarea id="pmJob"></textarea></div>
+    <div class="pm-section">KPI</div>
+    <div class="pm-note" id="kpiNote">Indicator și țintă. Valorile sunt salvate în acest dispozitiv.</div>
+    <div class="pm-kpi"><input id="pmKpi1" placeholder="Indicator 1"><input id="pmTarget1" placeholder="Țintă"></div>
+    <div class="pm-kpi"><input id="pmKpi2" placeholder="Indicator 2"><input id="pmTarget2" placeholder="Țintă"></div>
+    <div class="pm-kpi"><input id="pmKpi3" placeholder="Indicator 3"><input id="pmTarget3" placeholder="Țintă"></div>
+    <div class="pm-kpi"><input id="pmKpi4" placeholder="Indicator 4"><input id="pmTarget4" placeholder="Țintă"></div>
+    </div></details>
+    <p class="form-error" id="pmError" role="alert" hidden></p>
+  </div>
+  <div class="pm-actions"><button class="secondary-action" id="pmCancel" type="button"></button><button class="pm-save" id="pmSave" type="button">Mentés</button></div>
+</section></div>
+
+{% endverbatim %}

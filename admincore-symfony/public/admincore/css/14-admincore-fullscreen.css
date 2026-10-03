@@ -1,0 +1,32 @@
+
+/* ==== Admin Core — teljes ablak. A drawer helyett teljes képernyő, bal oldali menüvel. ==== */
+body.ac-full .adm-scrim{display:none!important}
+body.ac-full .adm-drawer{
+  position:fixed!important;inset:0!important;width:100%!important;max-width:none!important;
+  border-left:0!important;box-shadow:none!important;border-radius:0!important;
+  display:grid!important;grid-template-columns:252px minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);
+  background:var(--paper,#fff)!important;z-index:190!important}
+body.ac-full .adm-dhead{grid-column:1/-1;grid-row:1;padding:14px 22px 12px!important;
+  border-bottom:1px solid var(--ink100,rgba(0,0,0,.08))!important}
+body.ac-full #adminNav{
+  grid-column:1;grid-row:2;display:flex!important;flex-direction:column!important;flex-wrap:nowrap!important;
+  align-content:flex-start;gap:2px!important;padding:14px 12px!important;overflow:auto!important;
+  border-right:1px solid var(--ink100,rgba(0,0,0,.08))!important;border-bottom:0!important;
+  background:var(--ink-25,#fafafa)!important}
+body.ac-full #adminNav .adm-item{display:flex!important;width:100%!important;justify-content:space-between!important;
+  margin:0 0 2px 0!important;padding:9px 12px!important}
+body.ac-full #adminNav>div{display:flex;flex-direction:column;gap:2px}
+body.ac-full #adminRoot{grid-column:2;grid-row:2;overflow:auto!important;padding:24px 30px 60px!important;
+  max-width:none!important;background:transparent!important}
+body.ac-full #adminRoot>*{max-width:1180px}
+body.ac-full .adm-back{z-index:300}
+@media (max-width:860px){
+  body.ac-full .adm-drawer{grid-template-columns:1fr;grid-template-rows:auto auto minmax(0,1fr)}
+  body.ac-full #adminNav{grid-column:1;grid-row:2;flex-direction:row!important;flex-wrap:wrap!important;
+    border-right:0!important;border-bottom:1px solid var(--ink100,rgba(0,0,0,.08))!important}
+  body.ac-full #adminNav .adm-item{width:auto!important}
+  body.ac-full #adminRoot{grid-column:1;grid-row:3;padding:16px 16px 50px!important}
+}
+#acSize{border:1px solid var(--ink200,rgba(0,0,0,.14));background:transparent;border-radius:8px;
+  padding:6px 12px;font:inherit;font-size:13px;cursor:pointer;color:inherit}
+#acSize:hover{border-color:var(--red,#D81F26);color:var(--red,#D81F26)}
