@@ -1,0 +1,25 @@
+-- =====================================================================
+-- redassistance-v2 · 2026-10-03 · LEFUTTATVA (4 migráció)
+--   asm_import_1_batch_tables_20261003 · asm_import_2_view_and_function_20261003
+--   asm_import_3_fix_generated_columns_20261003 · asm_link_emp_skip_empty_name_20261003
+--
+-- ASM-import kötegekben (kézi most, API később), törlés nélkül:
+--   asm_import_batch    — minden betöltés egy köteg (ho, forras: manual|api|atvetel, fájlok, összesítők, ki, mikor)
+--   asm_manopera_tetel  — a köteg tételei (PersonalManopere)
+--   asm_manopera_sor    — NÉZET: hónaponként a legutolsó köteg adott havi sorai → a fogyasztók
+--                         (f_asm_rollup, f_panou_asm, f_my_period, v_asm_napi_szerelo) változatlanok
+--   asm_manopera_sor_regi_20261003 — a régi tábla, tartalék (API-ról elérhetetlen)
+--   f_asm_import(p_ho, p_forras, p_fajlok, p_osszesitok, p_sorok) — egy tranzakció:
+--       köteg → tételek → finance_havi_snapshot (Stat vânzări összesítők) → f_asm_rollup (KPI + óra-mezők)
+--       jog: iroda (is_office) vagy service_role (ASM-API)
+--
+-- Ellenőrzés: a márciusi adatok újrabetöltése az új függvénnyel a havi jelentést, a szerelő-KPI-t és az
+-- ASM-panelt bájtra azonosan adja (lenyomat-egyezés); szerelő nem importálhat, recepció igen.
+-- Javítás: üres ASM-szerelőnév eddig az első asm_nev nélküli dolgozóhoz párosodott (25 márciusi sor) — megszüntetve.
+--
+-- Visszaállás (sorrendben):
+--   create or replace view helyett: alter view public.asm_manopera_sor rename to asm_manopera_sor_nezet;
+--   alter table public.asm_manopera_sor_regi_20261003 rename to asm_manopera_sor;
+--   create or replace view public.v_asm_napi_szerelo as … (ugyanaz a definíció, a táblára)
+-- =====================================================================
+-- A teljes SQL a Supabase migrációs előzményeiben (supabase_migrations.schema_migrations) olvasható.

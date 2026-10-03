@@ -145,5 +145,9 @@
 
   if (!window.supabase || !CFG.supabaseUrl) { status('⚠ Adatbázis-kapcsolat nincs beállítva', true); return; }
   sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey);
+  // A többi pénzügyi modul (03-asm-import.js) ugyanazt a klienst és belépett felhasználót használja
+  window.RA_FIN = { client: function () { return sb; }, me: function () { return me; }, status: status, ready: false };
+  var origStart = start;
+  start = async function () { await origStart(); if (me && OFFICE.indexOf(me.role) !== -1) { window.RA_FIN.ready = true; document.dispatchEvent(new Event('ra-fin-ready')); } };
   start();
 })();

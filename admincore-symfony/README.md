@@ -24,7 +24,19 @@ ugyanaz a bejelentkezés — mind a négy oldal bájtra azonos az eredetivel (`a
 - Egyszeri átköltöztetés: ha a böngészőben régi adat van és az adatbázis üres, felajánlja a feltöltést.
 - A sablonban a `<!-- penzugy-db:begin/end -->` blokk a kiegészítés; az `app:verify-legacy` ezt kivágva
   ellenőrzi a bájtazonosságot (`VerifyLegacyCommand::ADDITIONS`).
-- 2. fázis: a számok bontása a `finance_*` táblákba + automatikus havi jelentés.
+- 2. fázis: lásd lent, „ASM-import és havi jelentés”.
+
+**ASM-import és havi jelentés (2. fázis, 2026-10-03):**
+- A panel „Import ASM” → „Importă în panel” gombja után a `03-asm-import.js` ugyanazokat a fájlokat az
+  adatbázisba is betölti (`f_asm_import`, forrás `manual`): köteg → tételek → **havi jelentés automatikusan**
+  (külön „küldés” gomb nélkül) → szerelőnkénti KPI és óra-mezők (`f_asm_rollup`). Az eredményt és a
+  dolgozóhoz nem párosított ASM-neveket a panel kiírja.
+- A hónap 5. napjától a panel figyelmeztet, ha az előző havi ASM-import hiányzik.
+- Minden import egy verzió (`asm_import_batch`), semmi nem íródik felül: hónaponként a legutolsó köteg érvényes,
+  a korábbiak visszakereshetők. A márciusi adatok újrabetöltése bájtra ugyanazt a jelentést és KPI-t adja.
+- **Automatikus ASM-API (előkészítve, KI):** `POST /api/asm/import` (Bearer `ASM_API_TOKEN`), ugyanaz a
+  JSON-formátum és ugyanaz az adatbázis-függvény `api` forrással. Bekapcsolás: `ASM_API_TOKEN` +
+  `ADMINCORE_SUPABASE_SERVICE_KEY` a `.env.local`-ba. Ami még kell hozzá: az ASM oldali export/feltöltő.
 Ami változott: szétbontott, kereshető fájlok, verziózott cache, konfiguráció `.env`-ben, Supabase-kapu
 engedélylistával, auditnaplóval és PIN-fékkel.
 
@@ -62,7 +74,7 @@ ne cseréld fel őket az `index.html.twig`-ben.
 ```bash
 composer install
 php bin/console app:verify-legacy     # bájtra azonos-e mind a 3 app az eredetivel
-php bin/phpunit                       # 45 teszt
+php bin/phpunit                       # 50 teszt
 php -S 127.0.0.1:8000 -t public       # http://127.0.0.1:8000/
 ```
 

@@ -128,3 +128,5 @@ vehicles
 warranty_feedback
 work_orders
 finance_panel_state
+asm_import_batch
+asm_manopera_tetel

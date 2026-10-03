@@ -30,6 +30,7 @@ final class GatewayPolicyCoverageTest extends TestCase
         yield 'admincore' => ['admincore', 12];
         yield 'szerelo' => ['szerelo', 22];
         yield 'teendoim' => ['teendoim', 16];
+        yield 'penzugy' => ['penzugy', 1];
     }
 
     #[DataProvider('apps')]
@@ -50,6 +51,11 @@ final class GatewayPolicyCoverageTest extends TestCase
         preg_match_all('/\.from\(\s*([A-Za-z_\'"]+)\s*\)/', file_get_contents(\dirname(__DIR__, 2).'/public/assets/penzugy/js/02-db-sync.js'), $m);
         self::assertEqualsCanonicalizing(['TABLE', "'profiles'", 'TABLE'], $m[1]); // betöltés, profil, mentés
         self::assertDoesNotMatchRegularExpression('/\.rpc\(/', file_get_contents(\dirname(__DIR__, 2).'/public/assets/penzugy/js/02-db-sync.js'));
+
+        // Az ASM-import réteg: egyetlen függvény (f_asm_import) és a kötegek olvasása — más táblához nem nyúl
+        $imp = file_get_contents(\dirname(__DIR__, 2).'/public/assets/penzugy/js/03-asm-import.js');
+        preg_match_all('/\.(rpc|from)\(\s*\'([a-z_]+)\'/', $imp, $m);
+        self::assertEqualsCanonicalizing(['rpc:f_asm_import', 'from:asm_import_batch'], array_map(static fn ($a, $b) => $a.':'.$b, $m[1], $m[2]));
     }
 
     public function testPhoneAppsUseNoTablesOrSupabaseAuthDirectly(): void

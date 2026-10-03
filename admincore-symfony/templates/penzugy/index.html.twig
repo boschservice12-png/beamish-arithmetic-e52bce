@@ -1,5 +1,5 @@
 {{ include('penzugy/markup/01-head.html.twig') }}<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<link rel="stylesheet" href="{{ asset('assets/penzugy/css/00-app.css') }}">{{ include('penzugy/markup/02-body.html.twig') }}<script src="{{ asset('assets/penzugy/js/01-app.js') }}"></script><!-- penzugy-db:begin --><script>window.ADMINCORE_CFG={{ admincore.clientConfig|json_encode(constant('JSON_HEX_TAG') b-or constant('JSON_UNESCAPED_SLASHES'))|raw }};</script><script src="{{ admincore.supabaseSdk }}"></script><script src="{{ asset('assets/penzugy/js/02-db-sync.js') }}"></script><!-- penzugy-db:end -->
+<link rel="stylesheet" href="{{ asset('assets/penzugy/css/00-app.css') }}">{{ include('penzugy/markup/02-body.html.twig') }}<script src="{{ asset('assets/penzugy/js/01-app.js') }}"></script><!-- penzugy-db:begin --><script>window.ADMINCORE_CFG={{ admincore.clientConfig|json_encode(constant('JSON_HEX_TAG') b-or constant('JSON_UNESCAPED_SLASHES'))|raw }};</script><script src="{{ admincore.supabaseSdk }}"></script><script src="{{ asset('assets/penzugy/js/02-db-sync.js') }}"></script><script src="{{ asset('assets/penzugy/js/03-asm-import.js') }}"></script><!-- penzugy-db:end -->
 
 </body>
 </html>
