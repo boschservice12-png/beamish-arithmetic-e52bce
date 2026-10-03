@@ -1,0 +1,36 @@
+# RedAssistance AdminCore — éles stack
+# Indítás:  docker compose --env-file .env.prod up -d
+name: redassistance
+
+services:
+  app:
+    image: ${APP_IMAGE:-ghcr.io/boschservice12-png/redassistance-admincore}:${APP_TAG:-latest}
+    build:
+      context: .
+      args:
+        APP_VERSION: ${APP_TAG:-dev}
+    restart: unless-stopped
+    env_file: ${APP_ENV_FILE:-.env.prod}
+    environment:
+      APP_ENV: prod
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    volumes:
+      # Auditnapló: tartós, a konténer cseréje után is megmarad (400 napos megőrzés)
+      - audit-logs:/app/var/log
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+        tag: "redassistance-app"
+
+volumes:
+  audit-logs:

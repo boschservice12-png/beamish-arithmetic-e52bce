@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Ops\ReadinessChecker;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -67,10 +68,19 @@ final class AdminCoreController extends AbstractController
         return $this->redirectToRoute('admincore_index', [], Response::HTTP_MOVED_PERMANENTLY);
     }
 
-    /** Terheléselosztó / monitoring ellenőrzés. */
+    /** Élő-e a folyamat (liveness) — külső függés nélkül, mindig gyors. */
     #[Route('/health', name: 'health', methods: ['GET', 'HEAD'])]
     public function health(): Response
     {
         return $this->json(['status' => 'ok']);
+    }
+
+    /** Ki tud-e szolgálni (readiness): Supabase elérhető, napló és cache írható. 503, ha nem. */
+    #[Route('/health/ready', name: 'health_ready', methods: ['GET', 'HEAD'])]
+    public function ready(ReadinessChecker $checker): Response
+    {
+        $r = $checker->check();
+
+        return $this->json(['status' => $r['ok'] ? 'ok' : 'hiba', 'checks' => $r['checks']], $r['ok'] ? 200 : 503, ['Cache-Control' => 'no-store']);
     }
 }

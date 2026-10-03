@@ -1,0 +1,15 @@
+# Staging: ugyanaz a kép, külön környezet, külön port, külön naplókötet.
+# Indítás:  docker compose -p redassistance-staging -f compose.yml -f compose.staging.yml --env-file .env.staging up -d
+services:
+  app:
+    env_file: ${APP_ENV_FILE:-.env.staging}
+    ports: !override
+      - "${APP_PORT:-8081}:8080"
+    volumes: !override
+      - staging-audit-logs:/app/var/log
+    logging:
+      options:
+        tag: "redassistance-staging"
+
+volumes:
+  staging-audit-logs:
