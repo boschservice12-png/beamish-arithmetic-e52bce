@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ro" translate="no">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<meta name="google" content="notranslate">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>RedAssistance — Atelier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+/* 2026-10-01 · RedAssistance-app kinézet: figyelem-lista, napi termelés, színes munkakártya, 8 csempe */
+:root{--bg:#F2F4F7;--card:#fff;--ink:#0f172a;--ink2:#5C6571;--ink3:#8a929e;--line:#E1E5EB;--red:#E11D2E;--red2:#B5121F;--redsoft:#FDE8EA;
+  --green:#1E9D55;--greensoft:#E3F5EA;--amber:#E8A33D;--ambersoft:#FFF4DD;--blue:#2A6FDB;--mono:"Geist Mono",ui-monospace,Menlo,monospace}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Geist",-apple-system,system-ui,sans-serif;font-size:15px}
+button{font:inherit;color:inherit;cursor:pointer}
+.top{background:#fff;padding:calc(10px + env(safe-area-inset-top)) 14px 10px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:20;border-bottom:1px solid var(--line)}
+.logo{width:28px;height:28px;border-radius:50%;background:var(--red);box-shadow:inset 0 0 0 6px #fff,inset 0 0 0 10px #737371;flex:none}
+.brand{color:var(--red);font-weight:700;font-size:14px;flex:1;line-height:1.1}
+.brand small{display:block;color:var(--ink3);font-weight:500;font-size:11px}
+.bell{position:relative;border:0;background:none;font-size:19px;padding:4px}
+.bell .n{position:absolute;top:-3px;right:-5px;background:var(--red);color:#fff;border-radius:999px;min-width:18px;height:18px;font-size:10.5px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px}
+.av{width:34px;height:34px;border-radius:50%;background:var(--bg);color:var(--ink2);font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;border:0}
+.lang{display:flex;gap:3px}.lang button{border:1px solid var(--line);background:#fff;border-radius:999px;width:30px;height:24px;font-size:9.5px;font-weight:700;color:var(--ink2)}
+.lang button.on{border-color:var(--red);color:var(--red)}
+.wrap{max-width:560px;margin:0 auto;padding:12px 14px 90px;display:grid;gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px}
+.eb{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--red)}
+.muted{color:var(--ink3)}
+/* figyelem */
+.att .hi{font-size:13px;color:var(--ink3)}
+.att h2{margin:2px 0 6px;font-size:18px;line-height:1.25;font-weight:600}
+.att button{width:100%;display:flex;align-items:center;gap:10px;border:0;border-top:1px solid var(--line);background:none;padding:11px 0;text-align:left;font-weight:600;font-size:14.5px}
+.att .chip{margin-left:auto;background:var(--redsoft);color:var(--red);border-radius:999px;padding:2px 9px;font-size:12px;font-weight:700;white-space:nowrap}
+.att .gt{color:var(--ink3)}
+/* termelés */
+.prod .row3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.prod .row3 div{background:var(--bg);border-radius:12px;padding:10px 6px;text-align:center}
+.prod .row3 b{display:block;font-family:var(--mono);font-size:21px;font-weight:600}
+.prod .row3 span{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3)}
+.prod .bar{height:9px;border-radius:5px;background:var(--bg);overflow:hidden;margin-top:10px}
+.prod .bar i{display:block;height:100%;background:var(--green);border-radius:5px}
+.prod .cap{font-size:12px;color:var(--ink3);margin-top:5px}
+/* munkakártya */
+.job{border-radius:18px;padding:14px;color:#fff;display:grid;gap:8px}
+.job.idle,.job.late{background:linear-gradient(150deg,var(--red),var(--red2))}
+.job.run,.job.pause{background:linear-gradient(150deg,#f5b400,#d98a1c);color:#2b1d00}
+.job.ok{background:linear-gradient(150deg,#1eaa5c,#12863f)}
+.job.none{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.job .lab{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.92}
+.job .ttl{font-weight:700;font-size:17px;line-height:1.25}
+.job .pl{font-family:var(--mono);font-size:12.5px;font-weight:600;background:rgba(255,255,255,.24);border-radius:6px;padding:2px 8px;justify-self:start}
+.job .tm{font-family:var(--mono);font-size:32px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+.job .tm small{font-size:13px;font-weight:500;opacity:.85}
+.job .bar{height:6px;border-radius:3px;background:rgba(255,255,255,.3);overflow:hidden}
+.job .bar i{display:block;height:100%;background:currentColor;opacity:.9}
+.b3{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.b3 button{border:0;border-radius:12px;padding:13px 4px;font-weight:700;font-size:15px;background:#fff;color:#1f2430}
+.b3 button:disabled{opacity:.4}
+.b3 .go{color:#12863f}.b3 .pz{color:#b45309}.b3 .st{color:var(--red2)}
+/* csempék */
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tl{position:relative;background:#fff;border:1px solid var(--line);border-radius:18px;padding:12px;text-align:left;display:grid;gap:3px;min-height:104px;align-content:start}
+.tl .ti{width:38px;height:38px;border-radius:11px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:19px;margin-bottom:5px}
+.tl b{font-size:14px;line-height:1.2}
+.tl .s{font-size:11.5px;color:var(--ink3)}
+.bad{position:absolute;top:10px;right:10px;background:var(--red);color:#fff;border-radius:999px;min-width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;padding:0 5px}
+.nav{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:8px 6px calc(8px + env(safe-area-inset-bottom));z-index:20}
+.nav button{border:0;background:none;font-size:20px;padding:6px 12px;opacity:.65;position:relative}
+.nav .g4{display:grid;grid-template-columns:1fr 1fr;gap:3px;width:24px;height:24px}.nav .g4 i{background:var(--red);border-radius:2px}
+/* élőlap */
+.hero h1{margin:2px 0 0;font-size:22px;font-weight:600}
+.names{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.names button{position:relative;background:#fff;border:1px solid var(--line);border-radius:18px;padding:12px;text-align:left;display:grid;gap:6px;min-height:118px;align-content:start}
+.names .ini{width:42px;height:42px;border-radius:50%;background:var(--redsoft);color:var(--red);display:flex;align-items:center;justify-content:center;font-weight:700}
+.names b{font-size:14.5px;line-height:1.2}
+.names .st{font-size:11.5px;font-weight:600;display:flex;align-items:center;gap:5px;color:var(--ink3)}
+.names .st i{width:8px;height:8px;border-radius:50%;background:var(--ink3)}
+.names .st.run{color:var(--green)}.names .st.run i{background:var(--green)}
+.names .st.pause{color:#b45309}.names .st.pause i{background:var(--amber)}
+.names .h{font-family:var(--mono);font-size:12px;color:var(--ink2)}
+/* PIN */
+.pinbox{display:flex;justify-content:center;gap:14px;margin:18px 0}.pinbox i{width:16px;height:16px;border-radius:50%;border:2px solid var(--ink3);display:block}.pinbox i.f{background:var(--red);border-color:var(--red)}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:300px;margin:0 auto}
+.pad button{background:#fff;border:1px solid var(--line);border-radius:16px;padding:17px;font-size:24px;font-weight:600;font-family:var(--mono)}
+.err{color:var(--red);text-align:center;font-size:13px;margin-top:10px;min-height:18px}
+.out{border:1px solid var(--line);background:#fff;border-radius:12px;padding:7px 10px;font-size:13px;color:var(--ink2)}
+/* lapok */
+.back{position:fixed;inset:0;background:rgba(15,23,42,.5);display:flex;align-items:flex-end;justify-content:center;z-index:50}
+.sheet{background:#fff;border-radius:22px 22px 0 0;width:100%;max-width:560px;padding:14px 16px calc(24px + env(safe-area-inset-bottom));max-height:88vh;overflow:auto}
+.sheet h3{margin:0 0 12px;font-size:17px}
+.grab{width:42px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 12px}
+.pc{border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:9px;display:grid;gap:6px}
+.pc .t{font-weight:600}
+.pc .m{font-size:12.5px;color:var(--ink3)}
+.msg{background:var(--bg);border-radius:10px;padding:8px 10px;font-size:14px;white-space:pre-wrap}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}.acts.one{grid-template-columns:1fr}
+.b{border:1px solid var(--line);background:#fff;border-radius:12px;padding:13px;font-size:15px;font-weight:700}
+.b.green{background:var(--green);border-color:var(--green);color:#fff}.b.red{background:var(--red);border-color:var(--red);color:#fff}
+.b.amber{background:var(--ambersoft);border-color:#f2d9a8;color:#8a5b00}.b.blue{background:var(--blue);border-color:var(--blue);color:#fff}
+.b:disabled{opacity:.45}
+textarea,.sheet input,.sheet select{width:100%;font:inherit;border:1px solid var(--line);border-radius:12px;padding:11px;margin-top:8px;background:#fff}
+.tiles3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tiles3 button{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 6px;font-size:13px;font-weight:600;min-height:74px}
+.tiles3 button.sel{border-color:var(--red);background:var(--redsoft);color:var(--red)}
+.more{display:none;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.more.on{display:grid}
+.quick{display:flex;gap:8px;margin-top:8px}.quick button{flex:1;border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px;font-family:var(--mono);font-weight:600}
+.quick button.sel{border-color:var(--red);color:var(--red)}
+.sw3{display:flex;gap:4px;background:var(--bg);border-radius:10px;padding:3px;margin-bottom:10px}
+.sw3 button{flex:1;border:0;background:none;border-radius:8px;padding:9px;font-weight:700}
+.sw3 button.on{background:#fff;color:var(--red);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.bub{max-width:82%;padding:8px 12px;border-radius:14px;font-size:14px;margin-bottom:6px}
+.bub small{display:block;font-size:11px;color:var(--ink3);margin-top:2px}
+.bub.me{margin-left:auto;background:var(--redsoft)}.bub.them{background:var(--bg)}
+.jl{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center;border:1px solid var(--line);border-left:4px solid var(--red);border-radius:12px;padding:10px 12px;margin-bottom:8px}
+.jl.run{border-left-color:var(--green)}.jl.pause{border-left-color:var(--amber)}.jl.done{border-left-color:var(--blue);opacity:.8}
+.jl .pl2{font-family:var(--mono);font-size:12px;color:var(--red);font-weight:600}
+.tag{display:inline-block;border-radius:999px;padding:2px 8px;font-size:11px;font-weight:700;background:var(--bg);color:var(--ink2)}
+.empty{text-align:center;color:var(--ink3);padding:18px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+'use strict';
+var SB_URL='https://zwsjfzqtskicrukidaog.supabase.co', SB_KEY='sb_publishable_Yu-prB2M7ZUtWiWxeV8LDg_6LINloIU';
+var sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:false}});
+var T={
+ ro:{who:'Cine ești?',pin:'PIN-ul tău',wrong:'PIN greșit',newPin:'Alege PIN-ul tău nou (4 cifre)',newPin2:'Repetă PIN-ul nou',pinMis:'Nu se potrivesc, încearcă din nou',pinBad:'PIN invalid (nu 1234)',out:'Ieșire',hello:'Bună',att1:'lucru are nevoie de atenția ta',attN:'lucruri au nevoie de atenția ta',attOk:'Totul e la zi ✓',
+   shopProd:'Producția atelierului azi',myProd:'Producția mea azi',prog:'Programat',lucrat:'Lucrat',fact:'Facturat',measured:'timp măsurat, nu introdus',
+   run:'lucrează',pz:'pauză',free:'liber',
+   jNext:'Următoarea lucrare',jRun:'▶ În lucru',jPause:'⏸ Pauză',jLate:'⚠ Întârziere – peste normă',jOk:'✓ Gata la timp',jLateDone:'⚠ Gata cu întârziere',jNone:'Nicio lucrare alocată azi',jWait:'Așteaptă aprobarea recepției',
+   start:'▶ Start',resume:'▶ Continuă',pause:'⏸ Pauză',stop:'■ Stop',norma:'normă',
+   tFel:'Sarcini primite',tReq:'Cerere',tRule:'Reguli și directive',tGuide:'Ghiduri de reparație',tSheet:'Fișa mea',tMsg:'Mesaje birou',tJobs:'Lucrările mele',tStat:'Statistică producție',
+   sNew:'noi',sDocs:'documente',sGuides:'ghiduri',sSign:'de semnat',sSigned:'semnată',sNotYet:'încă nepublicată',sOffice:'Ferenc · Yvonne · David',sToday:'azi',sZLA:'zi · lună · an',sReq:'zi liberă · sculă · echipament',
+   why:'De ce te oprești?',more:'altceva…',obs:'observație (opțional)',confirm:'Confirmă',cancel:'Anulează',doneQ:'Lucrarea e gata? Recepția o verifică (K6).',
+   xBtn:'⚡ Adaugă lucru extra',xT:'Lucru extra găsit',xD:'Ce ai găsit?',xM:'minute estimate',xN:'Recepția aprobă înainte de START.',
+   rNew:'Cerere nouă',rOff:'Zi liberă',rTool:'Sculă',rAid:'Echipament',rWhen:'Ziua / perioada',rWhat:'Ce îți trebuie?',rWhy:'Motiv (opțional)',rTo:'Merge la',rSend:'Trimite cererea',rMine:'Cererile mele',
+   stNew:'Trimisă',stOk:'Aprobată',stNo:'Respinsă',stGiven:'Predată',
+   read:'Am citit și am înțeles',readOk:'✓ Citit',none:'Nimic nou.',
+   sheetT:'Fișa postului',sub:'înlocuitor',duties:'Sarcini și obligații',accept:'Am primit și accept',accepted:'✓ Primit și acceptat',notPub:'Fișa ta nu a fost încă publicată de birou.',
+   msgT:'Mesaje cu biroul',msgPh:'Scrie biroului…',send:'Trimite',msgNote:'Mesajul ajunge la birou (Ferenc, Yvonne, David).',
+   fT:'Sarcini primite',fFrom:'de la',fDue:'Termen',fAcc:'✓ Accept',fDone:'✓ Gata',fBack:'↩ Trimit înapoi',fBackN:'De ce o trimiți înapoi? (opțional)',fSend:'Trimite înapoi',fProg:'Progres',fSave:'Salvează progresul',fNone:'Nu ai sarcini primite.',fNom:'Nu intră în timpul măsurat.',fNew:'NOU',close:'Închide',
+   day:'Zi',month:'Lună',year:'An',jobsN:'lucrări',norm140:'Ore normă lucrate',norm140n:'Minimul lunar este 140 de ore normă, proporțional cu prezența.',noLei:'Fără valori în lei – doar ore și lucrări.',
+   bl:{'BL-01':'Lipsă piesă','BL-02':'Lipsă sculă','BL-04':'Lipsă documentație','BL-03':'Lipsă aparat măsură','BL-05':'Fără aprobare scrisă','BL-06':'Risc de siguranță','BL-07':'Fără lucrare alocată','BL-08':'Sarcină internă / instruire','BL-09':'Garanție proprie','BL-10':'Aștept alt departament'}},
+ hu:{who:'Ki vagy?',pin:'A PIN-ed',wrong:'Rossz PIN',newPin:'Válassz új, saját PIN-t (4 számjegy)',newPin2:'Ismételd meg az új PIN-t',pinMis:'Nem egyezik, próbáld újra',pinBad:'Érvénytelen PIN (nem lehet 1234)',out:'Kilépés',hello:'Szia',att1:'dolog vár rád',attN:'dolog vár rád',attOk:'Minden rendben ✓',
+   shopProd:'A műhely mai termelése',myProd:'Mai termelésem',prog:'Programozott',lucrat:'Letermelt',fact:'Számlázott',measured:'mért idő, nem beírt',
+   run:'dolgozik',pz:'szünet',free:'szabad',
+   jNext:'Következő munka',jRun:'▶ Folyamatban',jPause:'⏸ Szünet',jLate:'⚠ Késés – a norma felett',jOk:'✓ Időben kész',jLateDone:'⚠ Késéssel kész',jNone:'Ma nincs kiosztott munka',jWait:'A recepció jóváhagyására vár',
+   start:'▶ Start',resume:'▶ Folytat',pause:'⏸ Szünet',stop:'■ Stop',norma:'norma',
+   tFel:'Kapott feladatok',tReq:'Kérés',tRule:'Szabályok és irányelvek',tGuide:'Javítási útmutatók',tSheet:'Munkalapom',tMsg:'Üzenet az irodának',tJobs:'Munkáim',tStat:'Termelési statisztika',
+   sNew:'új',sDocs:'dokumentum',sGuides:'útmutató',sSign:'átvételre vár',sSigned:'átvéve',sNotYet:'még nincs kiadva',sOffice:'Ferenc · Yvonne · David',sToday:'ma',sZLA:'nap · hónap · év',sReq:'szabadnap · szerszám · eszköz',
+   why:'Miért állsz meg?',more:'más…',obs:'megjegyzés (nem kötelező)',confirm:'Rendben',cancel:'Mégse',doneQ:'Kész a munka? A recepció ellenőrzi (végellenőrzés).',
+   xBtn:'⚡ Extra munka jelzése',xT:'Extra munka találva',xD:'Mit találtál?',xM:'becsült perc',xN:'A recepció jóváhagyja a START előtt.',
+   rNew:'Új kérés',rOff:'Szabadnap',rTool:'Szerszám',rAid:'Segédeszköz',rWhen:'Nap / időszak',rWhat:'Mi kell?',rWhy:'Indok (nem kötelező)',rTo:'Címzett',rSend:'Kérés elküldése',rMine:'Kéréseim',
+   stNew:'Elküldve',stOk:'Jóváhagyva',stNo:'Elutasítva',stGiven:'Kiadva',
+   read:'Elolvastam és megértettem',readOk:'✓ Elolvasva',none:'Nincs új.',
+   sheetT:'Munkalap',sub:'helyettes',duties:'Feladat- és kötelességkör',accept:'Átvettem és elfogadom',accepted:'✓ Átvéve',notPub:'A munkalapodat az iroda még nem adta ki.',
+   msgT:'Üzenetek az irodával',msgPh:'Írj az irodának…',send:'Küldés',msgNote:'Az üzenet az irodához megy (Ferenc, Yvonne, David).',
+   fT:'Kapott feladatok',fFrom:'küldte:',fDue:'Határidő',fAcc:'✓ Elfogadom',fDone:'✓ Kész',fBack:'↩ Visszaküldöm',fBackN:'Miért küldöd vissza? (nem kötelező)',fSend:'Visszaküldés',fProg:'Készültség',fSave:'Készültség mentése',fNone:'Nincs kapott feladatod.',fNom:'Nem számít a mért időbe.',fNew:'ÚJ',close:'Bezárás',
+   day:'Nap',month:'Hónap',year:'Év',jobsN:'munka',norm140:'Ledolgozott normaóra',norm140n:'A havi minimum 140 normaóra, a jelenléttel arányosítva.',noLei:'Pénzérték nélkül – csak órák és munkák.',
+   bl:{'BL-01':'Nincs alkatrész','BL-02':'Nincs szerszám','BL-04':'Nincs dokumentáció','BL-03':'Nincs mérőeszköz','BL-05':'Nincs írásos jóváhagyás','BL-06':'Biztonsági kockázat','BL-07':'Nincs kiosztott munka','BL-08':'Belső feladat / oktatás','BL-09':'Saját garancia','BL-10':'Más részlegre várok'}},
+ ne:{who:'तपाईं को हुनुहुन्छ?',pin:'तपाईंको PIN',wrong:'गलत PIN',out:'बाहिर',hello:'नमस्ते',start:'▶ सुरु',pause:'⏸ रोक्नुहोस्',stop:'■ रोक',confirm:'ठीक छ',cancel:'रद्द',read:'पढें र बुझें',accept:'प्राप्त र स्वीकार',send:'पठाउनुहोस्',close:'बन्द',
+   bl:{'BL-01':'पार्ट छैन','BL-02':'औजार छैन','BL-04':'कागजात छैन','BL-03':'नाप्ने उपकरण छैन','BL-05':'लिखित स्वीकृति छैन','BL-06':'सुरक्षा जोखिम','BL-07':'काम तोकिएको छैन','BL-08':'आन्तरिक काम / तालिम','BL-09':'आफ्नै ग्यारेन्टी','BL-10':'अर्को विभाग पर्खँदै'}}
+};
+T.en=T.ro;
+var lang=localStorage.getItem('ra_lang')||'ro', S=null, sel=null, pinBuf='', pinMode='login', pend=null, pin1='', tasks=[], per=null, fel=[], docs=[], reqs=[], ws=null, msgs=[], tick=null, poll=null, statP='zi';
+var t=function(k){return (T[lang]&&T[lang][k]!==undefined)?T[lang][k]:T.ro[k];};
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function hh(m){return (Math.round((m||0)/6)/10).toFixed(1)+'h';}
+function hms(m){var s=Math.max(0,Math.round((m||0)*60));return Math.floor(s/3600)+':'+String(Math.floor(s/60)%60).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}
+function app(){return document.getElementById('app');}
+function today(){var d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);}
+function load(){try{var s=JSON.parse(localStorage.getItem('ra_sess')||'null');if(s&&new Date(s.expires_at)>new Date())return s;}catch(e){}return null;}
+function initials(n){return String(n||'').split(' ').map(function(x){return x[0];}).join('').slice(0,2).toUpperCase();}
+function langBar(){return '<div class="lang">'+['hu','ro','en','ne'].map(function(l){return '<button class="'+(l===lang?'on':'')+'" data-lang="'+l+'">'+l.toUpperCase()+'</button>';}).join('')+'</div>';}
+function fDate(s){try{return new Date(s).toLocaleString(lang==='hu'?'hu-HU':'ro-RO',{month:'short',day:'2-digit',hour:'2-digit',minute:'2-digit'});}catch(e){return '';}}
+function sheet(inner){var b=document.createElement('div');b.className='back';b.innerHTML='<div class="sheet"><div class="grab"></div>'+inner+'</div>';document.body.appendChild(b);b.addEventListener('click',function(e){if(e.target===b){b.remove();refresh();}});return b;}
+
+/* ───── ÉLŐLAP: a műhely mai termelése + nevek ───── */
+async function login(){sel=null;pinBuf='';pinMode='login';pend=null;pin1='';clearInterval(poll);clearInterval(tick);
+  app().innerHTML='<div class="top"><span class="logo"></span><div class="brand">RedAssistance<small>Szkaliczki Service · Atelier</small></div>'+langBar()+'</div><div class="wrap" id="lw"><div class="empty">…</div></div>';
+  var r=await sb.rpc('f_szerelok'), a=await sb.rpc('f_atelier_azi');
+  var L=(r.data||[]).filter(function(e){return e.has_pin;}), A={};(a.data||[]).forEach(function(x){A[x.employee_id]=x;});
+  var P=0,M=0;L.forEach(function(e){var x=A[e.id];if(x){P+=x.programat_min;M+=x.produs_min;}});
+  var d=new Date();
+  document.getElementById('lw').innerHTML='<div class="card hero"><div class="eb">'+d.toLocaleDateString(lang==='hu'?'hu-HU':'ro-RO',{weekday:'long',day:'numeric',month:'long'})+'</div><h1>'+t('shopProd')+'</h1>'+
+   '<div class="prod"><div class="row3"><div><b>'+hh(P)+'</b><span>'+t('prog')+'</span></div><div><b>'+hh(M)+'</b><span>'+t('lucrat')+'</span></div><div><b>'+(P?Math.round(M/P*100):0)+'%</b><span>'+t('lucrat')+' / '+t('prog')+'</span></div></div>'+
+   '<div class="bar"><i style="width:'+(P?Math.min(100,M/P*100):0)+'%"></i></div><div class="cap">'+t('measured')+'</div></div></div>'+
+   '<div class="muted" style="font-weight:600;margin:2px 2px 0">'+t('who')+'</div><div class="names">'+L.map(function(e){var x=A[e.id]||{programat_min:0,produs_min:0};
+     var st=x.fut?'run':x.szunet?'pause':'';return '<button data-emp="'+e.id+'" data-name="'+esc(e.name)+'">'+(x.uj_feladat?'<span class="bad">'+x.uj_feladat+'</span>':'')+
+     '<span class="ini">'+initials(e.name)+'</span><b>'+esc(e.name)+'</b><span class="st '+st+'"><i></i>'+(st==='run'?t('run'):st==='pause'?t('pz'):t('free'))+'</span><span class="h">'+hh(x.produs_min)+' / '+hh(x.programat_min)+'</span></button>';}).join('')+'</div>';}
+function pinScreen(){app().innerHTML='<div class="top"><button class="out" id="back">‹</button><div class="brand">'+esc(sel.name)+'<small>'+t(pinMode==='new1'?'newPin':pinMode==='new2'?'newPin2':'pin')+'</small></div>'+langBar()+'</div><div class="wrap"><div class="pinbox" id="pb"></div><div class="pad">'+
+  [1,2,3,4,5,6,7,8,9,'',0,'⌫'].map(function(k){return k===''?'<span></span>':'<button data-k="'+k+'">'+k+'</button>';}).join('')+'</div><div class="err" id="perr"></div></div>';drawPin();}
+function drawPin(){document.getElementById('pb').innerHTML=[0,1,2,3].map(function(i){return '<i class="'+(i<pinBuf.length?'f':'')+'"></i>';}).join('');}
+async function tryLogin(){var r=await sb.rpc('f_pin_login',{p_emp:sel.id,p_pin:pinBuf,p_device:navigator.userAgent.slice(0,60)});
+  if(r.error||!r.data||!r.data[0]){pinBuf='';drawPin();document.getElementById('perr').textContent=t('wrong');if(navigator.vibrate)navigator.vibrate(120);return;}
+  gate(r.data[0]);}
+/* Induló PIN (1234) után kötelező saját PIN — a munkamenet csak csere után aktív */
+async function gate(s){var m=await sb.rpc('f_pin_must_change',{p_token:s.token});
+  if(m.error&&/munkamenet|session/i.test(m.error.message)){logout();return;}
+  if(m.data===true){S=null;pend=s;sel=sel||{id:s.employee_id,name:s.name};pinMode='new1';pin1='';pinBuf='';pinScreen();return;}
+  S=s;localStorage.setItem('ra_sess',JSON.stringify(S));main();}
+async function newPinStep(){var err=function(k){pinBuf='';drawPin();document.getElementById('perr').textContent=t(k);if(navigator.vibrate)navigator.vibrate(120);};
+  if(pinMode==='new1'){if(pinBuf==='1234'){err('pinBad');return;}pin1=pinBuf;pinBuf='';pinMode='new2';pinScreen();return;}
+  if(pinBuf!==pin1){pinMode='new1';pin1='';pinBuf='';pinScreen();document.getElementById('perr').textContent=t('pinMis');return;}
+  var r=await sb.rpc('f_change_own_pin',{p_token:pend.token,p_new:pinBuf});
+  if(r.error){pinMode='new1';pin1='';pinBuf='';pinScreen();document.getElementById('perr').textContent=t('pinBad');return;}
+  var s=pend;pend=null;pinMode='login';pin1='';S=s;localStorage.setItem('ra_sess',JSON.stringify(S));main();}
+function logout(){localStorage.removeItem('ra_sess');S=null;pend=null;clearInterval(poll);clearInterval(tick);login();}
+
+/* ───── ADATOK ───── */
+async function main(){await refresh();clearInterval(poll);poll=setInterval(refresh,20000);clearInterval(tick);tick=setInterval(liveTick,1000);}
+async function refresh(){
+  if(!S)return;
+  var a=await sb.rpc('f_my_tasks_on',{p_token:S.token,p_date:today()}); if(a.error){if(/munkamenet|session/i.test(a.error.message)){logout();return;}}
+  tasks=(a.data||[]).map(function(x){x._t0=Date.now();return x;});
+  var res=await Promise.all([sb.rpc('f_my_period',{p_token:S.token,p_from:today(),p_to:today()}),sb.rpc('f_my_feladat',{p_token:S.token}),sb.rpc('f_my_dok',{p_token:S.token}),
+    sb.rpc('f_my_keres',{p_token:S.token}),sb.rpc('f_my_munkalap',{p_token:S.token}),sb.rpc('f_my_uzenet',{p_token:S.token})]);
+  per=(res[0].data||[])[0]||null; fel=res[1].data||[]; docs=res[2].data||[]; reqs=res[3].data||[]; ws=(res[4].data||[])[0]||null; msgs=res[5].data||[];
+  if(!document.querySelector('.back'))render();}
+function live(x){return x.running?x.actual_minutes+(Date.now()-x._t0)/60000:x.actual_minutes;}
+function curJob(){var open=tasks.filter(function(x){return ['done','quality_checked','invoiceable','closed'].indexOf(x.status)<0;});
+  return tasks.find(function(x){return x.running;})||tasks.find(function(x){return x.status==='paused';})||open[0]||null;}
+function jobState(x){if(!x)return 'none';var m=live(x),late=x.est_minutes>0&&m>x.est_minutes;
+  if(['done','quality_checked','invoiceable','closed'].indexOf(x.status)>=0)return late?'lateDone':'ok';
+  if(x.running)return late?'late':'run'; if(x.status==='paused')return late?'late':'pause'; return 'idle';}
+function liveTick(){var x=curJob();if(!x||!x.running)return;var el=document.getElementById('jt');if(el)el.firstChild.textContent=hms(live(x))+' ';
+  var b=document.getElementById('jb');if(b)b.style.width=Math.min(100,live(x)/Math.max(1,x.est_minutes)*100)+'%';
+  var j=document.getElementById('job');if(j&&j.getAttribute('data-s')!==jobState(x))render();}
+function unread(cat){return docs.filter(function(d){return d.cat===cat&&!d.olvasta;}).length;}
+function newMsgs(){return msgs.filter(function(m){return m.uj;}).length;}
+function wsPending(){return ws&&ws.kiadva_at&&!ws.atvette_at;}
+function attItems(){var L=[],n;
+  n=fel.filter(function(x){return x.status==='sent';}).length; if(n)L.push(['fel','📋',t('tFel'),n+' '+t('sNew')]);
+  n=unread('rule'); if(n)L.push(['rule','📕',t('tRule'),n+' '+t('sNew')]);
+  n=unread('guide'); if(n)L.push(['guide','🛠',t('tGuide'),n+' '+t('sNew')]);
+  if(wsPending())L.push(['sheet','🗂',t('tSheet'),t('sSign')]);
+  n=newMsgs(); if(n)L.push(['msg','💬',t('tMsg'),n+' '+t('sNew')]);
+  n=reqs.filter(function(r){return r.status!=='new'&&Date.now()-new Date(r.created_at).getTime()<3*864e5;}).length; if(n)L.push(['req','🙋',t('tReq'),n+' ✓']);
+  return L;}
+
+/* ───── FŐLAP ───── */
+function render(){
+  var A=attItems(), P=per||{programat_min:0,produs_min:0,facturat_min:0,lucrari:0}, x=curJob(), s=jobState(x);
+  var h='<div class="top"><span class="logo"></span><div class="brand">RedAssistance<small>Atelier</small></div>'+langBar()+
+    '<button class="bell" data-open="att">🔔'+(A.length?'<span class="n">'+A.length+'</span>':'')+'</button><button class="av" id="fOut" title="'+t('out')+'">'+initials(S.name)+'</button></div><div class="wrap">';
+  h+='<div class="card att"><div class="hi">'+t('hello')+', '+esc(String(S.name).split(' ').pop())+'</div><h2>'+(A.length?A.length+' '+(A.length===1?t('att1'):t('attN')):t('attOk'))+'</h2>'+
+     A.map(function(a){return '<button data-open="'+a[0]+'">'+a[1]+' '+esc(a[2])+'<span class="chip">'+esc(a[3])+'</span><span class="gt">›</span></button>';}).join('')+'</div>';
+  // napi termelés – az élőlapon mindig látszik
+  h+='<div class="card prod"><div class="eb">'+t('myProd')+'</div><div class="row3"><div><b>'+hh(P.programat_min)+'</b><span>'+t('prog')+'</span></div><div><b id="kProd">'+hh(P.produs_min)+'</b><span>'+t('lucrat')+'</span></div><div><b>'+hh(P.facturat_min)+'</b><span>'+t('fact')+'</span></div></div>'+
+     '<div class="bar"><i style="width:'+(P.programat_min?Math.min(100,P.produs_min/P.programat_min*100):0)+'%"></i></div><div class="cap">'+P.lucrari+' '+t('jobsN')+' · '+t('measured')+'</div></div>';
+  // munkakártya
+  if(!x){h+='<div class="job none" id="job" data-s="none"><div class="lab" style="color:var(--ink3)">'+t('jNext')+'</div><div class="ttl">'+t('jNone')+'</div></div>';}
+  else{var cls={idle:'idle',run:'run',pause:'pause',late:'late',ok:'ok',lateDone:'late'}[s], lab={idle:t('jNext'),run:t('jRun'),pause:t('jPause'),late:t('jLate'),ok:t('jOk'),lateDone:t('jLateDone')}[s];
+    var wait=x.extra&&x.extra_approved!==true, fin=s==='ok'||s==='lateDone';
+    h+='<div class="job '+cls+'" id="job" data-s="'+s+'"><div class="lab">'+lab+(x.status==='paused'&&x.paused_bl?' · '+esc(x.paused_bl):'')+'</div><div class="ttl">'+(x.extra?'⚡ ':'')+esc(x.cim)+'</div>'+
+       (x.rendszam?'<span class="pl">'+esc(x.rendszam)+(x.auto?' · '+esc(x.auto):'')+'</span>':'')+
+       '<div class="tm" id="jt">'+hms(live(x))+' <small>/ '+hms(x.est_minutes)+' '+t('norma')+'</small></div><div class="bar"><i id="jb" style="width:'+Math.min(100,live(x)/Math.max(1,x.est_minutes)*100)+'%"></i></div>'+
+       (wait?'<div class="lab">'+t('jWait')+'</div>':'')+
+       (fin?'':'<div class="b3"><button class="go" data-act="start" data-id="'+x.id+'" '+(x.running||wait?'disabled':'')+'>'+(x.status==='paused'?t('resume'):t('start'))+'</button>'+
+       '<button class="pz" data-act="pause" data-id="'+x.id+'" '+(!x.running?'disabled':'')+'>'+t('pause')+'</button>'+
+       '<button class="st" data-act="done" data-id="'+x.id+'" '+(!(x.running||x.status==='paused')?'disabled':'')+'>'+t('stop')+'</button></div>')+'</div>';}
+  // 8 csempe
+  var b=function(n){return n?'<span class="bad">'+n+'</span>':'';};
+  var nf=fel.filter(function(x){return x.status==='sent';}).length;
+  h+='<div class="tiles">'+
+   '<button class="tl" data-open="fel">'+b(nf)+'<span class="ti">📋</span><b>'+t('tFel')+'</b><span class="s">'+fel.length+' · '+nf+' '+t('sNew')+'</span></button>'+
+   '<button class="tl" data-open="req"><span class="ti">🙋</span><b>'+t('tReq')+'</b><span class="s">'+t('sReq')+'</span></button>'+
+   '<button class="tl" data-open="rule">'+b(unread('rule'))+'<span class="ti">📕</span><b>'+t('tRule')+'</b><span class="s">'+docs.filter(function(d){return d.cat==='rule';}).length+' '+t('sDocs')+'</span></button>'+
+   '<button class="tl" data-open="guide">'+b(unread('guide'))+'<span class="ti">🛠</span><b>'+t('tGuide')+'</b><span class="s">'+docs.filter(function(d){return d.cat==='guide';}).length+' '+t('sGuides')+'</span></button>'+
+   '<button class="tl" data-open="sheet">'+b(wsPending()?1:0)+'<span class="ti">🗂</span><b>'+t('tSheet')+'</b><span class="s">'+(!ws||!ws.kiadva_at?t('sNotYet'):ws.atvette_at?t('sSigned'):t('sSign'))+'</span></button>'+
+   '<button class="tl" data-open="msg">'+b(newMsgs())+'<span class="ti">💬</span><b>'+t('tMsg')+'</b><span class="s">'+t('sOffice')+'</span></button>'+
+   '<button class="tl" data-open="jobs"><span class="ti">🚗</span><b>'+t('tJobs')+'</b><span class="s">'+tasks.length+' '+t('sToday')+'</span></button>'+
+   '<button class="tl" data-open="stat"><span class="ti">📊</span><b>'+t('tStat')+'</b><span class="s">'+t('sZLA')+'</span></button></div>';
+  h+='</div><nav class="nav"><button data-open="fel" aria-label="'+t('tFel')+'">📋</button><button data-open="msg" aria-label="'+t('tMsg')+'">💬</button><button aria-label="Acasă" onclick="window.scrollTo(0,0)"><span class="g4"><i></i><i></i><i></i><i></i></span></button><button data-open="jobs" aria-label="'+t('tJobs')+'">🚗</button><button data-open="stat" aria-label="'+t('tStat')+'">📊</button></nav>';
+  app().innerHTML=h;}
+
+/* ───── LAPOK (a meglévő logika: szünetkód, végellenőrzés, extra munka) ───── */
+function pauseSheet(id){var main=['BL-01','BL-02','BL-04'],rest=['BL-03','BL-05','BL-06','BL-07','BL-08','BL-09','BL-10'],code=null;
+  var b=sheet('<h3>'+t('why')+'</h3><div class="tiles3">'+main.map(function(c){return '<button data-c="'+c+'">'+esc(t('bl')[c])+'</button>';}).join('')+'</div><button class="out" id="more" style="margin-top:10px">'+t('more')+'</button><div class="more" id="rest">'+rest.map(function(c){return '<button data-c="'+c+'" class="out">'+c+' · '+esc(t('bl')[c])+'</button>';}).join('')+'</div><textarea id="pn" placeholder="'+esc(t('obs'))+'"></textarea><div class="acts"><button class="b" id="c">'+t('cancel')+'</button><button class="b amber" id="ok" disabled>'+t('confirm')+'</button></div>');
+  b.querySelector('#more').onclick=function(){b.querySelector('#rest').classList.toggle('on');};
+  b.querySelectorAll('[data-c]').forEach(function(x){x.onclick=function(){code=x.getAttribute('data-c');b.querySelectorAll('[data-c]').forEach(function(y){y.classList.remove('sel');});x.classList.add('sel');b.querySelector('#ok').disabled=false;};});
+  b.querySelector('#c').onclick=function(){b.remove();};
+  b.querySelector('#ok').onclick=async function(){var r=await sb.rpc('f_task_pause',{p_token:S.token,p_task:id,p_bl:code,p_note:b.querySelector('#pn').value||null});b.remove();if(r.error)alert(r.error.message);refresh();};}
+function doneSheet(id){var b=sheet('<h3>'+t('stop')+'</h3><div class="muted">'+t('doneQ')+'</div><textarea id="dn" placeholder="'+esc(t('obs'))+'"></textarea><div class="acts"><button class="b" id="c">'+t('cancel')+'</button><button class="b blue" id="ok">'+t('confirm')+'</button></div>');
+  b.querySelector('#c').onclick=function(){b.remove();};
+  b.querySelector('#ok').onclick=async function(){var r=await sb.rpc('f_task_finish',{p_token:S.token,p_task:id,p_note:b.querySelector('#dn').value||null});b.remove();if(r.error)alert(r.error.message);refresh();};}
+function extraSheet(){var mins=null, cur=curJob()||{};
+  var b=sheet('<h3>⚡ '+t('xT')+'</h3><input id="xR" placeholder="rendszám / nr. înmatriculare" value="'+esc(cur.rendszam||'')+'"><textarea id="xD" placeholder="'+esc(t('xD'))+'"></textarea><div class="muted" style="margin-top:8px">'+t('xM')+'</div><div class="quick">'+[30,60,90,120].map(function(m){return '<button data-m="'+m+'">'+m+'</button>';}).join('')+'</div><div class="muted" style="margin-top:8px">'+t('xN')+'</div><div class="acts"><button class="b" id="c">'+t('cancel')+'</button><button class="b green" id="ok" disabled>'+t('confirm')+'</button></div>');
+  var chk=function(){b.querySelector('#ok').disabled=!(mins&&b.querySelector('#xD').value.trim());};
+  b.querySelectorAll('[data-m]').forEach(function(x){x.onclick=function(){mins=+x.getAttribute('data-m');b.querySelectorAll('[data-m]').forEach(function(y){y.classList.remove('sel');});x.classList.add('sel');chk();};});
+  b.querySelector('#xD').oninput=chk; b.querySelector('#c').onclick=function(){b.remove();};
+  b.querySelector('#ok').onclick=async function(){var r=await sb.rpc('f_task_extra',{p_token:S.token,p_cim:b.querySelector('#xD').value.trim(),p_rendszam:b.querySelector('#xR').value.trim()||null,p_est_minutes:mins});b.remove();if(r.error)alert(r.error.message);refresh();};}
+function jobsSheet(){var fin=function(x){return ['done','quality_checked','invoiceable','closed'].indexOf(x.status)>=0;};
+  var b=sheet('<h3>🚗 '+t('tJobs')+'</h3>'+(tasks.length?tasks.map(function(x){var c=x.running?'run':x.status==='paused'?'pause':fin(x)?'done':'';
+    return '<div class="jl '+c+'"><div><b>'+(x.extra?'⚡ ':'')+esc(x.cim)+'</b><div class="pl2">'+esc(x.rendszam||'')+(x.auto?' · '+esc(x.auto):'')+'</div><div class="muted" style="font-size:12px">'+hms(live(x))+' / '+hms(x.est_minutes)+'</div></div>'+
+      (fin(x)||x.running?'<span class="tag">'+(x.running?'▶':'✓')+'</span>':'<button class="b green" style="padding:9px 12px" data-js="'+x.id+'" '+(x.extra&&x.extra_approved!==true?'disabled':'')+'>'+(x.status==='paused'?t('resume'):t('start'))+'</button>')+'</div>';}).join(''):'<div class="empty">'+t('jNone')+'</div>')+
+    '<button class="b red" style="width:100%;margin-top:6px" id="xb">'+t('xBtn')+'</button>');
+  b.querySelector('#xb').onclick=function(){b.remove();extraSheet();};
+  b.querySelectorAll('[data-js]').forEach(function(x){x.onclick=async function(){x.disabled=true;var r=await sb.rpc('f_task_start',{p_token:S.token,p_task:x.getAttribute('data-js')});if(r.error)alert(r.error.message);b.remove();refresh();};});}
+function reqSheet(kind){kind=kind||'off';
+  var K={off:['🌴',t('rOff'),'Yvonne (HR)'],tool:['🔧',t('rTool'),'David'],aid:['🧰',t('rAid'),'David']};
+  var st={new:t('stNew'),ok:t('stOk'),no:t('stNo'),given:t('stGiven')};
+  var b=sheet('<h3>🙋 '+t('rNew')+'</h3><div class="tiles3">'+Object.keys(K).map(function(k){return '<button data-rk="'+k+'" class="'+(k===kind?'sel':'')+'"><div style="font-size:22px">'+K[k][0]+'</div>'+K[k][1]+'</button>';}).join('')+'</div>'+
+    '<input id="qT" placeholder="'+esc(kind==='off'?t('rWhen'):t('rWhat'))+'"><textarea id="qW" rows="2" placeholder="'+esc(t('rWhy'))+'"></textarea>'+
+    '<div class="muted" style="margin-top:8px">'+t('rTo')+': <b>'+K[kind][2]+'</b></div><button class="b red" style="width:100%;margin-top:10px" id="qs">'+t('rSend')+'</button>'+
+    (reqs.length?'<h3 style="margin-top:16px">'+t('rMine')+'</h3>'+reqs.map(function(r){return '<div class="pc"><div class="t">'+K[r.tipus][0]+' '+esc(r.cim)+'</div><div class="m">'+st[r.status]+(r.dontotte?' · '+esc(r.dontotte):'')+(r.valasz?' · '+esc(r.valasz):'')+'</div></div>';}).join(''):''));
+  b.querySelectorAll('[data-rk]').forEach(function(x){x.onclick=function(){b.remove();reqSheet(x.getAttribute('data-rk'));};});
+  b.querySelector('#qs').onclick=async function(){var v=b.querySelector('#qT').value.trim();if(!v){b.querySelector('#qT').focus();return;}
+    this.disabled=true;var r=await sb.rpc('f_keres_uj',{p_token:S.token,p_tipus:kind,p_cim:v,p_indok:b.querySelector('#qW').value.trim()||null});if(r.error)alert(r.error.message);b.remove();refresh();};}
+function docSheet(cat){var L=docs.filter(function(d){return d.cat===cat;});
+  var b=sheet('<h3>'+(cat==='guide'?'🛠 '+t('tGuide'):'📕 '+t('tRule'))+'</h3>'+(L.length?L.map(function(d){return '<div class="pc"><div class="t">'+esc(d.cim)+'</div><div class="m">'+esc(d.tipus)+' · '+esc(d.kuldo)+' · '+fDate(d.created_at)+'</div>'+
+    (d.szoveg?'<div class="msg">'+esc(d.szoveg)+'</div>':'')+(d.olvasta?'<div class="m" style="color:var(--green);font-weight:700">'+t('readOk')+'</div>':'<button class="b green" data-rd="'+d.id+'">'+t('read')+'</button>')+'</div>';}).join(''):'<div class="empty">'+t('none')+'</div>'));
+  b.querySelectorAll('[data-rd]').forEach(function(x){x.onclick=async function(){x.disabled=true;await sb.rpc('f_dok_olvastam',{p_token:S.token,p_id:x.getAttribute('data-rd')});b.remove();await refresh();docSheet(cat);};});}
+function wsSheet(){var w=ws;
+  if(!w||!w.kiadva_at){sheet('<h3>🗂 '+t('sheetT')+'</h3>'+(w&&w.poszt?'<div class="pc"><div class="t">'+esc(w.poszt)+'</div><div class="m">'+esc(w.dept||'')+(w.helyettes?' · '+t('sub')+': '+esc(w.helyettes):'')+'</div></div>':'')+'<div class="empty">'+t('notPub')+'</div>');return;}
+  var b=sheet('<h3>🗂 '+t('sheetT')+'</h3><div class="pc"><div class="t">'+esc(w.poszt||'')+'</div><div class="m">'+esc(w.dept||'')+(w.helyettes?' · '+t('sub')+': '+esc(w.helyettes):'')+'</div><div class="m">'+esc(w.alt||'')+' · '+esc(w.spec||'')+'</div></div>'+
+    '<div class="pc"><div class="t">'+t('duties')+'</div><ol style="margin:0;padding-left:18px;display:grid;gap:6px;font-size:14px">'+(w.pontok||[]).map(function(p){return '<li>'+esc(p)+'</li>';}).join('')+'</ol></div>'+
+    (w.atvette_at?'<div class="m" style="color:var(--green);font-weight:700;text-align:center">'+t('accepted')+' · '+fDate(w.atvette_at)+'</div>':'<button class="b green" style="width:100%" id="acc">'+t('accept')+'</button>'));
+  var a=b.querySelector('#acc');if(a)a.onclick=async function(){a.disabled=true;await sb.rpc('f_munkalap_atvettem',{p_token:S.token});b.remove();await refresh();wsSheet();};}
+function msgSheet(){sb.rpc('f_uzenet_olvastam',{p_token:S.token});
+  var L=msgs.slice().reverse();
+  var b=sheet('<h3>💬 '+t('msgT')+'</h3><div>'+(L.length?L.map(function(m){return '<div class="bub '+(m.irodatol?'them':'me')+'">'+esc(m.szoveg)+'<small>'+esc(m.irodatol?m.szerzo:'✓')+' · '+fDate(m.created_at)+'</small></div>';}).join(''):'<div class="empty">'+t('none')+'</div>')+'</div>'+
+    '<textarea id="mt" rows="2" placeholder="'+esc(t('msgPh'))+'"></textarea><button class="b red" style="width:100%;margin-top:8px" id="ms">'+t('send')+'</button><div class="muted" style="font-size:12px;margin-top:6px">'+t('msgNote')+'</div>');
+  b.querySelector('#ms').onclick=async function(){var v=b.querySelector('#mt').value.trim();if(!v)return;this.disabled=true;await sb.rpc('f_uzenet_kuld',{p_token:S.token,p_szoveg:v});b.remove();await refresh();msgSheet();};}
+async function statSheet(){var rg=function(p){var d=new Date(),a,z;if(p==='zi'){a=z=today();}else if(p==='luna'){a=today().slice(0,8)+'01';z=today();}else{a=today().slice(0,4)+'-01-01';z=today();}return [a,z];};
+  var r=rg(statP), q=await sb.rpc('f_my_period',{p_token:S.token,p_from:r[0],p_to:r[1]}), P=(q.data||[])[0]||{programat_min:0,produs_min:0,facturat_min:0,lucrari:0};
+  var b=sheet('<h3>📊 '+t('tStat')+'</h3><div class="sw3">'+[['zi',t('day')],['luna',t('month')],['an',t('year')]].map(function(p){return '<button data-sp="'+p[0]+'" class="'+(p[0]===statP?'on':'')+'">'+p[1]+'</button>';}).join('')+'</div>'+
+    '<div class="prod"><div class="row3"><div><b>'+hh(P.programat_min)+'</b><span>'+t('prog')+'</span></div><div><b>'+hh(P.produs_min)+'</b><span>'+t('lucrat')+'</span></div><div><b>'+hh(P.facturat_min)+'</b><span>'+t('fact')+'</span></div></div></div>'+
+    '<div class="pc" style="margin-top:10px"><div class="t">'+P.lucrari+' '+t('jobsN')+'</div></div>'+
+    (statP==='luna'?'<div class="prod"><div class="t" style="font-weight:600">'+t('norm140')+': '+hh(P.produs_min)+' / 140h</div><div class="bar"><i style="width:'+Math.min(100,P.produs_min/60/140*100)+'%"></i></div><div class="cap">'+t('norm140n')+'</div></div>':'')+
+    '<div class="muted" style="font-size:12px;margin-top:8px">'+t('noLei')+'</div>');
+  b.querySelectorAll('[data-sp]').forEach(function(x){x.onclick=function(){statP=x.getAttribute('data-sp');b.remove();statSheet();};});}
+function felSheet(){var backId=null;
+  var b=sheet('<h3>📋 '+t('fT')+'</h3><div id="fl"></div><div class="muted" style="text-align:center;margin-top:6px;font-size:12.5px">'+t('fNom')+'</div>');
+  function card(x){var acc=x.status==='accepted';
+    var h='<div class="pc"><div>'+(x.status==='sent'?'<span class="tag" style="background:var(--redsoft);color:var(--red)">'+t('fNew')+'</span> ':'')+'<b>'+esc(x.cim)+'</b></div>'+
+      '<div class="m">'+t('fFrom')+' '+esc(x.kuldo)+(x.hatarido?' · '+t('fDue')+': '+esc(fDate(x.hatarido)):'')+'</div>'+(x.megjegyzes?'<div class="msg">'+esc(x.megjegyzes)+'</div>':'');
+    if(backId===x.id)h+='<textarea id="fbn" placeholder="'+esc(t('fBackN'))+'"></textarea><div class="acts"><button class="b" data-fa="nob">'+t('cancel')+'</button><button class="b amber" data-fa="back" data-id="'+x.id+'">'+t('fSend')+'</button></div>';
+    else if(acc)h+='<div class="m">'+t('fProg')+': <b id="pv-'+x.id+'">'+x.pct+'%</b></div><input type="range" min="0" max="100" step="10" value="'+x.pct+'" data-fr="'+x.id+'" style="accent-color:#E11D2E;border:0;padding:0">'+
+      '<textarea id="fn-'+x.id+'" rows="1" placeholder="'+esc(t('obs'))+'"></textarea><div class="acts"><button class="b" data-fa="progress" data-id="'+x.id+'">'+t('fSave')+'</button><button class="b blue" data-fa="done" data-id="'+x.id+'">'+t('fDone')+'</button></div>'+
+      '<div class="acts one"><button class="b" data-fa="askback" data-id="'+x.id+'" style="font-size:14px;padding:10px">'+t('fBack')+'</button></div>';
+    else h+='<div class="acts"><button class="b green" data-fa="accept" data-id="'+x.id+'">'+t('fAcc')+'</button><button class="b" data-fa="askback" data-id="'+x.id+'">'+t('fBack')+'</button></div>';
+    return h+'</div>';}
+  function draw(){b.querySelector('#fl').innerHTML=fel.length?fel.map(card).join(''):'<div class="empty">'+t('fNone')+'</div>';}
+  async function reload(){var f=await sb.rpc('f_my_feladat',{p_token:S.token});if(!f.error)fel=f.data||[];draw();}
+  async function act(kind,id,pct,note){b.querySelectorAll('[data-fa]').forEach(function(x){x.disabled=true;});
+    var r=await sb.rpc('f_feladat_lep',{p_token:S.token,p_id:id,p_action:kind,p_pct:pct==null?null:pct,p_note:note||null});if(r.error)alert(r.error.message);backId=null;await reload();}
+  b.addEventListener('input',function(e){var id=e.target.getAttribute&&e.target.getAttribute('data-fr');if(id){var v=document.getElementById('pv-'+id);if(v)v.textContent=e.target.value+'%';}});
+  b.addEventListener('click',function(e){var a=e.target.closest('[data-fa]');if(!a||a.disabled)return;var k=a.getAttribute('data-fa'),id=a.getAttribute('data-id');
+    if(k==='askback'){backId=id;draw();return;} if(k==='nob'){backId=null;draw();return;}
+    var n=b.querySelector('#fn-'+id);
+    if(k==='progress'){var rg=b.querySelector('[data-fr="'+id+'"]');act('progress',id,rg?+rg.value:null,n?n.value.trim():null);return;}
+    if(k==='back'){var bn=b.querySelector('#fbn');act('back',id,null,bn?bn.value.trim():null);return;}
+    act(k,id,null,n?n.value.trim():null);});
+  draw();
+  fel.filter(function(x){return x.status==='sent';}).forEach(function(x){sb.rpc('f_feladat_lep',{p_token:S.token,p_id:x.id,p_action:'read'}).then(function(){});});}
+function attSheet(){var A=attItems();var b=sheet('<h3>🔔</h3>'+(A.length?A.map(function(a){return '<button class="pc" style="width:100%;text-align:left;background:#fff" data-go="'+a[0]+'"><div class="t">'+a[1]+' '+esc(a[2])+'</div><div class="m">'+esc(a[3])+'</div></button>';}).join(''):'<div class="empty">'+t('attOk')+'</div>'));
+  b.querySelectorAll('[data-go]').forEach(function(x){x.onclick=function(){b.remove();openKind(x.getAttribute('data-go'));};});}
+function openKind(k){if(k==='fel')felSheet();else if(k==='req')reqSheet();else if(k==='rule'||k==='guide')docSheet(k);else if(k==='sheet')wsSheet();else if(k==='msg')msgSheet();else if(k==='jobs')jobsSheet();else if(k==='stat')statSheet();else if(k==='att')attSheet();}
+
+document.addEventListener('click',async function(e){
+  var l=e.target.closest('[data-lang]');if(l){lang=l.getAttribute('data-lang');localStorage.setItem('ra_lang',lang);if(S)render();else if(sel)pinScreen();else login();return;}
+  var n=e.target.closest('[data-emp]');if(n){sel={id:n.getAttribute('data-emp'),name:n.getAttribute('data-name')};pinBuf='';pinScreen();return;}
+  if(e.target.id==='back'){sel=null;localStorage.removeItem('ra_sess');login();return;}
+  var k=e.target.closest('[data-k]');if(k){var v=k.getAttribute('data-k');if(v==='⌫')pinBuf=pinBuf.slice(0,-1);else if(pinBuf.length<4)pinBuf+=v;drawPin();if(pinBuf.length===4){if(pinMode==='login')tryLogin();else newPinStep();}return;}
+  if(e.target.closest('#fOut')){logout();return;}
+  var o=e.target.closest('[data-open]');if(o){openKind(o.getAttribute('data-open'));return;}
+  var a=e.target.closest('[data-act]');if(a&&!a.disabled){var kind=a.getAttribute('data-act'),id=a.getAttribute('data-id');
+    if(kind==='start'){a.disabled=true;var r=await sb.rpc('f_task_start',{p_token:S.token,p_task:id});if(r.error)alert(r.error.message);refresh();}
+    else if(kind==='pause')pauseSheet(id);else if(kind==='done')doneSheet(id);}
+});
+document.addEventListener('visibilitychange',function(){if(!document.hidden){if(S)refresh();else if(!sel)login();}});
+var s0=load();if(s0)gate(s0);else login();
+})();
+</script>
+</body>
+</html>

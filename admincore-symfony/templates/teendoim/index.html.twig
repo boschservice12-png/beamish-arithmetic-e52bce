@@ -1,0 +1,8 @@
+{{ include('teendoim/markup/01-head.html.twig') }}<link rel="stylesheet" href="{{ asset('assets/teendoim/css/00-app.css') }}">
+</head>
+<body>
+<div id="app"></div>
+<script>window.ADMINCORE_CFG={{ admincore.clientConfig|json_encode(constant('JSON_HEX_TAG') b-or constant('JSON_UNESCAPED_SLASHES'))|raw }};</script><script src="{{ admincore.supabaseSdk }}"></script>
+<script src="{{ asset('assets/teendoim/js/01-app.js') }}"></script>
+</body>
+</html>

@@ -30,7 +30,26 @@ final class GatewayPolicy
     /** Csak olvasó függvények. */
     public const READ_RPCS = [
         'f_elo_szamlalo_iroda', 'f_felveteli_allapot_iroda', 'f_gazdasagi_jelentes_utolso',
-        'f_heti_gyules_elokeszites', 'f_kalap', 'f_szerelok',
+        'f_heti_gyules_elokeszites', 'f_kalap', // f_szerelok: a PIN_READ_RPCS-ben (a telefon belépés előtt is hívja)
+    ];
+
+    /**
+     * Szerelő-telefon és Teendőim: Supabase-bejelentkezés nélkül (anon) hívott függvények.
+     * A jogosultságot a függvény adja: PIN-belépéskor kapott munkamenet-token (p_token / p_key).
+     */
+    public const PIN_LOGIN_RPC = 'f_pin_login';
+
+    public const PIN_WRITE_RPCS = [
+        'f_change_own_pin', 'f_dok_olvastam', 'f_feladat_lep', 'f_keres_uj', 'f_munkalap_atvettem',
+        'f_task_extra', 'f_task_finish', 'f_task_pause', 'f_task_start', 'f_uzenet_kuld', 'f_uzenet_olvastam',
+        'f_tf_dok_kiad', 'f_tf_dok_visszavon', 'f_tf_keres_dont', 'f_tf_munkalap_ment',
+        'f_tf_uzenet_kuld', 'f_tf_uzenet_olvastam',
+    ];
+
+    public const PIN_READ_RPCS = [
+        'f_atelier_azi', 'f_pin_must_change', 'f_szerelok',
+        'f_my_dok', 'f_my_feladat', 'f_my_keres', 'f_my_munkalap', 'f_my_period', 'f_my_tasks_on', 'f_my_uzenet',
+        'f_tf_cimzettek', 'f_tf_dokok', 'f_tf_irodasok', 'f_tf_keresek', 'f_tf_ki', 'f_tf_munkalapok', 'f_tf_uzenetek',
     ];
 
     /** Auth végpontok: bejelentkezés/frissítés, saját fiók, kilépés. Regisztráció, meghívó stb. nincs. */
@@ -63,6 +82,15 @@ final class GatewayPolicy
             $fn = substr($path, 4);
             if (!\in_array($method, ['POST', 'GET'], true)) {
                 return GatewayDecision::deny();
+            }
+            if (self::PIN_LOGIN_RPC === $fn) {
+                return GatewayDecision::allow('pin:login', audit: true, requiresUser: false);
+            }
+            if (\in_array($fn, self::PIN_WRITE_RPCS, true)) {
+                return GatewayDecision::allow('pin:'.$fn, audit: true, requiresUser: false);
+            }
+            if (\in_array($fn, self::PIN_READ_RPCS, true)) {
+                return GatewayDecision::allow('pin:'.$fn, audit: false, requiresUser: false);
             }
             if (\in_array($fn, self::WRITE_RPCS, true)) {
                 return GatewayDecision::allow('rpc:'.$fn, audit: true, requiresUser: true);

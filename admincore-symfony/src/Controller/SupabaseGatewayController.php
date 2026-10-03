@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Gateway\GatewayPolicy;
 use App\Gateway\JwtClaims;
+use App\Gateway\PinLoginThrottle;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -18,6 +19,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  *  - csak az engedélyezett táblák / függvények / auth végpontok mennek át (GatewayPolicy)
  *  - minden írás és bejelentkezés naplózva: ki, mikor, mit, milyen eredménnyel (var/log/audit-*.log)
  *  - a felhasználó saját tokenje megy tovább → a Supabase jogosultságai (RLS) változatlanul érvényesek
+ *  - szerelő-telefon / Teendőim: PIN-belépés fékezve, a műveletek munkamenet szerint naplózva
  */
 final class SupabaseGatewayController
 {
@@ -35,6 +37,7 @@ final class SupabaseGatewayController
     public function __construct(
         private readonly HttpClientInterface $httpClient,
         private readonly GatewayPolicy $policy,
+        private readonly PinLoginThrottle $throttle,
         #[Autowire(service: 'monolog.logger.audit')]
         private readonly LoggerInterface $audit,
         #[Autowire('%env(ADMINCORE_SUPABASE_URL)%')]
@@ -61,6 +64,24 @@ final class SupabaseGatewayController
             return new JsonResponse(['code' => 'GATEWAY_FORBIDDEN', 'message' => 'Gateway: '.$reason, 'details' => null, 'hint' => null], Response::HTTP_FORBIDDEN);
         }
 
+        $body = $request->getContent();
+        $args = self::jsonObject($body);
+        $ip = (string) $request->getClientIp();
+        $pinEmployee = 'pin:login' === $decision->resource ? (string) ($args['p_emp'] ?? '') : null;
+
+        $keyLogin = 'pin:f_tf_ki' === $decision->resource;
+        $retry = match (true) {
+            null !== $pinEmployee => $this->throttle->retryAfter($pinEmployee, $ip),
+            $keyLogin => $this->throttle->keyRetryAfter($ip),
+            default => null,
+        };
+        if (null !== $retry) {
+            $this->audit->warning('gateway.pin_throttled', ['employee' => $pinEmployee, 'resource' => $decision->resource, 'retry_after' => $retry, 'ip' => $ip]);
+
+            return new JsonResponse(['code' => 'GATEWAY_RATE_LIMIT', 'message' => 'Túl sok hibás PIN. Próbáld újra később.', 'details' => null, 'hint' => null],
+                Response::HTTP_TOO_MANY_REQUESTS, ['Retry-After' => (string) $retry]);
+        }
+
         // A nyers query stringet adjuk tovább: a PostgREST-szűrők (or=(...), in.(...)) sorrendje és alakja számít.
         $query = (string) $request->server->get('QUERY_STRING', '');
         $url = rtrim($this->upstream, '/').'/'.$service.'/v1/'.$path.('' !== $query ? '?'.$query : '');
@@ -70,7 +91,6 @@ final class SupabaseGatewayController
                 $headers[$name] = $request->headers->get($name);
             }
         }
-        $body = $request->getContent();
 
         $started = microtime(true);
         try {
@@ -84,7 +104,33 @@ final class SupabaseGatewayController
             return new JsonResponse(['code' => 'GATEWAY_UPSTREAM', 'message' => 'A Supabase nem érhető el', 'details' => null, 'hint' => null], Response::HTTP_BAD_GATEWAY);
         }
 
-        if ($decision->audit) {
+        if (null !== $pinEmployee) {
+            $session = self::jsonList($content)[0] ?? null;
+            $ok = $status < 300 && \is_array($session) && isset($session['token']);
+            $ok ? $this->throttle->success($pinEmployee) : $this->throttle->failure($pinEmployee, $ip);
+            $this->audit->info($ok ? 'gateway.pin_login' : 'gateway.pin_login_failed', [
+                'employee' => $pinEmployee,
+                'name' => $ok ? ($session['name'] ?? null) : null,
+                'session' => $ok ? self::sessionId((string) $session['token']) : null,
+                'device' => $args['p_device'] ?? null,
+                'status' => $status,
+                'ip' => $ip,
+            ]);
+        } elseif ($keyLogin && [] === self::jsonList($content)) {
+            // érvénytelen iroda-kulcs vagy lejárt munkamenet: üres válasz
+            $this->throttle->keyFailure($ip);
+            $this->audit->info('gateway.key_login_failed', ['status' => $status, 'ip' => $ip]);
+        } elseif ($decision->audit && str_starts_with($decision->resource, 'pin:')) {
+            $this->audit->info('gateway.write', [
+                'resource' => $decision->resource,
+                'method' => $method,
+                'status' => $status,
+                'ms' => (int) round((microtime(true) - $started) * 1000),
+                'session' => self::sessionId((string) ($args['p_token'] ?? $args['p_key'] ?? '')),
+                'fields' => array_map('strval', array_keys($args)),
+                'ip' => $ip,
+            ]);
+        } elseif ($decision->audit) {
             $this->audit->info('gateway.write', [
                 'resource' => $decision->resource,
                 'method' => $method,
@@ -122,6 +168,31 @@ final class SupabaseGatewayController
         $row = array_is_list($data) ? ($data[0] ?? []) : $data;
 
         return \is_array($row) ? array_map('strval', array_keys($row)) : null;
+    }
+
+    /** @return array<string, mixed> */
+    private static function jsonObject(string $body): array
+    {
+        $data = '' === $body ? null : json_decode($body, true);
+
+        return \is_array($data) && !array_is_list($data) ? $data : [];
+    }
+
+    /** @return list<mixed> */
+    private static function jsonList(string $body): array
+    {
+        $data = json_decode($body, true);
+
+        return \is_array($data) && array_is_list($data) ? $data : [];
+    }
+
+    /**
+     * A munkamenet-token maga belépési jog, ezért a naplóba csak a lenyomata kerül.
+     * A pin_login sor ugyanezt a lenyomatot a dolgozó nevével rögzíti → minden művelet visszakövethető.
+     */
+    private static function sessionId(string $token): ?string
+    {
+        return '' === $token ? null : substr(hash('sha256', $token), 0, 12);
     }
 
     private static function loginEmail(string $body): ?string

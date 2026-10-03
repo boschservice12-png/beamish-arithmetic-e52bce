@@ -8,6 +8,10 @@ framework:
     assets:
         version_strategy: App\Asset\ContentHashVersionStrategy
 
+    # Ha a tárhely proxy/Cloudflare mögött van: a valódi kliens-IP kell a PIN-fékhez és a naplóhoz.
+    trusted_proxies: '%env(default::TRUSTED_PROXIES)%'
+    trusted_headers: ['x-forwarded-for', 'x-forwarded-proto', 'x-forwarded-host', 'x-forwarded-port']
+
 when@test:
     framework:
         test: true

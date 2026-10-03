@@ -15,6 +15,33 @@ final class AdminCoreController extends AbstractController
         return $this->render('admincore/index.html.twig');
     }
 
+    /** Szerelő telefon (PIN-es belépés) — a szerelo-telefon.html-lel azonos felület. */
+    #[Route('/szerelo', name: 'szerelo_index', methods: ['GET', 'HEAD'])]
+    public function szerelo(): Response
+    {
+        return $this->render('szerelo/index.html.twig');
+    }
+
+    /** Teendőim — az iroda oldala a szerelő-telefon csatornához (teendoim.html). */
+    #[Route('/teendoim', name: 'teendoim_index', methods: ['GET', 'HEAD'])]
+    public function teendoim(): Response
+    {
+        return $this->render('teendoim/index.html.twig');
+    }
+
+    /** A Netlify-os fájlnevek → új címek (régi könyvjelzők, kiosztott QR-kódok). */
+    #[Route('/szerelo-telefon.html', name: 'szerelo_legacy', methods: ['GET', 'HEAD'])]
+    public function szereloLegacy(): Response
+    {
+        return $this->redirectToRoute('szerelo_index', [], Response::HTTP_MOVED_PERMANENTLY);
+    }
+
+    #[Route('/teendoim.html', name: 'teendoim_legacy', methods: ['GET', 'HEAD'])]
+    public function teendoimLegacy(): Response
+    {
+        return $this->redirectToRoute('teendoim_index', [], Response::HTTP_MOVED_PERMANENTLY);
+    }
+
     /** Régi könyvjelzők (a monolit fájlneve) → új cím. */
     #[Route('/AdminCore_Szervezesi_tabla_{version}.html', name: 'admincore_legacy', requirements: ['version' => '[0-9_]+'], methods: ['GET', 'HEAD'])]
     public function legacy(): Response

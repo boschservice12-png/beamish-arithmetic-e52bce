@@ -1,6 +1,6 @@
 -- =====================================================================
 -- RedAssistance — redassistance-v2 (zwsjfzqtskicrukidaog)
--- Biztonsági javítás · 2026-10-03 · ELŐKÉSZÍTVE, MÉG NINCS LEFUTTATVA
+-- Biztonsági javítás · 2026-10-03 · LEFUTTATVA (migration: admincore_security_hardening_20261003)
 --
 -- Miért: a publishable kulcs nyilvános (minden HTML-ben benne van), így bárki
 -- közvetlenül hívhatja a Supabase-t a Symfony-kapu megkerülésével. Az alábbi
