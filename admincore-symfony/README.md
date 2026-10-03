@@ -144,3 +144,19 @@ kötelező pénzügyi jelentést a javítás nem érinti.
 | `f_verif_generalas`, `f_heti_gyules_elokeszites`, `f_kalap` | bejelentkezés nélkül futnak | csak bejelentkezve |
 | `f_set_pin` | **bármely** bejelentkezett felhasználó (szerelő is) bármely szerelő PIN-jét átírhatja | csak owner/admin (Ferenc, Yvonne, David) — tesztelve: szerelő elutasítva, owner sikeres, mindkét próba visszagörgetve |
 | `f_szerelok` | bejelentkezés nélkül | marad így (a szerelő-telefon belépés előtt használja) |
+
+## PIN-fék az adatbázisban (2026-10-03) — RÉSZBEN LEFUTTATVA
+
+`supabase/2026-10-03_pin_brake.sql` — a kapu fékje csak a mi felületünkön át érkező kéréseket látja; a nyilvános
+kulccsal a Supabase közvetlenül is hívható, ezért a fék az `f_pin_login`-ba is bekerül:
+5 egymást követő hibás PIN → 15 perc zárolás, minden próbálkozás a `pin_login_naplo` táblába (180 nap),
+owner/admin új PIN-nel azonnal feloldja.
+
+| Rész | Állapot |
+|---|---|
+| `pin_login_naplo` tábla, `employees.pin_fail_count` / `pin_locked_until` | lefuttatva |
+| `f_set_pin`: zárolás törlése új PIN-nél; közvetlen SQL-ből (pl. `f_prod_selftest`) újra hívható | lefuttatva |
+| `f_prod_selftest` lezárása — bejelentkezés nélkül is futtatható volt, és Tamás Arnold PIN-jét törli | lefuttatva |
+| `f_pin_login` új változata (maga a fék) | **nincs lefuttatva** — SQL Editorból kell, lásd a fájl fejlécét |
+
+A kapu már kezeli az új viselkedést (hibás PIN-re API-n át `200 []` jön kivétel helyett — teszt őrzi).

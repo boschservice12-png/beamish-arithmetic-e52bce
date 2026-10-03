@@ -78,6 +78,17 @@ final class PinGatewayTest extends WebTestCase
         self::assertSame('gateway.pin_throttled', array_slice($this->audit(), -1)[0]['message']);
     }
 
+    public function testEmptyAnswerFromDbBrakeCountsAsFailure(): void
+    {
+        // Az adatbázis-szintű PIN-fék (pin_brake) API-hívásra hibás PIN-nél 200 + [] választ ad kivétel helyett.
+        FakeSupabase::$responder = static fn () => new MockResponse('[]', ['http_code' => 200]);
+        for ($i = 0; $i < 5; ++$i) {
+            self::assertSame(200, $this->login('000'.$i));
+        }
+        self::assertSame(429, $this->login('4321'));
+        self::assertSame('gateway.pin_login_failed', $this->audit()[0]['message']);
+    }
+
     public function testOtherEmployeeIsNotBlockedByOneEmployeesFailures(): void
     {
         for ($i = 0; $i < 5; ++$i) {
