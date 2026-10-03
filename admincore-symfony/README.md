@@ -7,9 +7,9 @@ Három, eddig önálló HTML-fájl egy Symfony-alkalmazásban, egy közös Supab
 | `/` | `AdminCore_Szervezesi_tabla_33_3.html` (505 KB) | vezetés / iroda — Supabase-bejelentkezés |
 | `/szerelo` | `szerelo-telefon.html` | szerelők telefonja — név + 4 jegyű PIN |
 | `/teendoim` | `teendoim.html` | iroda ↔ szerelő-telefon csatorna — név + PIN vagy iroda-kulcs |
-| `/penzugy` | `panou … (2026-04 modell)` — „Panou de control operațional” | pénzügy / vezetés — fejlesztés alatt; az AdminCore „Pénzügy ↗” gombja (`finance-dashboard.html`) ide visz |
+| `/penzugy` | `panou … (2026-04 modell)` — „Panou de control operațional” | pénzügy / vezetés — fejlesztés alatt; az AdminCore „Pénzügy ↗” (`finance-dashboard.html`) és „Panou Operațional ↗” (`panou-operational.html`) gombja is ide visz |
 
-A régi fájlnevek (`/szerelo-telefon.html`, `/teendoim.html`, `/finance-dashboard.html`, `/AdminCore_…html`) 301-gyel az új címre visznek,
+A régi fájlnevek (`/szerelo-telefon.html`, `/teendoim.html`, `/finance-dashboard.html`, `/panou-operational.html`, `/AdminCore_…html`) 301-gyel az új címre visznek,
 így a kiosztott linkek és QR-kódok működnek.
 
 **A felületek és a működés változatlanok**: ugyanaz a HTML, CSS és JS, ugyanaz a Supabase-adatbázis,

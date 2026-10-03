@@ -36,8 +36,12 @@ final class AdminCoreController extends AbstractController
         return $this->render('penzugy/index.html.twig');
     }
 
-    /** Az AdminCore „Pénzügy ↗” gombja relatív címen nyitja: finance-dashboard.html. */
+    /**
+     * Az AdminCore „Pénzügy ↗” (finance-dashboard.html) és „Panou Operațional ↗” (panou-operational.html)
+     * gombja relatív címen nyit — mindkettő a pénzügyi panel (Panou de control operațional).
+     */
     #[Route('/finance-dashboard.html', name: 'penzugy_legacy', methods: ['GET', 'HEAD'])]
+    #[Route('/panou-operational.html', name: 'penzugy_legacy_panou', methods: ['GET', 'HEAD'])]
     public function penzugyLegacy(): Response
     {
         return $this->redirectToRoute('penzugy_index', [], Response::HTTP_MOVED_PERMANENTLY);

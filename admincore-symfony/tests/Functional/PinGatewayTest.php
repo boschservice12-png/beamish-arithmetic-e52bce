@@ -198,5 +198,7 @@ final class PinGatewayTest extends WebTestCase
 
         $this->client->request('GET', '/finance-dashboard.html');
         self::assertResponseRedirects('/penzugy', 301);
+        $this->client->request('GET', '/panou-operational.html');
+        self::assertResponseRedirects('/penzugy', 301);
     }
 }
