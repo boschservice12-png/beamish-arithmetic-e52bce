@@ -27,6 +27,15 @@ final class VerifyLegacyCommand
     ];
 
     /**
+     * Szándékos KIEGÉSZÍTÉSEK (új funkció, az eredeti kód érintetlen): a renderelt oldalból ezek a blokkok
+     * az összevetés előtt kivágódnak. Apponként reguláris kifejezések.
+     */
+    public const ADDITIONS = [
+        // Pénzügyi panel → adatbázis-szinkron (finance_panel_state), 2026-10-03
+        'penzugy' => ['#<!-- penzugy-db:begin -->.*?<!-- penzugy-db:end -->#s'],
+    ];
+
+    /**
      * Szándékos, dokumentált eltérések az eredetihez képest (eredeti → javított), apponként.
      * Minden új javítás ide kerül, indoklással — így az eltérés auditálható marad.
      */
@@ -77,10 +86,19 @@ final class VerifyLegacyCommand
             }
             $expected = str_replace($from, $to, $expected);
         }
-        $actual = $this->reassemble($this->twig->render($template));
+        $rendered = $this->twig->render($template);
+        foreach (self::ADDITIONS[$app] ?? [] as $pattern) {
+            $rendered = preg_replace($pattern, '', $rendered, -1, $cut);
+            if (1 !== $cut) {
+                $io->error($app.': a kiegészítő blokk nem pontosan egyszer szerepel: '.$pattern);
+
+                return false;
+            }
+        }
+        $actual = $this->reassemble($rendered);
 
         if ($actual === $expected) {
-            $io->success(\sprintf('%s azonos: %s (%d bájt, %d dokumentált javítással)', $app, $legacy, \strlen($expected), \count(self::KNOWN_FIXES[$app])));
+            $io->success(\sprintf('%s azonos: %s (%d bájt, %d dokumentált javítással, %d kiegészítéssel)', $app, $legacy, \strlen($expected), \count(self::KNOWN_FIXES[$app]), \count(self::ADDITIONS[$app] ?? [])));
 
             return true;
         }

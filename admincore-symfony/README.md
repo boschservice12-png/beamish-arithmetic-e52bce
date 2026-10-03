@@ -15,10 +15,16 @@ A régi fájlnevek (`/szerelo-telefon.html`, `/teendoim.html`, `/finance-dashboa
 **A felületek és a működés változatlanok**: ugyanaz a HTML, CSS és JS, ugyanaz a Supabase-adatbázis,
 ugyanaz a bejelentkezés — mind a négy oldal bájtra azonos az eredetivel (`app:verify-legacy`).
 
-**Pénzügyi panel — ismert korlát:** a 2026-04-es modell minden adatot a böngésző saját tárhelyén
-(`localStorage`, kulcs: `redassistance-panel-v16`) tárol, a Supabase-hez nem kapcsolódik. Új címen (domainen)
-a böngésző a régi tárhely adatait nem látja. Következő fejlesztési lépés: mentés/betöltés az adatbázis
-`finance_*` tábláiba, és automatikus havi jelentés.
+**Pénzügyi panel — adatbázis-mentés (1. fázis, 2026-10-03):** a panel kódja változatlan; a
+`public/assets/penzugy/js/02-db-sync.js` réteg minden mentést a `finance_panel_state` táblába is beír,
+**verziózva** (append-only: minden mentés új sor, felülírás/törlés nincs), induláskor onnan tölt.
+- Belépés: ugyanaz a Supabase-fiók, mint az AdminCore-ban (azonos domainen közös munkamenet).
+- Hozzáférés: **iroda** (owner, admin, reception) — az adatbázis RLS-e kényszeríti ki; szerelő/hr nem lát.
+- Ütközés: ha közben más mentett, nem írja felül, figyelmeztet.
+- Egyszeri átköltöztetés: ha a böngészőben régi adat van és az adatbázis üres, felajánlja a feltöltést.
+- A sablonban a `<!-- penzugy-db:begin/end -->` blokk a kiegészítés; az `app:verify-legacy` ezt kivágva
+  ellenőrzi a bájtazonosságot (`VerifyLegacyCommand::ADDITIONS`).
+- 2. fázis: a számok bontása a `finance_*` táblákba + automatikus havi jelentés.
 Ami változott: szétbontott, kereshető fájlok, verziózott cache, konfiguráció `.env`-ben, Supabase-kapu
 engedélylistával, auditnaplóval és PIN-fékkel.
 

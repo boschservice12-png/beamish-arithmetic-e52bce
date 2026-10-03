@@ -18,6 +18,7 @@ final class GatewayPolicy
         'hr_munkaposzt', 'hr_munkaposzt_szemely', 'hr_poszt_betoltes', 'hr_tmj', 'hr_verif_lista', 'hr_verif_naplo',
         'org_employee_points', 'org_kpi_entries', 'org_point_rules',
         'prod_task', 'tel_feladat',
+        'finance_panel_state',   // pénzügyi panel (iroda), verziózott állapot
         'v_2_2_felveteli_kpi', 'v_termeles_utolso_ho', 'v_verif_ma',
     ];
 

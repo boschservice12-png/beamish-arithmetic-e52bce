@@ -42,11 +42,14 @@ final class GatewayPolicyCoverageTest extends TestCase
         self::assertSame([], array_values(array_diff($called, self::allRpcs())), $app.' hív olyan függvényt, ami nincs a GatewayPolicy-ben');
     }
 
-    public function testFinancePanelHasNoSupabaseAccessYet(): void
+    public function testFinancePanelTouchesOnlyItsStateTable(): void
     {
-        // A 2026-04-es pénzügyi modell böngésző-tárhelyen dolgozik. Ha Supabase-hívás kerül bele,
-        // a GatewayPolicy-t és ezt a tesztet tudatosan kell bővíteni.
-        self::assertDoesNotMatchRegularExpression('/\.rpc\(|createClient\(|supabase/i', self::js('penzugy'));
+        // A pénzügyi modell (01-app.js) maga nem hív Supabase-t; csak a 02-db-sync.js réteg, és csak a saját táblát + profilt.
+        $app = file_get_contents(\dirname(__DIR__, 2).'/public/assets/penzugy/js/01-app.js');
+        self::assertDoesNotMatchRegularExpression('/\.rpc\(|createClient\(|supabase/i', $app);
+        preg_match_all('/\.from\(\s*([A-Za-z_\'"]+)\s*\)/', file_get_contents(\dirname(__DIR__, 2).'/public/assets/penzugy/js/02-db-sync.js'), $m);
+        self::assertEqualsCanonicalizing(['TABLE', "'profiles'", 'TABLE'], $m[1]); // betöltés, profil, mentés
+        self::assertDoesNotMatchRegularExpression('/\.rpc\(/', file_get_contents(\dirname(__DIR__, 2).'/public/assets/penzugy/js/02-db-sync.js'));
     }
 
     public function testPhoneAppsUseNoTablesOrSupabaseAuthDirectly(): void
@@ -69,7 +72,7 @@ final class GatewayPolicyCoverageTest extends TestCase
     {
         $relations = file(__DIR__.'/../fixtures/supabase_relations.txt', \FILE_IGNORE_NEW_LINES | \FILE_SKIP_EMPTY_LINES);
         // Csak az AdminCore ér táblához (a telefonos appoknál a fenti teszt tiltja); ott a 'jobs' egy képernyő neve.
-        preg_match_all('/[\'"]([a-z][a-z0-9_]*)[\'"]/', self::js('admincore'), $m);
+        preg_match_all('/[\'"]([a-z][a-z0-9_]*)[\'"]/', self::js('admincore').self::js('penzugy'), $m);
         $named = array_values(array_intersect($relations, array_unique($m[1])));
 
         self::assertNotEmpty($named);
