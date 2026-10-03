@@ -1,0 +1,5 @@
+# Másold public.yml néven, és írd be a nyilvános címet → külső elérhetőség + TLS-tanúsítvány lejárata
+- targets:
+    - https://szerviz.example.ro/health/ready
+  labels:
+    hely: nyilvanos

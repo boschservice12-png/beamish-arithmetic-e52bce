@@ -56,6 +56,7 @@ final class SupabaseGatewayController
 
         if (!$decision->allowed || ($decision->requiresUser && null === $user['id'])) {
             $reason = $decision->allowed ? 'nincs bejelentkezve' : 'nem engedélyezett végpont';
+            $request->attributes->set('_ra_gw', ['resource' => $decision->allowed ? $decision->resource : '-', 'outcome' => 'denied']);
             $this->audit->warning('gateway.denied', [
                 'service' => $service, 'path' => $path, 'method' => $method, 'reason' => $reason,
                 'user' => $user, 'ip' => $request->getClientIp(),
@@ -76,6 +77,8 @@ final class SupabaseGatewayController
             default => null,
         };
         if (null !== $retry) {
+            $request->attributes->set('_ra_gw', ['resource' => $decision->resource, 'outcome' => 'throttled']);
+            $request->attributes->set('_ra_login', ['type' => $keyLogin ? 'iroda_kulcs' : 'pin', 'result' => 'throttled']);
             $this->audit->warning('gateway.pin_throttled', ['employee' => $pinEmployee, 'resource' => $decision->resource, 'retry_after' => $retry, 'ip' => $ip]);
 
             return new JsonResponse(['code' => 'GATEWAY_RATE_LIMIT', 'message' => 'Túl sok hibás PIN. Próbáld újra később.', 'details' => null, 'hint' => null],
@@ -99,15 +102,29 @@ final class SupabaseGatewayController
             $content = 'HEAD' === $method ? '' : $upstream->getContent(false);
             $upstreamHeaders = $upstream->getHeaders(false);
         } catch (TransportExceptionInterface $e) {
+            $request->attributes->set('_ra_gw', ['resource' => $decision->resource, 'outcome' => 'upstream_down']);
             $this->audit->error('gateway.upstream_error', ['resource' => $decision->resource, 'method' => $method, 'error' => $e->getMessage(), 'user' => $user]);
 
             return new JsonResponse(['code' => 'GATEWAY_UPSTREAM', 'message' => 'A Supabase nem érhető el', 'details' => null, 'hint' => null], Response::HTTP_BAD_GATEWAY);
+        }
+
+        $request->attributes->set('_ra_gw', ['resource' => $decision->resource, 'outcome' => match (true) {
+            $status >= 500 => 'server_error', $status >= 400 => 'client_error', default => 'ok',
+        }]);
+        if ('auth:login' === $decision->resource) {
+            $request->attributes->set('_ra_login', ['type' => 'jelszo', 'result' => $status < 300 ? 'ok' : 'fail']);
+        } elseif ('rpc:f_asm_import' === $decision->resource) {
+            $request->attributes->set('_ra_asm', ['source' => 'manual', 'ok' => $status < 300]);
+        }
+        if ($keyLogin) {
+            $request->attributes->set('_ra_login', ['type' => 'iroda_kulcs', 'result' => [] === self::jsonList($content) ? 'fail' : 'ok']);
         }
 
         if (null !== $pinEmployee) {
             $session = self::jsonList($content)[0] ?? null;
             $ok = $status < 300 && \is_array($session) && isset($session['token']);
             $ok ? $this->throttle->success($pinEmployee) : $this->throttle->failure($pinEmployee, $ip);
+            $request->attributes->set('_ra_login', ['type' => 'pin', 'result' => $ok ? 'ok' : 'fail']);
             $this->audit->info($ok ? 'gateway.pin_login' : 'gateway.pin_login_failed', [
                 'employee' => $pinEmployee,
                 'name' => $ok ? ($session['name'] ?? null) : null,

@@ -1,0 +1,50 @@
+# RedAssistance — Prometheus
+global:
+  scrape_interval: 30s
+  evaluation_interval: 30s
+  external_labels:
+    rendszer: redassistance
+
+rule_files:
+  - /etc/prometheus/rules/*.yml
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ['alertmanager:9093']
+
+scrape_configs:
+  # Az alkalmazás saját mérései (/metrics, Bearer tokennel)
+  - job_name: admincore
+    metrics_path: /metrics
+    authorization:
+      type: Bearer
+      credentials_file: /run/secrets/metrics_token
+    static_configs:
+      - targets: ['app:8080']
+
+  # Kívülről nézve: válaszol-e a rendszer (belső cím + opcionális nyilvános URL-ek → TLS-lejárat is)
+  - job_name: blackbox
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+      - targets: ['http://app:8080/health/ready']
+    file_sd_configs:
+      - files: ['/etc/prometheus/targets/*.yml']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox:9115
+
+  # A szerver: lemez, memória, CPU + a mentés textfile-mérései (ra_backup_*)
+  - job_name: node
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  - job_name: monitoring
+    static_configs:
+      - targets: ['localhost:9090', 'alertmanager:9093', 'loki:3100', 'alloy:12345']

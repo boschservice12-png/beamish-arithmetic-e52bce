@@ -71,12 +71,14 @@ final class AsmApiController
             $status = $r->getStatusCode();
             $body = $r->getContent(false);
         } catch (TransportExceptionInterface $e) {
+            $request->attributes->set('_ra_asm', ['source' => 'api', 'ok' => false]);
             $this->audit->error('asm_api.upstream_error', ['error' => $e->getMessage()]);
 
             return new JsonResponse(['error' => 'A Supabase nem érhető el'], Response::HTTP_BAD_GATEWAY);
         }
 
         $result = json_decode($body, true);
+        $request->attributes->set('_ra_asm', ['source' => 'api', 'ok' => $status < 300]);
         $this->audit->info('asm_api.import', [
             'ho' => $p['ho'], 'sorok_bejott' => \count($p['sorok']), 'status' => $status,
             'batch' => $result['batch'] ?? null, 'sorok_betoltve' => $result['sorok'] ?? null, 'ip' => $request->getClientIp(),

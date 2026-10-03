@@ -1,0 +1,41 @@
+# RedAssistance — Alertmanager. A ${…} értékek indításkor a környezetből jönnek (compose.monitoring.yml).
+global:
+  smtp_smarthost: '${SMTP_SMARTHOST}'
+  smtp_from: '${ALERT_EMAIL_FROM}'
+  smtp_auth_username: '${SMTP_USER}'
+  smtp_auth_password_file: /run/secrets/smtp_password
+  smtp_require_tls: true
+
+route:
+  receiver: iroda
+  group_by: [alertname]
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 12h
+  routes:
+    - matchers: ['severity="critical"']
+      receiver: iroda
+      repeat_interval: 2h
+
+inhibit_rules:
+  # ha az alkalmazás áll, a belőle következő riasztások ne zajongjanak
+  - source_matchers: ['alertname="RA_AlkalmazasLeallt"']
+    target_matchers: ['alertname=~"RA_NemKeszenleti|RA_KulsoElerhetetlen|RA_SokSzerverHiba|RA_LassuValaszok"']
+  - source_matchers: ['alertname="RA_SupabaseKapuNemEriEl"']
+    target_matchers: ['alertname=~"RA_NemKeszenleti|RA_SokSzerverHiba|RA_SupabaseLassu"']
+  - source_matchers: ['alertname="RA_LemezBetelik"']
+    target_matchers: ['alertname="RA_LemezFogy"']
+
+receivers:
+  - name: iroda
+    email_configs:
+      - to: '${ALERT_EMAIL_TO}'
+        send_resolved: true
+        headers:
+          Subject: '[RedAssistance {{ .Status | toUpper }}] {{ .CommonAnnotations.summary }}'
+        text: |-
+          {{ range .Alerts }}{{ .Labels.severity | toUpper }} · {{ .Labels.alertname }}
+          {{ .Annotations.summary }}
+          Teendő: {{ .Annotations.teendo }}
+          Kezdete: {{ .StartsAt.Local.Format "2006-01-02 15:04" }}
+          {{ end }}

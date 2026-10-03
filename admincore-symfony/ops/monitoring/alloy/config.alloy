@@ -1,0 +1,80 @@
+// RedAssistance — központi naplógyűjtés (Grafana Alloy → Loki)
+//  1) a stack összes konténerének stdout/stderr-je (Caddy hozzáférési napló, Symfony hibák JSON-ban)
+//  2) az auditnapló (var/log/audit-*.log, a naplókötetből, csak olvasva)
+// Címkék szándékosan kevesek (service, kind, level, event) — felhasználó / IP soha nem címke, csak a sorban kereshető.
+
+discovery.docker "stack" {
+  host = "unix:///var/run/docker.sock"
+  filter {
+    name   = "label"
+    values = ["com.docker.compose.project=redassistance"]
+  }
+}
+
+discovery.relabel "stack" {
+  targets = []
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+    target_label  = "service"
+  }
+}
+
+loki.source.docker "stack" {
+  host          = "unix:///var/run/docker.sock"
+  targets       = discovery.docker.stack.targets
+  relabel_rules = discovery.relabel.stack.rules
+  labels        = {"job" = "docker"}
+  forward_to    = [loki.process.stack.receiver]
+}
+
+loki.process "stack" {
+  stage.json {
+    expressions = {level = "level", level_name = "level_name", logger = "logger"}
+  }
+  stage.template {
+    source   = "level"
+    template = "{{ if .level_name }}{{ ToLower .level_name }}{{ else if .level }}{{ ToLower .level }}{{ else }}info{{ end }}"
+  }
+  stage.template {
+    source   = "kind"
+    template = "{{ if .logger }}{{ if hasPrefix \"http.log.access\" .logger }}access{{ else }}server{{ end }}{{ else if .level_name }}app{{ else }}other{{ end }}"
+  }
+  stage.labels {
+    values = {level = "", kind = ""}
+  }
+  forward_to = [loki.write.default.receiver]
+}
+
+local.file_match "audit" {
+  path_targets = [{"__path__" = "/audit/audit-*.log", "job" = "audit", "service" = "app", "kind" = "audit"}]
+  sync_period  = "30s"
+}
+
+loki.source.file "audit" {
+  targets    = local.file_match.audit.targets
+  forward_to = [loki.process.audit.receiver]
+}
+
+loki.process "audit" {
+  stage.json {
+    expressions = {event = "message", level = "level_name", ts = "datetime"}
+  }
+  stage.timestamp {
+    source = "ts"
+    format = "RFC3339Nano"
+  }
+  stage.template {
+    source   = "level"
+    template = "{{ ToLower .Value }}"
+  }
+  stage.labels {
+    values = {event = "", level = ""}
+  }
+  forward_to = [loki.write.default.receiver]
+}
+
+loki.write "default" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}

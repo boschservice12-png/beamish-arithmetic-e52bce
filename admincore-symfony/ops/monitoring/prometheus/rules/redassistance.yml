@@ -1,0 +1,181 @@
+# RedAssistance — riasztási szabályok
+# Súlyosság: critical = azonnal (a műhely/iroda nem tud dolgozni vagy adat van veszélyben)
+#            warning  = munkaidőben nézd meg
+# Minden riasztásnak van "teendo" leírása: mit csinálj először.
+groups:
+  - name: elerhetoseg
+    rules:
+      - alert: RA_AlkalmazasLeallt
+        expr: up{job="admincore"} == 0
+        for: 2m
+        labels: {severity: critical}
+        annotations:
+          summary: "Az AdminCore nem válaszol (2 perce)"
+          teendo: "docker compose ps; docker compose logs --tail=100 app. Újraindítás: docker compose up -d app"
+
+      - alert: RA_NemKeszenleti
+        expr: ra_ready == 0
+        for: 3m
+        labels: {severity: critical}
+        annotations:
+          summary: "Az AdminCore fut, de nem tud kiszolgálni"
+          teendo: "curl -s localhost:8080/health/ready → melyik ellenőrzés hibás (supabase / napló / cache). Supabase: status.supabase.com"
+
+      - alert: RA_KulsoElerhetetlen
+        expr: probe_success{job="blackbox"} == 0
+        for: 5m
+        labels: {severity: critical}
+        annotations:
+          summary: "{{ $labels.instance }} kívülről nem érhető el"
+          teendo: "DNS, reverse proxy / Cloudflare, tűzfal, tanúsítvány ellenőrzése"
+
+      - alert: RA_TanusitvanyLejar
+        expr: (probe_ssl_earliest_cert_expiry - time()) / 86400 < 14
+        for: 1h
+        labels: {severity: warning}
+        annotations:
+          summary: "A TLS-tanúsítvány {{ $value | printf \"%.0f\" }} nap múlva lejár ({{ $labels.instance }})"
+          teendo: "Automatikus megújítás ellenőrzése a reverse proxyn"
+
+      - alert: RA_SupabaseLassu
+        expr: ra_check_duration_seconds{check="supabase"} > 1.5
+        for: 10m
+        labels: {severity: warning}
+        annotations:
+          summary: "A Supabase lassan válaszol ({{ $value | printf \"%.2f\" }} s)"
+          teendo: "status.supabase.com; Supabase Dashboard → Reports → API / Database"
+
+  - name: hibak
+    rules:
+      - alert: RA_SokSzerverHiba
+        expr: |
+          (sum(rate(ra_http_requests_total{status="5xx"}[5m])) or vector(0))
+            / clamp_min(sum(rate(ra_http_requests_total[5m])), 1e-9) > 0.05
+          and sum(rate(ra_http_requests_total[5m])) > 0.02
+        for: 5m
+        labels: {severity: warning}
+        annotations:
+          summary: "A kérések {{ $value | humanizePercentage }}-a 5xx hibával zárul"
+          teendo: "Grafana → RedAssistance → Hibák panel; docker compose logs app | grep -i error"
+
+      - alert: RA_SupabaseKapuNemEriEl
+        expr: increase(ra_gateway_requests_total{outcome="upstream_down"}[5m]) > 3
+        labels: {severity: critical}
+        annotations:
+          summary: "A Supabase-kapu nem éri el a Supabase-t ({{ $value | printf \"%.0f\" }} hiba / 5 perc)"
+          teendo: "Hálózat / DNS a szerveren; status.supabase.com"
+
+      - alert: RA_SupabaseSzerverHibak
+        expr: increase(ra_gateway_requests_total{outcome="server_error"}[15m]) > 10
+        labels: {severity: warning}
+        annotations:
+          summary: "A Supabase 5xx-et ad ({{ $value | printf \"%.0f\" }} / 15 perc)"
+          teendo: "Supabase Dashboard → Logs → API / Postgres"
+
+      - alert: RA_LassuValaszok
+        expr: histogram_quantile(0.95, sum by (le) (rate(ra_http_request_duration_seconds_bucket{route!~"health.*"}[10m]))) > 2
+        for: 10m
+        labels: {severity: warning}
+        annotations:
+          summary: "p95 válaszidő {{ $value | printf \"%.1f\" }} s"
+          teendo: "Supabase válaszidő (RA_SupabaseLassu), szerver CPU / memória"
+
+  - name: biztonsag
+    rules:
+      - alert: RA_PinProbalkozasok
+        expr: sum(increase(ra_login_total{type=~"pin|iroda_kulcs", result=~"fail|throttled"}[15m])) > 20
+        labels: {severity: warning}
+        annotations:
+          summary: "Sok hibás PIN / iroda-kulcs ({{ $value | printf \"%.0f\" }} / 15 perc)"
+          teendo: "Grafana → Auditnapló: gateway.pin_login_failed / pin_throttled — melyik dolgozó, melyik IP. Ha idegen: tűzfal + PIN-csere"
+
+      - alert: RA_JelszoProbalkozasok
+        expr: sum(increase(ra_login_total{type="jelszo", result="fail"}[15m])) > 10
+        labels: {severity: warning}
+        annotations:
+          summary: "Sok hibás jelszavas belépés ({{ $value | printf \"%.0f\" }} / 15 perc)"
+          teendo: "Auditnapló: auth:login státusz 400 — melyik e-mail címre"
+
+      - alert: RA_SokTiltottKeres
+        expr: sum(increase(ra_gateway_requests_total{outcome="denied"}[15m])) > 30
+        labels: {severity: warning}
+        annotations:
+          summary: "Sok tiltott kapukérés ({{ $value | printf \"%.0f\" }} / 15 perc)"
+          teendo: "Friss telepítés után: hiányzó engedély (GatewayPolicy). Egyébként: kutakodás — auditnapló gateway.denied"
+
+  - name: uzlet_es_adat
+    rules:
+      - alert: RA_AsmImportHianyzik
+        # a hónap 5. napjától: az aktuális hónapban még nem volt sikeres ASM-import (= az előző hónap nincs betöltve)
+        expr: |
+          ra_asm_import_last_success_timestamp_seconds
+            < on() (time() - (day_of_month() - 1) * 86400 - hour() * 3600 - minute() * 60)
+          and on() day_of_month() >= 5
+        for: 1h
+        labels: {severity: warning}
+        annotations:
+          summary: "Hiányzik az előző havi ASM-import — a havi jelentés és a KPI nem frissült"
+          teendo: "Pénzügyi panel → Import ASM (6 fájl), vagy az automatikus ASM-API ellenőrzése"
+
+      - alert: RA_AsmImportSikertelen
+        expr: increase(ra_asm_import_total{result="hiba"}[1h]) > 0
+        labels: {severity: warning}
+        annotations:
+          summary: "Sikertelen ASM-import ({{ $labels.source }})"
+          teendo: "Auditnapló: asm_api.import / gateway.write rpc:f_asm_import — státusz és hibaüzenet"
+
+      - alert: RA_MentesElmaradt
+        expr: time() - ra_backup_last_success_timestamp_seconds > 26 * 3600
+        labels: {severity: critical}
+        annotations:
+          summary: "Több mint 26 órája nem volt sikeres adatbázis-mentés"
+          teendo: "docker compose logs backup; OPERATIONS.md → Mentés"
+
+      - alert: RA_MentesNincsAdat
+        expr: absent(ra_backup_last_success_timestamp_seconds)
+        for: 30h
+        labels: {severity: critical}
+        annotations:
+          summary: "Nincs adat a mentésről (a mentő szolgáltatás nem fut?)"
+          teendo: "docker compose -f compose.yml -f compose.monitoring.yml -f compose.backup.yml ps backup"
+
+      - alert: RA_VisszaallitasProbaRegi
+        expr: time() - ra_restore_test_last_success_timestamp_seconds > 8 * 86400
+        labels: {severity: warning}
+        annotations:
+          summary: "Több mint 8 napja nem volt sikeres visszaállítási próba"
+          teendo: "OPERATIONS.md → Visszaállítási próba"
+
+  - name: szerver
+    rules:
+      - alert: RA_LemezFogy
+        expr: node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs"} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay|squashfs"} < 0.10
+        for: 15m
+        labels: {severity: warning}
+        annotations:
+          summary: "Kevés a szabad lemez ({{ $labels.mountpoint }}: {{ $value | humanizePercentage }})"
+          teendo: "docker system df; régi mentések / képek: docker image prune"
+
+      - alert: RA_LemezBetelik
+        expr: node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs"} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay|squashfs"} < 0.04
+        for: 5m
+        labels: {severity: critical}
+        annotations:
+          summary: "Mindjárt betelik a lemez ({{ $labels.mountpoint }})"
+          teendo: "Azonnal helyet felszabadítani — betelt lemeznél a mentés és az auditnapló is leáll"
+
+      - alert: RA_MemoriaFogy
+        expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes < 0.08
+        for: 15m
+        labels: {severity: warning}
+        annotations:
+          summary: "Kevés a szabad memória ({{ $value | humanizePercentage }})"
+          teendo: "docker stats — melyik konténer"
+
+      - alert: RA_MonitoringCelNemValaszol
+        expr: up{job=~"node|monitoring"} == 0
+        for: 10m
+        labels: {severity: warning}
+        annotations:
+          summary: "{{ $labels.instance }} ({{ $labels.job }}) nem válaszol"
+          teendo: "docker compose ps"
