@@ -24,7 +24,7 @@ final class ContentHashVersionStrategy implements VersionStrategyInterface
     {
         $file = $this->publicDir.'/'.ltrim($path, '/');
 
-        return $this->cache[$path] ??= is_file($file) ? substr(md5_file($file), 0, 10) : '';
+        return $this->cache[$path] ??= is_file($file) ? substr((string) md5_file($file), 0, 10) : '';
     }
 
     public function applyVersion(string $path): string

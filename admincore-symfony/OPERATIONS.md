@@ -27,7 +27,7 @@ docker compose -f compose.yml -f compose.monitoring.yml -f compose.backup.yml --
 
 ### Mi fut minden pushnál
 
-1. **PHP**: composer validate + `composer audit` (sérülékeny függőség = piros), szintaxis, konténer/YAML/Twig-lint, 58 PHPUnit-teszt, `app:verify-legacy` (byte-azonosság a régi HTML-ekkel, csak dokumentált javításokkal).
+1. **PHP**: composer validate + `composer audit` (sérülékeny függőség = piros), szintaxis, konténer/YAML/Twig-lint, **PHPStan** (alkalmazás: 8-as szint, tesztek: 6-os), 58 PHPUnit-teszt, `app:verify-legacy` (byte-azonosság a régi HTML-ekkel, csak dokumentált javításokkal).
 2. **E2E**: valódi Chromium, a valódi Symfony egy Supabase-utánzat előtt: belépés, menü, mért KPI, kapu-tiltás, szerelő-PIN, Teendőim, pénzügyi belépés.
 3. **Ops**: compose-fájlok, Prometheus (21 szabály), Alertmanager, Loki, Alloy, blackbox, dashboard JSON, shellcheck.
 4. **Mentés**: a teljes mentés → titkosítás → visszaállítási próba → kézi visszafejtés → egy tábla kinyerése lánc egy Supabase-szerű próbaadatbázison, **negatív próbákkal** (eltérést és hibás mentést is észre kell vennie).
@@ -76,6 +76,14 @@ Kiadás: `git tag admincore-v1.0.0 && git push origin admincore-v1.0.0` → CI �
 | Egy felhasználó | `{job="audit"} \|= "valaki@szerviz.ro"` |
 
 Megőrzés: metrikák 90 nap, Loki 90 nap, **auditnapló-fájl 400 nap** (a naplókötetben, a Lokitól függetlenül).
+
+**Ha maga a monitoring áll le (deadman):** a `RA_Watchdog` riasztás szándékosan mindig aktív, és percenként pingel egy
+külső figyelőt. Beállítás (ingyenes): healthchecks.io → új check, „Period 1 perc, Grace 5 perc” → a ping-URL a
+`.env.prod`-ba: `DEADMAN_URL=https://hc-ping.com/<uuid>`. Ha a szerver, a Prometheus vagy az Alertmanager leáll,
+a healthchecks.io küld e-mailt / SMS-t — a riasztórendszer saját kiesése is látszik.
+
+**Biztonsági fejlécek:** Content-Security-Policy (az adat csak a saját kapura / Supabase-re mehet, idegen szkript nem
+tölthető, keretbe ágyazás tiltva), HSTS a HTTPS-kapun, `nosniff`, `X-Frame-Options`, `Referrer-Policy`.
 
 ---
 

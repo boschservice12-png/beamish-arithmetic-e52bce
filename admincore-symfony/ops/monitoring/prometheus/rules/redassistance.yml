@@ -5,6 +5,13 @@
 groups:
   - name: elerhetoseg
     rules:
+      - alert: RA_Watchdog
+        expr: vector(1)
+        labels: {severity: none}
+        annotations:
+          summary: "A riasztási lánc él (ez a riasztás szándékosan mindig aktív)"
+          teendo: "Semmi. Ha a külső deadman-figyelő jelez, akkor a monitoring állt le: docker compose ps"
+
       - alert: RA_AlkalmazasLeallt
         expr: up{job="admincore"} == 0
         for: 2m

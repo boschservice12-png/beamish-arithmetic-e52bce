@@ -12,6 +12,7 @@ final class FakeSupabase
     public static array $requests = [];
     public static ?\Closure $responder = null;
 
+    /** @param array<string, mixed> $options */
     public function __invoke(string $method, string $url, array $options = []): ResponseInterface
     {
         self::$requests[] = ['method' => $method, 'url' => $url, 'options' => $options];

@@ -67,6 +67,10 @@ jobs:
           php bin/console lint:yaml config --parse-tags
           php bin/console lint:twig templates
           php bin/console debug:router --env=prod > /dev/null
+      - name: Statikus kódelemzés (PHPStan — alkalmazás 8-as, tesztek 6-os szint)
+        run: |
+          vendor/bin/phpstan analyse -c phpstan.dist.neon --no-progress --memory-limit=1G
+          vendor/bin/phpstan analyse -c phpstan.tests.neon --no-progress --memory-limit=1G
       - name: Egység- és funkcionális tesztek
         run: vendor/bin/phpunit
       - name: A régi alkalmazásokkal byte-azonos kimenet
@@ -130,7 +134,7 @@ jobs:
           printf 'PUBLIC_DOMAIN=szerviz.example.ro\nACME_EMAIL=a@example.ro\n' >> .env.prod
           docker compose -f compose.yml -f compose.edge.yml -f compose.monitoring.yml -f compose.backup.yml --env-file .env.prod config -q
       - name: Shell-szkriptek (shellcheck)
-        run: shellcheck -S warning ops/deploy.sh ops/backup/*.sh ops/install/bootstrap.sh tests/e2e/run.sh
+        run: shellcheck -S warning ops/deploy.sh ops/backup/*.sh ops/install/bootstrap.sh ops/monitoring/alertmanager/entrypoint.sh tests/e2e/run.sh
 
   backup:
     name: Mentés → titkosítás → visszaállítási próba

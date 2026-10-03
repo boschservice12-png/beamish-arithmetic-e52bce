@@ -96,9 +96,13 @@ final class MetricsStore
     public static function parseKey(string $key): array
     {
         [$name, $q] = explode('|', $key, 2) + [1 => ''];
-        parse_str($q, $labels);
+        parse_str($q, $parsed);
+        $labels = [];
+        foreach ($parsed as $k => $v) {
+            $labels[(string) $k] = \is_scalar($v) ? (string) $v : '';
+        }
 
-        return [$name, array_map('strval', $labels)];
+        return [$name, $labels];
     }
 
     /** @return array{c: array<string, float>, h: array<string, array{b: list<int>, s: float, n: int}>, g: array<string, float>} */

@@ -1,0 +1,7 @@
+# Statikus kódelemzés — a CI-ban kötelező. Az alkalmazáskód a legszigorúbb (8-as) szinten.
+# A Symfony- és PHPUnit-bővítményeket a phpstan/extension-installer tölti be.
+parameters:
+    level: 8
+    paths:
+        - src
+    tmpDir: var/cache/phpstan

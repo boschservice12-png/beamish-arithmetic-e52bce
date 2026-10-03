@@ -23,6 +23,7 @@ final class SupabaseGatewayTest extends WebTestCase
         @unlink($this->auditFile);
     }
 
+    /** @param array<string, mixed> $claims */
     private static function jwt(array $claims): string
     {
         $b64 = static fn (string $s) => rtrim(strtr(base64_encode($s), '+/', '-_'), '=');
@@ -30,6 +31,7 @@ final class SupabaseGatewayTest extends WebTestCase
         return 'Bearer '.$b64('{"alg":"HS256","typ":"JWT"}').'.'.$b64(json_encode($claims)).'.c2lnbmF0dXJl';
     }
 
+    /** @return array<string, string> */
     private function userHeaders(): array
     {
         return [
@@ -131,6 +133,7 @@ final class SupabaseGatewayTest extends WebTestCase
         self::assertSame('gateway.denied', $this->auditLines()[0]['message']);
     }
 
+    /** @return iterable<string, array{string, string, bool}> */
     public static function forbiddenRequests(): iterable
     {
         yield 'ismeretlen tábla' => ['GET', '/sb/rest/v1/finance_havi_snapshot', true];

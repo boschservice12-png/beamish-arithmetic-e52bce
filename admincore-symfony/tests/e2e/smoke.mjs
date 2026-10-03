@@ -96,9 +96,11 @@ async function open(path, viewport = { width: 1400, height: 900 }, extra = {}) {
 
 // --- D) Pénzügy: belépési képernyő (az adatbázis-szinkron rétege) ---
 {
-  const { page } = await open('/penzugy');
+  const { page, errors } = await open('/penzugy');
   await page.waitForSelector('#dbSyncOverlay #dbsEmail', { timeout: 15000 }).catch(() => {});
   check(await page.evaluate(() => !!document.querySelector('#dbSyncOverlay #dbsEmail')), 'Pénzügy: belépés nélkül nem látszik adat (bejelentkezés kérve)');
+  const csp = errors.filter(e => /Content Security Policy|Refused to/.test(e));
+  check(csp.length === 0, 'Pénzügy: nincs CSP-sértés', csp.join(' | '));
   await page.close();
 }
 

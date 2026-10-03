@@ -16,6 +16,11 @@ final class AdminCoreTest extends WebTestCase
         self::assertResponseIsSuccessful();
         self::assertResponseHeaderSame('X-Content-Type-Options', 'nosniff');
         self::assertResponseHeaderSame('X-Frame-Options', 'SAMEORIGIN');
+        $csp = (string) $client->getResponse()->headers->get('Content-Security-Policy');
+        self::assertStringContainsString("object-src 'none'", $csp);
+        self::assertStringContainsString("frame-ancestors 'self'", $csp);
+        self::assertMatchesRegularExpression("#connect-src 'self' [^;]*supabase#", $csp);
+        self::assertStringNotContainsString('*', $csp);
 
         $html = $client->getResponse()->getContent();
         self::assertStringStartsWith('<!DOCTYPE html>', $html);

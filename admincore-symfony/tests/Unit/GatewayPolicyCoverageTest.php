@@ -25,6 +25,7 @@ final class GatewayPolicyCoverageTest extends TestCase
             ...GatewayPolicy::WRITE_RPCS, ...GatewayPolicy::READ_RPCS];
     }
 
+    /** @return iterable<string, array{string, int}> */
     public static function apps(): iterable
     {
         yield 'admincore' => ['admincore', 13];
@@ -76,7 +77,7 @@ final class GatewayPolicyCoverageTest extends TestCase
 
     public function testEveryRelationNamedInJsIsAllowed(): void
     {
-        $relations = file(__DIR__.'/../fixtures/supabase_relations.txt', \FILE_IGNORE_NEW_LINES | \FILE_SKIP_EMPTY_LINES);
+        $relations = (array) file(__DIR__.'/../fixtures/supabase_relations.txt', \FILE_IGNORE_NEW_LINES | \FILE_SKIP_EMPTY_LINES);
         // Csak az AdminCore ér táblához (a telefonos appoknál a fenti teszt tiltja); ott a 'jobs' egy képernyő neve.
         preg_match_all('/[\'"]([a-z][a-z0-9_]*)[\'"]/', self::js('admincore').self::js('penzugy'), $m);
         $named = array_values(array_intersect($relations, array_unique($m[1])));

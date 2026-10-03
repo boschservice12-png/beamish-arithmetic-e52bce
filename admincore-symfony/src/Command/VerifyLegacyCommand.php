@@ -84,6 +84,11 @@ final class VerifyLegacyCommand
     private function verify(SymfonyStyle $io, string $app, string $template, string $legacy): bool
     {
         $expected = file_get_contents($this->projectDir.'/'.$legacy);
+        if (false === $expected) {
+            $io->error($app.': nem olvasható: '.$legacy);
+
+            return false;
+        }
         foreach (self::KNOWN_FIXES[$app] as $from => $to) {
             if (1 !== substr_count($expected, $from)) {
                 $io->error($app.': a javítás forrásszövege nem pontosan egyszer szerepel: '.$from);
@@ -95,7 +100,7 @@ final class VerifyLegacyCommand
         $rendered = $this->twig->render($template);
         foreach (self::ADDITIONS[$app] ?? [] as $pattern) {
             $rendered = preg_replace($pattern, '', $rendered, -1, $cut);
-            if (1 !== $cut) {
+            if (null === $rendered || 1 !== $cut) {
                 $io->error($app.': a kiegészítő blokk nem pontosan egyszer szerepel: '.$pattern);
 
                 return false;
@@ -123,13 +128,13 @@ final class VerifyLegacyCommand
         $public = $this->projectDir.'/public/';
         $cfg = ['supabaseUrl' => $this->config->getUpstreamUrl()] + $this->config->getClientConfig();
 
-        $html = preg_replace('#<script>window\.ADMINCORE_CFG=.*?;</script>#', '', $html, 1);
-        $html = preg_replace_callback(
+        $html = (string) preg_replace('#<script>window\.ADMINCORE_CFG=.*?;</script>#', '', $html, 1);
+        $html = (string) preg_replace_callback(
             '#<script src="/(assets/\w+/js/[^"?]+)(?:\?v=\w+)?"></script>#',
             static fn (array $m) => '<script>'.file_get_contents($public.$m[1]).'</script>',
             $html,
         );
-        $html = preg_replace_callback(
+        $html = (string) preg_replace_callback(
             '#<link rel="stylesheet"((?: id="[^"]*")?) href="/(assets/\w+/css/[^"?]+)(?:\?v=\w+)?">#',
             static fn (array $m) => '<style'.$m[1].'>'.file_get_contents($public.$m[2]).'</style>',
             $html,

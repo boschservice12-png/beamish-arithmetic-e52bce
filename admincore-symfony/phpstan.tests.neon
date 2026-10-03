@@ -1,0 +1,9 @@
+# A tesztek 6-os szinten (a tesztkód sok `string|false` visszatérést kezel szándékosan szigorítás nélkül).
+parameters:
+    level: 6
+    paths:
+        - tests
+    excludePaths:
+        - tests/e2e
+        - tests/bootstrap.php
+    tmpDir: var/cache/phpstan-tests

@@ -34,19 +34,13 @@ services:
   alertmanager:
     <<: *hardening
     image: prom/alertmanager:v0.28.1
-    # a ${…} helyőrzőket indításkor a környezetből töltjük ki (az Alertmanager maga nem ismeri)
-    entrypoint: ["/bin/sh", "-c"]
-    command:
-      - >-
-        sed -e "s|\$${SMTP_SMARTHOST}|$$SMTP_SMARTHOST|g" -e "s|\$${ALERT_EMAIL_FROM}|$$ALERT_EMAIL_FROM|g"
-        -e "s|\$${SMTP_USER}|$$SMTP_USER|g" -e "s|\$${ALERT_EMAIL_TO}|$$ALERT_EMAIL_TO|g"
-        /etc/alertmanager/alertmanager.yml > /alertmanager/runtime.yml &&
-        exec /bin/alertmanager --config.file=/alertmanager/runtime.yml --storage.path=/alertmanager
+    entrypoint: ["/etc/alertmanager/entrypoint.sh"]
     environment:
       SMTP_SMARTHOST: ${SMTP_SMARTHOST:-smtp.example.ro:587}
       SMTP_USER: ${SMTP_USER:-riasztas@example.ro}
       ALERT_EMAIL_FROM: ${ALERT_EMAIL_FROM:-riasztas@example.ro}
       ALERT_EMAIL_TO: ${ALERT_EMAIL_TO:-iroda@example.ro}
+      DEADMAN_URL: ${DEADMAN_URL:-}
     volumes:
       - ./ops/monitoring/alertmanager:/etc/alertmanager:ro
       - alertmanager-data:/alertmanager
