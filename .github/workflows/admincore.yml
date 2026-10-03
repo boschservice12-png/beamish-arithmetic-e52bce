@@ -98,7 +98,7 @@ jobs:
         run: sh run.sh
       - if: failure()
         working-directory: admincore-symfony/tests/e2e
-        run: tail -50 php.log upstream.log || true
+        run: tail -n 60 php.log upstream.log || true
 
   ops:
     name: Ops-konfigurációk (monitoring, riasztás, compose, shell)

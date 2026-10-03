@@ -10,6 +10,12 @@ const jwt = 'Bearer'.length && b64('{"alg":"HS256","typ":"JWT"}') + '.' + b64(JS
 const user = { id: uid, aud: 'authenticated', role: 'authenticated', email: 'ferenc@szkaliczki.local', app_metadata: {}, user_metadata: {}, created_at: '2026-01-01T00:00:00Z' };
 http.createServer((req, res) => {
   let body = ''; req.on('data', c => body += c); req.on('end', () => {
+    // a „legutolsó mért hónap” lekérdezés 1,5 mp-et késik: a háttér-előtöltés és egy közben jövő menükattintás
+    // versenyhelyzete így a teszten is előjön (lassú hálózatot utánoz)
+    if (req.url.startsWith('/rest/v1/v_kpi_honap?select=ho') && req.url.includes('elert=not.is.null')) return setTimeout(handle, 1500);
+    handle();
+  });
+  function handle() {
     fs.appendFileSync(LOG, JSON.stringify({ m: req.method, u: req.url, auth: (req.headers.authorization || '').slice(0, 20), apikey: req.headers.apikey, body }) + '\n');
     const json = (code, obj) => { res.writeHead(code, { 'content-type': 'application/json' }); res.end(obj === undefined ? '' : JSON.stringify(obj)); };
     const u = new URL(req.url, 'http://x');
@@ -52,5 +58,5 @@ http.createServer((req, res) => {
     if ((req.headers.accept || '').includes('vnd.pgrst.object')) return json(406, { code: 'PGRST116', message: 'no rows' });
     if (req.method === 'POST' && !u.pathname.includes('/rpc/')) return json(201, []);
     return json(200, []);
-  });
+  }
 }).listen(Number(process.env.FAKE_SUPABASE_PORT || 8767), '127.0.0.1');

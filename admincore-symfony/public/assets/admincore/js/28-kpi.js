@@ -19,13 +19,15 @@ function injectNav(){var b0=window.RA_NAV&&window.RA_NAV.box&&window.RA_NAV.box(
 
 async function load(){var s=sb();if(!s){lastErr='nincs kapcsolat';return;}lastErr='';
   try{
-    if(!honapok.length){
+    if(!honapok.length||!ho){
       var hk=await s.from('v_kpi_honap').select('ho').order('ho',{ascending:false});
       if(hk.error)throw hk.error;
-      honapok=Array.from(new Set((hk.data||[]).map(function(x){return x.ho;})));
+      var lista=Array.from(new Set((hk.data||[]).map(function(x){return x.ho;})));
       // alapértelmezés: a legutolsó hónap, amelyben van mért érték (nem a jövőbeli üres hónap)
       var mert=await s.from('v_kpi_honap').select('ho').not('elert','is',null).order('ho',{ascending:false}).limit(1);
-      ho=ho||(mert.data&&mert.data[0]&&mert.data[0].ho)||honapok[0]||null;
+      // a lista és a hónap EGYSZERRE kerül be — a háttér-előtöltés és egy közben jövő kattintás nem láthat félkész állapotot
+      ho=ho||(mert.data&&mert.data[0]&&mert.data[0].ho)||lista[0]||null;
+      honapok=lista;
     }
     if(!ho){kpi=[];szerelok=[];koteg=null;return;}
     var r=await Promise.all([

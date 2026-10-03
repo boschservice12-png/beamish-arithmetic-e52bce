@@ -34,13 +34,16 @@ async function open(path, viewport = { width: 1400, height: 900 }, extra = {}) {
   await page.fill('#sbPass', 'rossz-jelszo'); await page.click('#sbGo');
   await page.waitForFunction(() => /Hibás/.test((document.getElementById('sbErr') || {}).textContent || ''), null, { timeout: 10000 }).catch(() => {});
   check(/Hibás/.test(await page.textContent('#sbErr')), 'Admin Core: rossz jelszó elutasítva');
+  // a KPI háttér-előtöltésének első kérése (hónaplista) — erre várunk, hogy a kattintás a két lekérdezés KÖZÉ essen
+  const elotoltes = page.waitForRequest(r => r.url().includes('v_kpi_honap?select=ho&order'), { timeout: 15000 }).catch(() => null);
   await page.fill('#sbPass', 'helyes-jelszo'); await page.click('#sbGo');
   await page.waitForFunction(() => !document.getElementById('sbLogin'), null, { timeout: 15000 }).catch(() => {});
   check(await page.evaluate(() => !document.getElementById('sbLogin')), 'Admin Core: helyes jelszóval belép');
   await page.evaluate(() => document.getElementById('adminOpen').click());
   await page.waitForSelector('[data-adm9]', { timeout: 10000 });
   check(await page.evaluate(() => document.querySelectorAll('#adminNav button').length) >= 20, 'Admin Core: menü betöltve');
-  // szándékosan azonnal kattintunk (a belépés utáni adatbetöltés közben) — FIX-002 regressziós próbája
+  // szándékosan az adatbetöltés közben kattintunk: FIX-002 (ADMIN.render) és a KPI előtöltés–kattintás versenyhelyzetének próbája
+  check(!!(await elotoltes), 'KPI: a háttér-előtöltés elindult (a menüjelvényhez)');
   await page.click('[data-adm9]');
   await page.waitForSelector('#kpiHo', { timeout: 10000 });
   await page.waitForTimeout(800);
@@ -51,6 +54,11 @@ async function open(path, viewport = { width: 1400, height: 900 }, extra = {}) {
     koteg: document.body.innerText.includes('ASM-import: #7'),
     parositatlan: document.body.innerText.includes('99.ISMERETLEN'),
   }));
+  if (k.ho !== '2026-03-01' || !k.koteg) {
+    // diagnosztika: mit lát a felhasználó, és milyen KPI-kérések mentek ki
+    console.log('  [diag] KPI-nézet:', await page.evaluate(() => (document.getElementById('adminRoot') || {}).innerText?.slice(0, 600)));
+    try { fs.readFileSync(new URL('./upstream.log', import.meta.url), 'utf8').split('\n').filter(l => /kpi_honap|asm_import|stat_szamol/.test(l)).forEach(l => console.log('  [diag]', l.slice(0, 160))); } catch (e) {}
+  }
   check(k.ho === '2026-03-01', 'KPI: alapból az utolsó mért hónap', k.ho);
   check(k.piros === '2', 'KPI: beavatkozást igénylő mutatók száma a menüben', k.piros);
   check(!k.xss, 'KPI: adatbázisból jövő HTML escape-elve');
