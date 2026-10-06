@@ -12,3 +12,17 @@
   to = "/404.html"
   status = 404
   force = true
+
+# boschteam főoldala a szerelő app; a régi RPW panel (index.html) külön alkalmazás.
+[[redirects]]
+  from = "/"
+  to = "/szerelo-telefon.html"
+  status = 200
+  force = true
+
+# A teljes RPW-csomag zipje ne legyen letölthető a site-ról.
+[[redirects]]
+  from = "/RPWDEPLOYteljes*"
+  to = "/404.html"
+  status = 404
+  force = true
