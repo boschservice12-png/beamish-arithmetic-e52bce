@@ -52,6 +52,8 @@ a{color:var(--red-ink)}
 .skip:focus{left:16px}
 
 /* bands */
+.demo-band{background:var(--fg);color:var(--bg);font-size:.86rem;text-align:center}
+.demo-band .wrap{padding-block:8px}
 .prelaunch{background:var(--red-soft);color:var(--fg);font-size:.88rem;text-align:center}
 .prelaunch .wrap{padding-block:8px}
 

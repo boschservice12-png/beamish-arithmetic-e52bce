@@ -1,7 +1,9 @@
-# RedAssistance publikus weboldal (RO)
+# RedAssistance weboldal — DEMÓ (RO)
 
-Éles, többoldalas statikus site a V4.0 specifikáció alapján, a
-https://claude.ai/artifact/KDyWtEBs41gey9SdpB6JvY hasonmásból. A demó- és auditréteg nincs benne.
+**Csak demó.** A régi weboldal átalakítását mutatja be: az űrlapok semmit nem küldenek (szimulált válasz), egy demó-sáv jelzi, hogy ez nem az éles oldal, és az oldal `noindex`.
+
+Többoldalas statikus site a V4.0 specifikáció alapján, a
+https://claude.ai/artifact/KDyWtEBs41gey9SdpB6JvY hasonmásból. Az audit-réteg és az 50 kritériumos panel nincs benne.
 
 ## Felépítés
 
@@ -13,12 +15,11 @@ https://claude.ai/artifact/KDyWtEBs41gey9SdpB6JvY hasonmásból. A demó- és au
 | `build.mjs` | Generátor, függőség nélkül: `node site/build.mjs` → `ro/*.html` |
 | `ro/*.html` | Generált kimenet (commitolva, build nélkül is kiszolgálható) |
 | `assets/` | CSS, JS, saját tárhelyről kiszolgált fontok (OFL) |
-| `../functions/site-lead.js` | Űrlap → e-mail (Resend), fix címzettel, honeypottal, szerveroldali validálással |
 | `oglinda.html` | A korábbi „Oglinda” oldal, változatlanul |
 
 Szerkesztés: `src/` módosítása → `node site/build.mjs` → commit. A `ro/` mappát kézzel ne szerkeszd.
 
-## Indulás előtti teendők (a `config.json`-ban)
+## Élesítés előtt eldöntendő (a `config.json`-ban)
 
 | # | Teendő | Kulcs | Amíg nincs kitöltve |
 |---|---|---|---|
@@ -32,7 +33,7 @@ Szerkesztés: `src/` módosítása → `node site/build.mjs` → commit. A `ro/`
 | 8 | Jogi dokumentumok éles URL-je | `links.*` | jelenleg **staging** URL-ek |
 | 9 | Indexelés engedélyezése | `site.indexable: true` | `noindex`, nincs canonical |
 
-Netlify környezeti változók: `RESEND_API_KEY` (kötelező), `LEAD_TO` (alapértelmezés: `contact@redassistance.net`).
+Éles indításhoz: a `config.json`-ban `"demo": false`, és a `site.js` `send()` függvényét egy valódi végpontra kell cserélni.
 
 ## Ami a hasonmáshoz képest változott
 

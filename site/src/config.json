@@ -1,12 +1,11 @@
 {
-  "_readme": "Single source of truth for facts that need sign-off. A null / false value HIDES the related block at build time instead of publishing a placeholder. Fill a value, run `node site/build.mjs`, commit the output. See site/README.md for the open items.",
-
+  "demo": true,
+  "_readme": "DEMO. Single source of truth for facts that need sign-off. A null / false value HIDES the related block at build time instead of publishing a placeholder. Fill a value, run `node site/build.mjs`, commit the output. See site/README.md.",
   "site": {
     "url": "https://redassistance.net",
     "path": "/ro/",
     "indexable": false
   },
-
   "company": {
     "name": "SC RED ASSISTANCE SRL",
     "cui": "47746920",
@@ -19,24 +18,17 @@
     "phone": null,
     "phoneHref": null
   },
-
   "links": {
     "login": "https://secure.redassistance.net/",
     "privacy": "https://staging.redassistance.net/ro/politica-de-confidentialitate",
     "terms": "https://staging.redassistance.net/ro/termeni-si-conditii",
     "cookies": "https://staging.redassistance.net/ro/politica-cookie"
   },
-
-  "forms": {
-    "endpoint": "/.netlify/functions/site-lead"
-  },
-
   "offer": {
     "price": null,
     "cardAtSignup": null,
     "onExpiry": null
   },
-
   "survey": {
     "published": false,
     "n": 33,
@@ -44,7 +36,6 @@
     "method": null,
     "questionsUrl": null
   },
-
   "flags": {
     "legalValidated": false,
     "securityReport": false,

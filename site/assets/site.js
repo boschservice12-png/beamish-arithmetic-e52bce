@@ -1,4 +1,4 @@
-/* RedAssistance public site: menu, copy buttons, conversion events, lead forms. No third-party code. */
+/* RedAssistance demo site: menu, copy buttons, conversion events, simulated lead forms. No third-party code. */
 (function () {
   'use strict';
   var $ = function (s, r) { return (r || document).querySelector(s); };
@@ -98,6 +98,7 @@
     box.appendChild(d);
   }
   var MAIL = CFG.email || 'contact@redassistance.net';
+  // Kept for when a real endpoint replaces the demo send().
   var ERR = {
     net: 'Conexiunea s-a întrerupt. Datele tale au rămas în formular. Verifică internetul și apasă din nou butonul.',
     server: 'Serverul nu a putut salva cererea acum. Nu s-a trimis nimic. Încearcă din nou în câteva minute sau scrie la <a href="mailto:' + MAIL + '">' + MAIL + '</a>.'
@@ -107,20 +108,9 @@
     demo: 'Cererea a ajuns. Îți răspundem pe e-mail în 2 zile lucrătoare.',
     signup: '<strong>Înscriere primită.</strong> Verificăm datele atelierului în 2 zile lucrătoare și îți scriem pe e-mail. Proba de 30 de zile începe la activare.'
   };
+  // Demo: no backend. Resolves after a short delay so the loading/success states are visible.
   function send(form) {
-    var data = { type: form.getAttribute('data-lead'), page: location.pathname };
-    $$('input[name]', form).forEach(function (el) { data[el.name] = el.type === 'checkbox' ? el.checked : el.value.trim(); });
-    if (data.phone) data.phone = phoneNorm(data.phone);
-    if (data.cui) data.cui = data.cui.replace(/^RO/i, '').trim();
-    var ctl = 'AbortController' in window ? new AbortController() : null;
-    var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 15000);
-    return fetch(CFG.endpoint, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data), signal: ctl ? ctl.signal : undefined
-    }).then(function (r) {
-      clearTimeout(timer);
-      if (!r.ok) throw 'server';
-    }, function () { clearTimeout(timer); throw 'net'; });
+    return new Promise(function (res) { setTimeout(res, 900); });
   }
 
   $$('form[data-lead]').forEach(function (form) {
@@ -160,7 +150,7 @@
         } else {
           form.reset();
         }
-        state(box, 'ok', OK[type]);
+        state(box, 'ok', OK[type] + (CFG.demo ? ' <em>(Demo: nimic nu a fost trimis.)</em>' : ''));
       }, function (kind) {
         state(box, 'bad', ERR[kind] || ERR.server);
       }).then(function () {
