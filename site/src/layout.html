@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>{{page.title}}</title>
+<meta name="description" content="{{page.description}}">
+{{#if site.indexable}}<link rel="canonical" href="{{page.canonical}}">
+<link rel="alternate" hreflang="ro" href="{{page.canonical}}">{{else}}<meta name="robots" content="noindex, nofollow">{{/if}}
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ro_RO">
+<meta property="og:site_name" content="RedAssistance">
+<meta property="og:title" content="{{page.title}}">
+<meta property="og:description" content="{{page.description}}">
+<meta property="og:url" content="{{page.canonical}}">
+<meta name="theme-color" content="#c8102e">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23c8102e'/%3E%3Ctext x='16' y='23' font-family='Arial' font-weight='700' font-size='19' fill='%23fff' text-anchor='middle'%3ER%3C/text%3E%3C/svg%3E">
+<link rel="preload" href="../assets/fonts/familjen-grotesk-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../assets/site.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"RedAssistance","legalName":"{{company.name}}","url":"{{site.url}}","email":"{{company.email}}","taxID":"{{company.cui}}","address":{"@type":"PostalAddress","streetAddress":"{{company.street}}","addressLocality":"{{company.city}}","postalCode":"{{company.zip}}","addressCountry":"RO"}}</script>
+</head>
+<body>
+<a class="skip" href="#main">Sari la conținut</a>
+<div class="prelaunch"><div class="wrap">RedAssistance este în pregătire pentru lansare. Unele servicii și condiții sunt în curs de finalizare.</div></div>
+
+<header class="site"><div class="wrap hdr">
+  <a class="logo" href="index.html"><b>R</b>RedAssistance</a>
+  <button class="btn ghost menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="mainNav">Meniu</button>
+  <nav class="main" id="mainNav" aria-label="Navigare principală">
+    <a href="soferi.html"{{#if is.soferi}} aria-current="page"{{/if}}>Pentru șoferi</a>
+    <a href="service-auto.html"{{#if is.service}} aria-current="page"{{/if}}>Pentru service-uri</a>
+    <a href="cum-functioneaza.html"{{#if is.cum}} aria-current="page"{{/if}}>Cum funcționează</a>
+    <a href="despre.html"{{#if is.despre}} aria-current="page"{{/if}}>Despre noi</a>
+    <a href="contact.html"{{#if is.contact}} aria-current="page"{{/if}}>Contact</a>
+  </nav>
+  <div class="hdr-right">
+    <a class="btn ghost" href="{{links.login}}" rel="noopener">Login</a>
+  </div>
+</div></header>
+
+<main id="main">
+{{{body}}}
+</main>
+
+<footer><div class="wrap">
+  <div class="ft">
+    <div><a class="logo" href="index.html"><b>R</b>RedAssistance</a><p class="mut" style="margin-top:10px">Mai multă grijă pentru fiecare drum.</p></div>
+    <div><h2>Soluții</h2><ul><li><a href="soferi.html">Pentru șoferi</a></li><li><a href="service-auto.html">Pentru service-uri</a></li><li><a href="cum-functioneaza.html">Cum funcționează</a></li></ul></div>
+    <div><h2>RedAssistance</h2><ul><li><a href="despre.html">Despre noi</a></li><li><a href="intrebari.html">Întrebări frecvente</a></li><li><a href="contact.html">Contact</a></li><li><a href="{{links.login}}" rel="noopener">Login</a></li></ul></div>
+    <div><h2>Documente</h2><ul><li><a href="{{links.privacy}}" rel="noopener">Politica de confidențialitate</a></li><li><a href="{{links.terms}}" rel="noopener">Termeni și condiții</a></li><li><a href="{{links.cookies}}" rel="noopener">Politica de cookie</a></li></ul></div>
+  </div>
+  <div class="legal-id"><span>{{company.name}}</span><span>CUI {{company.cui}}</span><span>{{company.regcom}}</span><span>{{company.street}}, {{company.city}}, {{company.county}}</span><a href="mailto:{{company.email}}">{{company.email}}</a>{{#if company.phone}}<a href="tel:{{company.phoneHref}}">{{company.phone}}</a>{{/if}}<span>© {{year}}</span></div>
+</div></footer>
+
+<script>window.RA={endpoint:"{{forms.endpoint}}",email:"{{company.email}}"};</script>
+<script src="../assets/site.js" defer></script>
+</body>
+</html>

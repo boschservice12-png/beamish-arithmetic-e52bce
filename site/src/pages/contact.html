@@ -1,0 +1,29 @@
+<!--meta {"slug":"contact","title":"Contact · RedAssistance","description":"Scrie-ne pentru întrebări sau o demonstrație pentru service-ul tău. SC RED ASSISTANCE SRL, Sângeorgiu de Mureș."} -->
+<section class="hero"><div class="wrap grid2">
+  <div>
+    <p class="eyebrow">Contact</p>
+    <h1 style="margin-top:14px">Scrie-ne.</h1>
+    <p class="lead" style="margin-top:14px">Pentru întrebări sau o demonstrație pentru service-ul tău.</p>
+    <dl class="method" style="margin-top:22px">
+      <dt>Denumire</dt><dd>{{company.name}}</dd>
+      <dt>CUI</dt><dd class="tnum">{{company.cui}}</dd>
+      <dt>Nr. Reg. Com.</dt><dd class="tnum">{{company.regcom}}</dd>
+      <dt>Sediu</dt><dd>{{company.street}}, {{company.city}}, {{company.county}}, {{company.zip}}</dd>
+      <dt>E-mail</dt><dd><a href="mailto:{{company.email}}">{{company.email}}</a> <button class="btn ghost tiny" type="button" data-copy="{{company.email}}">Copiază</button></dd>
+      {{#if company.phone}}<dt>Telefon</dt><dd><a href="tel:{{company.phoneHref}}">{{company.phone}}</a></dd>{{/if}}
+    </dl>
+  </div>
+  <div class="formbox">
+    <h2 style="font-size:1.12rem;margin-bottom:6px">Cerere de demonstrație</h2>
+    <p class="small mut" style="margin-bottom:14px">Îți răspundem pe e-mail în 2 zile lucrătoare.</p>
+    <form data-lead="demo" novalidate>
+      <div class="field"><label for="dName">Numele service-ului</label><input id="dName" name="name" autocomplete="organization" maxlength="120" data-rule="required" data-msg="Scrie numele service-ului."><span class="err" hidden></span></div>
+      <div class="field"><label for="dEmail">E-mail</label><input id="dEmail" name="email" type="email" autocomplete="email" maxlength="160" data-rule="email"><span class="err" hidden></span></div>
+      <div class="field"><label for="dPhone">Telefon <span class="mut" style="font-weight:400">(opțional)</span></label><input id="dPhone" name="phone" type="tel" autocomplete="tel" inputmode="tel" data-rule="phone-opt"><span class="err" hidden></span></div>
+      <div class="hp" aria-hidden="true"><label>Website <input name="website" tabindex="-1" autocomplete="off"></label></div>
+      <p class="small mut">Folosim datele doar pentru a-ți răspunde. <a href="{{links.privacy}}" rel="noopener">Politica de confidențialitate</a>.</p>
+      <button class="btn pri" type="submit">Trimite cererea</button>
+      <div class="state" aria-live="polite"></div>
+    </form>
+  </div>
+</div></section>

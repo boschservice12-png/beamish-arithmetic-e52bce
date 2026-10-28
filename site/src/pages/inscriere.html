@@ -1,0 +1,31 @@
+<!--meta {"slug":"inscriere","title":"Înscriere service · 30 de zile gratuit · RedAssistance","description":"Înscrie-ți service-ul și testează RedAssistance 30 de zile gratuit. Întâi doar datele de contact; datele firmei la activare."} -->
+<section class="hero"><div class="wrap grid2">
+  <div>
+    <p class="eyebrow">Înscriere service</p>
+    <h1 style="margin-top:14px">30 de zile gratuit, pe mașinile din atelierul tău.</h1>
+    <p class="lead" style="margin-top:14px">Întâi doar datele de contact. Datele firmei le ceri doar la activare.</p>
+    <ul class="list mut" style="margin-top:16px;gap:6px"><li>Pasul 1: nume, e-mail, telefon</li><li>Pasul 2 (activare): CUI și denumirea firmei</li><li>Verificăm datele în 2 zile lucrătoare și îți scriem pe e-mail</li></ul>
+    <p class="small mut" style="margin-top:14px"><a href="service-auto.html#oferta">Vezi oferta actuală</a> înainte să te înscrii.</p>
+  </div>
+  <div class="formbox">
+    <div class="stepper" aria-label="Pași"><span data-step="1" class="on">1 · Contact</span><span data-step="2">2 · Activare</span><span data-step="3">3 · Confirmare</span></div>
+    <form data-lead="signup" data-steps="2" novalidate style="margin-top:16px">
+      <fieldset data-step="1" style="border:0;padding:0;margin:0;display:grid;gap:16px">
+        <legend class="hp">Contact</legend>
+        <div class="field"><label for="sName">Numele service-ului</label><input id="sName" name="name" autocomplete="organization" maxlength="120" data-rule="required" data-msg="Scrie numele service-ului."><span class="err" hidden></span></div>
+        <div class="field"><label for="sEmail">E-mail</label><input id="sEmail" name="email" type="email" autocomplete="email" inputmode="email" maxlength="160" data-rule="email"><span class="err" hidden></span></div>
+        <div class="field"><label for="sPhone">Telefon</label><input id="sPhone" name="phone" type="tel" autocomplete="tel" inputmode="tel" data-rule="phone"><span class="hint">Ex.: 0740 123 456</span><span class="err" hidden></span></div>
+      </fieldset>
+      <fieldset data-step="2" hidden style="border:0;padding:0;margin:0;display:grid;gap:16px">
+        <legend class="hp">Activare</legend>
+        <div class="field"><label for="sCui">CUI firmă</label><input id="sCui" name="cui" inputmode="numeric" autocomplete="off" maxlength="12" data-rule="cui"><span class="hint">Fără „RO”. Verificăm cifra de control.</span><span class="err" hidden></span></div>
+        <div class="field"><label for="sFirm">Denumire firmă</label><input id="sFirm" name="firm" autocomplete="organization" maxlength="160" data-rule="required" data-msg="Scrie denumirea firmei, ca în certificatul de înregistrare."><span class="hint">Ca în certificatul de înregistrare. O verificăm noi cu registrul.</span><span class="err" hidden></span></div>
+        <label class="check"><input name="consent" type="checkbox" data-rule="consent" data-msg="Bifează că ai citit termenii pentru a continua."> <span>Am citit <a href="{{links.terms}}" rel="noopener">Termenii</a> și <a href="{{links.privacy}}" rel="noopener">Politica de confidențialitate</a>.</span></label>
+        <span class="err" data-for="consent" hidden></span>
+      </fieldset>
+      <div class="hp" aria-hidden="true"><label>Website <input name="website" tabindex="-1" autocomplete="off"></label></div>
+      <div class="cta-row" data-buttons><button class="btn sec" type="button" data-back hidden>Înapoi</button><button class="btn pri" type="submit" data-next>Continuă</button></div>
+      <div class="state" aria-live="polite"></div>
+    </form>
+  </div>
+</div></section>

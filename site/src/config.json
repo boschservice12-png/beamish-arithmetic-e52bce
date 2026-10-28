@@ -1,0 +1,53 @@
+{
+  "_readme": "Single source of truth for facts that need sign-off. A null / false value HIDES the related block at build time instead of publishing a placeholder. Fill a value, run `node site/build.mjs`, commit the output. See site/README.md for the open items.",
+
+  "site": {
+    "url": "https://redassistance.net",
+    "path": "/ro/",
+    "indexable": false
+  },
+
+  "company": {
+    "name": "SC RED ASSISTANCE SRL",
+    "cui": "47746920",
+    "regcom": "J2023000388268",
+    "street": "Str. Petki David nr. 27",
+    "city": "Sângeorgiu de Mureș",
+    "county": "jud. Mureș",
+    "zip": "547530",
+    "email": "contact@redassistance.net",
+    "phone": null,
+    "phoneHref": null
+  },
+
+  "links": {
+    "login": "https://secure.redassistance.net/",
+    "privacy": "https://staging.redassistance.net/ro/politica-de-confidentialitate",
+    "terms": "https://staging.redassistance.net/ro/termeni-si-conditii",
+    "cookies": "https://staging.redassistance.net/ro/politica-cookie"
+  },
+
+  "forms": {
+    "endpoint": "/.netlify/functions/site-lead"
+  },
+
+  "offer": {
+    "price": null,
+    "cardAtSignup": null,
+    "onExpiry": null
+  },
+
+  "survey": {
+    "published": false,
+    "n": 33,
+    "period": "octombrie 2026",
+    "method": null,
+    "questionsUrl": null
+  },
+
+  "flags": {
+    "legalValidated": false,
+    "securityReport": false,
+    "appStoresLive": false
+  }
+}
