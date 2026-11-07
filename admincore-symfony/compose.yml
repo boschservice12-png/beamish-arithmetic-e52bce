@@ -32,5 +32,38 @@ services:
         max-file: "5"
         tag: "redassistance-app"
 
+  # Flotta-riport ütemező (opcionális): óránként megnézi, esedékes-e a havi riport; a küldési napló miatt
+  # egy időszakot pontosan egyszer küld, és ha a szerver a küldés napján állt, a következő órában pótolja.
+  # Bekapcsolás:  docker compose --profile fleet-report --env-file .env.prod up -d
+  # Bemenet: a fleet-report kötet in/ mappája (FLEET_REPORT_INPUT), napló: ledger.json ugyanott.
+  fleet-report:
+    image: ${APP_IMAGE:-ghcr.io/boschservice12-png/redassistance-admincore}:${APP_TAG:-latest}
+    profiles: [fleet-report]
+    restart: unless-stopped
+    env_file: ${APP_ENV_FILE:-.env.prod}
+    environment:
+      APP_ENV: prod
+      TZ: Europe/Bucharest
+    entrypoint: ["sh", "-c", "while :; do php bin/console app:fleet-report:send --if-due --no-interaction || echo 'fleet-report: hiba, a következő órában újra'; sleep 3600; done"]
+    healthcheck:
+      disable: true
+    volumes:
+      - audit-logs:/app/var/log
+      - fleet-report:/app/var/share/fleet-report
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+        tag: "redassistance-fleet-report"
+
 volumes:
   audit-logs:
+  fleet-report:

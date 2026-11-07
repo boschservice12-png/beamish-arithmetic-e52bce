@@ -1,0 +1,33 @@
+{# A riport-levél törzse: rövid, telefonon is olvasható; a teljes riport a PDF-ben, a számok a CSV-ben. Csak inline stílus. #}
+{% set c = r.totals %}{% set p = r.previous %}
+<!doctype html>
+<html lang="ro"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f3f4f6;font-family:Arial,Helvetica,sans-serif;color:#1b1d22">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6"><tr><td align="center" style="padding:16px">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:10px">
+<tr><td style="padding:18px 20px 6px;border-bottom:3px solid #c8102e">
+  <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#c8102e;font-weight:bold">TyreFleet · Raport flotă</div>
+  <div style="font-size:22px;font-weight:bold;margin:4px 0">{{ r.fleetName }} · {{ r.period.label }}</div>
+</td></tr>
+<tr><td style="padding:14px 20px;font-size:15px;line-height:1.5">
+  Cost total: <b>{{ c.total|lei }}</b> fără TVA{% if p %} ({{ c.total|pct_of(p.total) }} față de {{ r.previousPeriod.label }}){% endif %} ·
+  <b style="color:{{ r.budgetLevel == 'red' ? '#c8102e' : (r.budgetLevel == 'amb' ? '#8a5200' : '#16733a') }}">{{ r.budgetPct|num }}% din buget</b>
+  ({{ r.budget|lei }}).<br>
+  {{ c.perKm|num(2) }} lei/km · {{ c.consumption|num(1) }} l/100 km · {{ c.km|num }} km.
+</td></tr>
+<tr><td style="padding:0 20px 8px">
+  <div style="font-size:16px;font-weight:bold;margin:6px 0">Ce trebuie decis ({{ r.openDecisions }})</div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+  {% for d in r.decisions %}
+    <tr><td valign="top" style="width:26px;padding:6px 0"><span style="display:inline-block;width:20px;height:20px;line-height:20px;border-radius:10px;text-align:center;color:#fff;font-size:12px;font-weight:bold;background:{{ d.level == 'red' ? '#c8102e' : (d.level == 'amb' ? '#a86400' : '#16833f') }}">{{ d.level == 'ok' ? '✓' : loop.index }}</span></td>
+    <td style="padding:6px 0;font-size:14px;line-height:1.45;border-bottom:1px solid #eef0f3">{{ d.text }}</td></tr>
+  {% endfor %}
+  </table>
+</td></tr>
+<tr><td style="padding:10px 20px 18px;font-size:13px;color:#646a75;line-height:1.5">
+  Atașat: raportul complet (PDF){{ csv ? ' și datele pentru Excel (CSV, separator ;)' : '' }}.<br>
+  Costuri și km = perioada raportată; starea flotei = la {{ r.generatedAt|date('d.m.Y') }}. Lei fără TVA.<br>
+  Mesaj trimis automat de TyreFleet — nu răspundeți la acest e-mail.
+</td></tr>
+</table></td></tr></table>
+</body></html>

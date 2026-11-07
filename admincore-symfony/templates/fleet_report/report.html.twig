@@ -1,0 +1,138 @@
+{# Flotta-riport — PDF (Dompdf, A4) és böngésző. Táblázatos elrendezés: a Dompdf flexet/gridet nem ismer.
+   variant: internal = a flotta saját vezetőjének. #}
+{% set c = r.totals %}{% set p = r.previous %}
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<title>Raport flotă · {{ r.fleetName }} · {{ r.period.label }}</title>
+<style>
+@page { size: A4; margin: 14mm 12mm 16mm; }
+* { box-sizing: border-box; }
+body { font-family: "DejaVu Sans", sans-serif; font-size: 8.6pt; color: #1b1d22; line-height: 1.38; margin: 0; }
+h1 { font-size: 17pt; margin: 0; }
+h2 { font-size: 10.5pt; margin: 0 0 5px; }
+.eyebrow { font-size: 7pt; letter-spacing: 1.2px; text-transform: uppercase; color: #c8102e; font-weight: bold; }
+.mute { color: #646a75; }
+.head { border-bottom: 2.5pt solid #c8102e; padding-bottom: 6px; margin-bottom: 8px; width: 100%; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 9px; font-weight: bold; font-size: 7.5pt; }
+.b-red { background: #fde8eb; color: #c8102e; } .b-amb { background: #fff1d9; color: #8a5200; } .b-ok { background: #e3f5ea; color: #16733a; }
+.sum { font-size: 9.4pt; margin: 0 0 8px; }
+table { width: 100%; border-collapse: collapse; }
+.kpis td { width: 25%; border: 1pt solid #dfe2e7; padding: 6px 8px; vertical-align: top; }
+.kv { font-size: 14pt; font-weight: bold; }
+.kv.red { color: #c8102e; } .kv.amb { color: #8a5200; } .kv.ok { color: #16733a; }
+.kl { font-size: 7.4pt; color: #646a75; }
+.card { border: 1pt solid #dfe2e7; padding: 7px 9px; margin-bottom: 8px; }
+tr { page-break-inside: avoid; }
+.card.bad { border-color: #c8102e; }
+.t td, .t th { padding: 3px 4px; border-bottom: 0.6pt solid #dfe2e7; text-align: left; vertical-align: top; }
+.t th { font-size: 6.8pt; color: #646a75; text-transform: uppercase; letter-spacing: .5px; }
+.r { text-align: right !important; white-space: nowrap; }
+.mono { font-family: "DejaVu Sans Mono", monospace; }
+.up { color: #c8102e; font-weight: bold; } .dn { color: #16733a; font-weight: bold; } .eq { color: #646a75; }
+.warn { background: #fff1d9; color: #8a5200; font-weight: bold; }
+.dec td { padding: 4px 4px; border-bottom: 0.6pt solid #dfe2e7; vertical-align: top; }
+.n { font-weight: bold; font-size: 9pt; }
+.n.red { color: #c8102e; } .n.amb { color: #a86400; } .n.ok { color: #16833f; }
+.split td { width: 50%; vertical-align: top; padding: 0; }
+.split td.l { padding-right: 5px; } .split td.rr { padding-left: 5px; }
+.bars td { vertical-align: top; text-align: center; padding: 0 4px; }
+.bar { width: 26px; margin: 0 auto; }
+.bar.in { background: #16833f; } .bar.over { background: #c8102e; } .bar.cur { border: 1.5pt solid #1b1d22; }
+.bl td { font-size: 7pt; color: #646a75; text-align: center; padding-top: 2px; }
+.foot { font-size: 6.8pt; color: #646a75; border-top: 0.6pt solid #dfe2e7; padding-top: 5px; margin-top: 6px; }
+.tred { color: #c8102e; font-weight: bold; }
+</style>
+</head>
+<body>
+<table class="head"><tr>
+  <td><div class="eyebrow">TyreFleet · Raport flotă · {{ r.period.kind == 'month' ? 'lunar' : (r.period.kind == 'quarter' ? 'trimestrial' : 'anual') }}</div>
+    <h1>{{ r.fleetName }} · {{ r.period.label }}</h1>
+    <div class="mute">{{ r.vehicleCount }} vehicule · lei fără TVA (TVA 21% separat) · generat {{ r.generatedAt|date('d.m.Y') }}</div></td>
+  <td class="r" style="vertical-align: bottom">
+    {% if r.budgetLevel == 'red' %}<span class="badge b-red">peste buget</span>{% elseif r.budgetLevel == 'amb' %}<span class="badge b-amb">aproape de buget</span>{% else %}<span class="badge b-ok">în buget</span>{% endif %}</td>
+</tr></table>
+
+{% set top = r.vehicles|first %}
+<p class="sum">Costul parcului în <b>{{ r.period.label }}</b>: <b>{{ c.total|lei }}</b> fără TVA
+  ({% if p %}<span class="{{ c.total|trend_of(p.total) }}">{{ c.total|pct_of(p.total) }}</span> față de {{ r.previousPeriod.label }}{% else %}fără perioadă anterioară{% endif %}),
+  <b class="{{ r.budgetLevel == 'red' ? 'tred' : '' }}">{{ r.budgetPct|num }}%</b> din bugetul de {{ r.budget|lei }}.
+  Cost pe km: <b>{{ c.perKm|num(2) }} lei</b> · consum <b>{{ c.consumption|num(1) }} l/100 km</b> pe {{ c.km|num }} km.
+  {% if top %}Cel mai scump vehicul: <b>{{ top.plate }}</b> ({{ top.totals.total|lei }}).{% endif %}
+  {% if r.overBudget %}<b>{{ r.overBudget|length }}</b> vehicule peste buget.{% else %}Toate vehiculele în buget.{% endif %}
+  {% if r.exceptions %}<b>{{ r.exceptions|length }}</b> semnale de combustibil de verificat.{% else %}Fără anomalii de combustibil.{% endif %}</p>
+
+<table class="kpis"><tr>
+  <td><div class="kv {{ r.budgetLevel }}">{{ c.total|lei }}</div><div class="kl">cost total · {{ r.budgetPct|num }}% din buget</div></td>
+  <td><div class="kv">{{ c.perKm|num(2) }}</div><div class="kl">lei / km {% if p %}· <span class="{{ c.perKm|trend_of(p.perKm) }}">{{ c.perKm|pct_of(p.perKm) }}</span>{% endif %}</div></td>
+  <td><div class="kv">{{ c.consumption|num(1) }}</div><div class="kl">l / 100 km {% if p %}· <span class="{{ c.consumption|trend_of(p.consumption) }}">{{ c.consumption|pct_of(p.consumption) }}</span>{% endif %}</div></td>
+  {% set risk = (r.state.blocked|length) + r.state.tyres.now %}
+  <td><div class="kv {{ risk ? 'red' : 'ok' }}">{{ risk }}</div><div class="kl">vehicule cu risc acum (acte / anvelope)</div></td>
+</tr></table>
+<div style="height: 8px"></div>
+
+<div class="card"><h2>Ce trebuie decis ({{ r.openDecisions }})</h2>
+<table class="dec">{% for d in r.decisions %}<tr><td style="width: 20px"><span class="n {{ d.level }}">{{ d.level == 'ok' ? '✓' : loop.index ~ '.' }}</span></td><td>{{ d.text }}</td></tr>{% endfor %}</table></div>
+
+<table class="split"><tr><td class="l">
+<div class="card"><h2>Indicatori · {{ r.period.label }} vs {{ r.previousPeriod.label }}</h2>
+<table class="t"><tr><th>Indicator</th><th class="r">Perioada</th><th class="r">Anterior</th><th class="r">Δ</th></tr>
+{% for k, label in {'total': 'Cost total', 'admin': 'Administrativ', 'oper': 'Funcționare', 'fuel': 'Combustibil'} %}
+<tr><td>{{ label }}</td><td class="r mono">{{ c.get(k)|lei }}</td><td class="r mono">{{ p ? p.get(k)|lei : '—' }}</td><td class="r {{ p ? c.get(k)|trend_of(p.get(k)) : 'eq' }}">{{ p ? c.get(k)|pct_of(p.get(k)) : '—' }}</td></tr>
+{% endfor %}
+<tr><td>km parcurși</td><td class="r mono">{{ c.km|num }}</td><td class="r mono">{{ p ? p.km|num : '—' }}</td><td class="r eq">{{ p ? c.km|pct_of(p.km) : '—' }}</td></tr>
+<tr><td>lei / km</td><td class="r mono">{{ c.perKm|num(2) }}</td><td class="r mono">{{ p ? p.perKm|num(2) : '—' }}</td><td class="r {{ p ? c.perKm|trend_of(p.perKm) : 'eq' }}">{{ p ? c.perKm|pct_of(p.perKm) : '—' }}</td></tr>
+<tr><td>l / 100 km</td><td class="r mono">{{ c.consumption|num(1) }}</td><td class="r mono">{{ p ? p.consumption|num(1) : '—' }}</td><td class="r {{ p ? c.consumption|trend_of(p.consumption) : 'eq' }}">{{ p ? c.consumption|pct_of(p.consumption) : '—' }}</td></tr>
+</table></div>
+</td><td class="rr">
+<div class="card"><h2>Cost total pe luni</h2>
+{% set maxT = max(r.trend|map(t => t.total)|merge([1])) %}
+<table class="bars"><tr>{% for t in r.trend %}{% set h = max(2, (70 * t.total / maxT)|round) %}<td><div style="height: {{ 70 - h }}px"></div><div class="mono" style="font-size: 6.5pt">{{ (t.total / 1000)|round }}k</div><div class="bar {{ t.over ? 'over' : 'in' }}{{ r.period.contains(t.month) ? ' cur' : '' }}" style="height: {{ h }}px"></div></td>{% endfor %}</tr>
+<tr class="bl">{% for t in r.trend %}<td>{{ t.label }}</td>{% endfor %}</tr></table>
+<div class="mute" style="font-size: 7pt">Verde = în bugetul lunar, roșu = peste. Încadrat = perioada raportată.</div>
+<table class="t">{% for s in r.bySub|slice(0, 6) %}<tr><td>{{ s.sub }}</td><td class="r mono">{{ s.net|lei }}</td><td class="r mono">{{ s.pct|num(1) }}%</td></tr>{% endfor %}</table>
+</div>
+</td></tr></table>
+
+<div class="card"><h2>Pe vehicul · {{ r.period.label }}</h2>
+<table class="t"><tr><th>Vehicul</th><th class="r">Admin</th><th class="r">Funcț.</th><th class="r">Comb.</th><th class="r">Total</th><th class="r">km</th><th class="r">lei/km</th><th class="r">l/100</th><th class="r">% buget</th><th class="r">vs 6 l.</th></tr>
+{% for v in r.vehicles %}{% set t = v.totals %}
+<tr><td><b class="mono">{{ v.plate }}</b><br><span class="mute">{{ v.model }}{{ v.driver ? ' · ' ~ v.driver : '' }}</span></td>
+<td class="r mono">{{ t.admin|lei }}</td><td class="r mono">{{ t.oper|lei }}</td><td class="r mono">{{ t.fuel|lei }}</td><td class="r mono"><b>{{ t.total|lei }}</b></td>
+<td class="r mono">{{ t.km|num }}</td><td class="r mono">{{ t.perKm|num(2) }}</td><td class="r mono">{{ t.consumption|num(1) }}</td>
+<td class="r{{ v.budgetPct >= 100 ? ' warn' : '' }}">{{ v.budgetPct|num }}%</td><td class="r {{ v.vsBaseline|trend }}">{{ v.vsBaseline|pct }}</td></tr>
+{% endfor %}
+<tr><td><b>Parc</b></td><td class="r mono"><b>{{ c.admin|lei }}</b></td><td class="r mono"><b>{{ c.oper|lei }}</b></td><td class="r mono"><b>{{ c.fuel|lei }}</b></td><td class="r mono"><b>{{ c.total|lei }}</b></td><td class="r mono">{{ c.km|num }}</td><td class="r mono">{{ c.perKm|num(2) }}</td><td class="r mono">{{ c.consumption|num(1) }}</td><td class="r">{{ r.budgetPct|num }}%</td><td></td></tr>
+</table>
+<div class="mute" style="font-size: 7pt">„% buget” = bugetul vehiculului pe perioadă. „vs 6 l.” = față de media proprie a vehiculului în cele 6 luni dinaintea perioadei.</div></div>
+
+<table class="split"><tr><td class="l">
+<div class="card{{ r.exceptions ? ' bad' : '' }}"><h2>Excepții combustibil ({{ r.exceptions|length }})</h2>
+{% if r.exceptions %}<table class="t">{% for x in r.exceptions %}<tr><td class="mono" style="width: 70px">{{ x.plate }}</td><td>{{ x.detail }}</td></tr>{% endfor %}</table>
+{% else %}<div class="mute">Nicio anomalie în această perioadă.</div>{% endif %}</div>
+</td><td class="rr">
+<div class="card"><h2>Operațiuni anvelope ({{ r.operations|length }})</h2>
+{% if r.operations %}<table class="t">{% for o in r.operations %}<tr><td class="mono">{{ o.date|rodate }}</td><td class="mono">{{ o.plate }}</td><td>{{ o.type }}</td><td class="r mono">{{ o.cost ? o.cost|lei : '—' }}</td></tr>{% endfor %}</table>
+{% else %}<div class="mute">Nicio operațiune înregistrată în această perioadă.</div>{% endif %}</div>
+</td></tr></table>
+
+{% set st = r.state %}
+<div class="card"><h2>Starea flotei la {{ r.generatedAt|date('d.m.Y') }} · perioada următoare</h2>
+<table class="kpis"><tr>
+  <td><div class="kv {{ st.tyres.now ? 'red' : 'ok' }}">{{ st.tyres.ok }} / {{ st.tyres.soon }} / {{ st.tyres.now }}</div><div class="kl">anvelope: în regulă / curând / acum</div></td>
+  {% set exp = st.documents|filter(d => d.expired)|length %}
+  <td><div class="kv {{ exp ? 'red' : 'ok' }}">{{ exp }} / {{ (st.documents|length) - exp }}</div><div class="kl">documente: expirate / în 30 zile</div></td>
+  <td><div class="kv">{{ st.tyreOrders3m.count }}</div><div class="kl">seturi noi în 3 luni · {{ st.tyreOrders3m.cost|lei }}</div></td>
+  <td><div class="kv {{ st.setsWithoutProof ? 'amb' : 'ok' }}">{{ st.setsWithoutProof }}</div><div class="kl">seturi fără locație sigură</div></td>
+</tr></table>
+{% if st.documents %}<div style="height: 6px"></div><table class="t"><tr><th>Document</th><th>Pentru</th><th>Termen</th></tr>
+{% for d in st.documents|slice(0, 16) %}<tr><td>{{ d.label }}</td><td class="mute">{{ d.for }}</td><td class="{{ d.expired ? 'tred' : '' }}">{{ d.due|rodate }}{{ d.expired ? ' · expirat' : '' }}</td></tr>{% endfor %}</table>
+{% if st.documents|length > 16 %}<div class="mute">… și încă {{ (st.documents|length) - 16 }} în aplicație.</div>{% endif %}{% endif %}
+</div>
+
+<div class="foot">Sursa: TyreFleet · facturi introduse sau importate, decont card carburant, alimentări cu km, fișe TyreFleet, aplicația șoferului.
+Costuri și km = perioada raportată; starea flotei = la data generării. TyreFleet nu emite facturi — este evidența costurilor.
+Document generat automat, fără date personale sensibile (CNP, date medicale).</div>
+</body>
+</html>

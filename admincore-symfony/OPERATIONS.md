@@ -174,9 +174,39 @@ Mind a szerveren, gitben soha. Részletek: `ops/secrets/README.md`.
 
 | Titok | Hol | Ki fér hozzá |
 |---|---|---|
-| `APP_SECRET`, Supabase-kulcsok, `METRICS_TOKEN`, `ASM_API_TOKEN` | `.env.prod` | szerver (root) |
+| `APP_SECRET`, Supabase-kulcsok, `METRICS_TOKEN`, `ASM_API_TOKEN`, `MAILER_DSN` (SMTP-jelszó) | `.env.prod` | szerver (root) |
 | `metrics_token`, `grafana_admin_password`, `smtp_password` | `ops/secrets/` | szerver (root) |
 | `backup_db_url` (DB-jelszó!) | `ops/secrets/` | szerver (root) |
 | `age_recipient` (nyilvános kulcs) | `ops/secrets/` | nem titok |
 | age **titkos** kulcs | offline | csak Ferenc |
 | `DEPLOY_SSH_KEY` | GitHub Secrets | CI |
+
+---
+
+## 8. Flotta-riport e-mailben (`app:fleet-report:send`)
+
+Havi (negyedéves, éves) vezetői riport a flottának: **PDF + CSV** csatolva, rövid összefoglaló és döntési lista a levélben.
+Bemenet: a flotta pillanatképe a `tyrefleet.fleet-report/1` szerződés szerint (`src/FleetReport/FleetSnapshot.php`) —
+ma a flotta-demó „Raport lunar → Date JSON (server)” gombja adja, később a flotta-adatbázis ugyanezt.
+
+**Bekapcsolás (egyszer):**
+1. `.env.prod`: `MAILER_DSN=smtp://felhasznalo:jelszo@smtp.szolgaltato.ro:587`, `FLEET_REPORT_FROM`, `FLEET_REPORT_TO`
+   (+ `FLEET_REPORT_CC`), `FLEET_REPORT_INPUT=var/share/fleet-report/in/flota.json`, `FLEET_REPORT_DAY`, `FLEET_REPORT_HOUR`.
+   A feladó domainjén SPF és DKIM legyen beállítva, különben a levél spambe megy.
+2. Próba küldés nélkül: `docker compose run --rm app php bin/console app:fleet-report:send --dry-run` → a PDF/CSV/HTML a
+   `var/share/fleet-report/out` mappába kerül; nézd meg.
+3. Egy próbalevél magadnak: `… app:fleet-report:send --to=te@cegem.ro` (ez beíródik a naplóba — élesítés előtt töröld:
+   `var/share/fleet-report/ledger.json`).
+4. Ütemező: `docker compose --profile fleet-report --env-file .env.prod up -d` — óránként megnézi, esedékes-e.
+
+**Szabályok:** időszakonként **pontosan egyszer** megy ki (`ledger.json`: címzettek, időpont, a PDF és a CSV SHA-256-ja);
+ha a szerver a küldés napján állt, a következő órában pótolja; ha a pillanatkép az időszak vége előtt készült, **nem küld**
+(hiányos hónapot nem riportolunk) — friss export kell. Újraküldés: `--force` (a naplóban `forced: true`).
+Minden küldés az auditnaplóban: `fleet_report.sent`.
+
+| Tünet | Teendő |
+|---|---|
+| „Már kiment” | Rendben — ha mégis újra kell: `--force`. |
+| „a … még nem teljes” | Friss export a demóból / adatbázisból az időszak lezárása után. |
+| „Nincs feladó / Nincs címzett” | `FLEET_REPORT_FROM` / `FLEET_REPORT_TO` a `.env.prod`-ban. |
+| SMTP-hiba a logban | `MAILER_DSN` (host, port 587, jelszó); az ütemező egy óra múlva újrapróbálja. |

@@ -1,0 +1,3727 @@
+{
+ "schema": "tyrefleet.fleet-report/1",
+ "fleet": {
+  "id": "curier-demo",
+  "name": "Curier Demo SRL"
+ },
+ "generatedAt": "2026-11-01",
+ "budget": {
+  "fleetMonth": 36000,
+  "fleetYear": 400000,
+  "vehicleMonth": 2600,
+  "warnPct": 80,
+  "vehicles": {}
+ },
+ "vehicles": [
+  {
+   "plate": "MS 81 DSN",
+   "model": "SKODA OCTAVIA",
+   "driver": "Andrei P."
+  },
+  {
+   "plate": "TM 53 DMC",
+   "model": "SKODA OCTAVIA",
+   "driver": "Bogdan M."
+  },
+  {
+   "plate": "TM 12 HZM",
+   "model": "RENAULT KANGOO",
+   "driver": "Csaba K."
+  },
+  {
+   "plate": "MS 44 VUK",
+   "model": "FORD TRANSIT",
+   "driver": "Dan I."
+  },
+  {
+   "plate": "CJ 31 BZT",
+   "model": "SKODA OCTAVIA",
+   "driver": "Elena S."
+  },
+  {
+   "plate": "MS 47 NSC",
+   "model": "SKODA OCTAVIA",
+   "driver": "Florin T."
+  },
+  {
+   "plate": "TM 69 CLU",
+   "model": "DACIA LOGAN",
+   "driver": "Gabriel R."
+  },
+  {
+   "plate": "IS 93 SHG",
+   "model": "RENAULT KANGOO",
+   "driver": "Horia V."
+  },
+  {
+   "plate": "MS 76 PNH",
+   "model": "DACIA LOGAN",
+   "driver": "Ioana D."
+  },
+  {
+   "plate": "MS 25 ZBS",
+   "model": "SKODA OCTAVIA",
+   "driver": "Levente B."
+  },
+  {
+   "plate": "B 60 XNU",
+   "model": "FORD TRANSIT",
+   "driver": "Marius C."
+  },
+  {
+   "plate": "TM 74 AEJ",
+   "model": "DACIA LOGAN",
+   "driver": "Nicolae F."
+  },
+  {
+   "plate": "IS 55 UFJ",
+   "model": "RENAULT KANGOO",
+   "driver": "Ovidiu G."
+  },
+  {
+   "plate": "MS 59 KXR",
+   "model": "DACIA LOGAN",
+   "driver": "Paul H."
+  },
+  {
+   "plate": "MS 83 BSG",
+   "model": "DACIA LOGAN",
+   "driver": "Radu L."
+  },
+  {
+   "plate": "B 14 HDB",
+   "model": "DACIA LOGAN",
+   "driver": "Sorin N."
+  }
+ ],
+ "costs": [
+  {
+   "plate": "TM 53 DMC",
+   "date": "2025-11-05",
+   "cat": "oper",
+   "sub": "Anvelope",
+   "net": 180,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 44 VUK",
+   "date": "2025-11-05",
+   "cat": "oper",
+   "sub": "Anvelope",
+   "net": 240,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "CJ 31 BZT",
+   "date": "2025-11-05",
+   "cat": "oper",
+   "sub": "Anvelope",
+   "net": 180,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 47 NSC",
+   "date": "2025-11-05",
+   "cat": "oper",
+   "sub": "Anvelope",
+   "net": 180,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 69 CLU",
+   "date": "2025-11-05",
+   "cat": "oper",
+   "sub": "Anvelope",
+   "net": 180,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "IS 93 SHG",
+   "date": "2025-11-05",
+   "cat": "oper",
+   "sub": "Anvelope",
+   "net": 240,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 25 ZBS",
+   "date": "2025-11-05",
+   "cat": "oper",
+   "sub": "Anvelope",
+   "net": 180,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 74 AEJ",
+   "date": "2025-11-05",
+   "cat": "oper",
+   "sub": "Anvelope",
+   "net": 180,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "IS 55 UFJ",
+   "date": "2025-11-05",
+   "cat": "oper",
+   "sub": "Anvelope",
+   "net": 240,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 59 KXR",
+   "date": "2025-11-05",
+   "cat": "oper",
+   "sub": "Anvelope",
+   "net": 180,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "B 14 HDB",
+   "date": "2025-11-05",
+   "cat": "oper",
+   "sub": "Anvelope",
+   "net": 180,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 69 CLU",
+   "date": "2025-11-07",
+   "cat": "admin",
+   "sub": "CASCO",
+   "net": 2258,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 83 BSG",
+   "date": "2025-11-09",
+   "cat": "admin",
+   "sub": "RCA",
+   "net": 1297,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 44 VUK",
+   "date": "2025-11-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 780,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 47 NSC",
+   "date": "2025-11-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 520,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 69 CLU",
+   "date": "2025-11-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 520,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "IS 93 SHG",
+   "date": "2025-11-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 780,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 74 AEJ",
+   "date": "2025-11-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 520,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 59 KXR",
+   "date": "2025-11-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 520,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 83 BSG",
+   "date": "2025-11-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 520,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 47 NSC",
+   "date": "2025-11-13",
+   "cat": "admin",
+   "sub": "ITP",
+   "net": 212,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 76 PNH",
+   "date": "2025-11-15",
+   "cat": "oper",
+   "sub": "Reparație",
+   "net": 1764,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "CJ 31 BZT",
+   "date": "2025-11-19",
+   "cat": "admin",
+   "sub": "Rovinietă",
+   "net": 142,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 69 CLU",
+   "date": "2025-11-20",
+   "cat": "oper",
+   "sub": "Piese / consumabile",
+   "net": 154,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 81 DSN",
+   "date": "2025-11-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1373,
+   "liters": 223,
+   "km": 3687
+  },
+  {
+   "plate": "TM 53 DMC",
+   "date": "2025-11-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 714,
+   "liters": 116,
+   "km": 1904
+  },
+  {
+   "plate": "TM 12 HZM",
+   "date": "2025-11-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2604,
+   "liters": 423,
+   "km": 4517
+  },
+  {
+   "plate": "MS 44 VUK",
+   "date": "2025-11-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2364,
+   "liters": 384,
+   "km": 4028
+  },
+  {
+   "plate": "CJ 31 BZT",
+   "date": "2025-11-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 733,
+   "liters": 119,
+   "km": 2030
+  },
+  {
+   "plate": "MS 47 NSC",
+   "date": "2025-11-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 942,
+   "liters": 153,
+   "km": 2650
+  },
+  {
+   "plate": "TM 69 CLU",
+   "date": "2025-11-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 837,
+   "liters": 136,
+   "km": 2068
+  },
+  {
+   "plate": "IS 93 SHG",
+   "date": "2025-11-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2906,
+   "liters": 472,
+   "km": 4856
+  },
+  {
+   "plate": "MS 76 PNH",
+   "date": "2025-11-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1287,
+   "liters": 209,
+   "km": 3002
+  },
+  {
+   "plate": "MS 25 ZBS",
+   "date": "2025-11-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 813,
+   "liters": 132,
+   "km": 2231
+  },
+  {
+   "plate": "B 60 XNU",
+   "date": "2025-11-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 3202,
+   "liters": 520,
+   "km": 5080
+  },
+  {
+   "plate": "TM 74 AEJ",
+   "date": "2025-11-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1435,
+   "liters": 233,
+   "km": 3414
+  },
+  {
+   "plate": "IS 55 UFJ",
+   "date": "2025-11-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2377,
+   "liters": 386,
+   "km": 4125
+  },
+  {
+   "plate": "MS 59 KXR",
+   "date": "2025-11-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 911,
+   "liters": 148,
+   "km": 2268
+  },
+  {
+   "plate": "MS 83 BSG",
+   "date": "2025-11-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1490,
+   "liters": 242,
+   "km": 3920
+  },
+  {
+   "plate": "B 14 HDB",
+   "date": "2025-11-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 960,
+   "liters": 156,
+   "km": 2416
+  },
+  {
+   "plate": "MS 81 DSN",
+   "date": "2025-12-05",
+   "cat": "admin",
+   "sub": "RCA",
+   "net": 1188,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 81 DSN",
+   "date": "2025-12-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 520,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 12 HZM",
+   "date": "2025-12-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 780,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 76 PNH",
+   "date": "2025-12-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 520,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 25 ZBS",
+   "date": "2025-12-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 520,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "B 60 XNU",
+   "date": "2025-12-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 780,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "IS 55 UFJ",
+   "date": "2025-12-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 780,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 25 ZBS",
+   "date": "2025-12-12",
+   "cat": "admin",
+   "sub": "ITP",
+   "net": 224,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 44 VUK",
+   "date": "2025-12-15",
+   "cat": "oper",
+   "sub": "Reparație",
+   "net": 1112,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 74 AEJ",
+   "date": "2025-12-15",
+   "cat": "admin",
+   "sub": "Rovinietă",
+   "net": 150,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "IS 55 UFJ",
+   "date": "2025-12-15",
+   "cat": "oper",
+   "sub": "Reparație",
+   "net": 1279,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 44 VUK",
+   "date": "2025-12-18",
+   "cat": "admin",
+   "sub": "ITP",
+   "net": 217,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 83 BSG",
+   "date": "2025-12-18",
+   "cat": "admin",
+   "sub": "ITP",
+   "net": 179,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 47 NSC",
+   "date": "2025-12-20",
+   "cat": "oper",
+   "sub": "Piese / consumabile",
+   "net": 119,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 59 KXR",
+   "date": "2025-12-24",
+   "cat": "admin",
+   "sub": "Rovinietă",
+   "net": 149,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 81 DSN",
+   "date": "2025-12-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1422,
+   "liters": 231,
+   "km": 3743
+  },
+  {
+   "plate": "TM 53 DMC",
+   "date": "2025-12-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 770,
+   "liters": 125,
+   "km": 2130
+  },
+  {
+   "plate": "TM 12 HZM",
+   "date": "2025-12-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2432,
+   "liters": 395,
+   "km": 4417
+  },
+  {
+   "plate": "MS 44 VUK",
+   "date": "2025-12-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2604,
+   "liters": 423,
+   "km": 4470
+  },
+  {
+   "plate": "CJ 31 BZT",
+   "date": "2025-12-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 930,
+   "liters": 151,
+   "km": 2525
+  },
+  {
+   "plate": "MS 47 NSC",
+   "date": "2025-12-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1145,
+   "liters": 186,
+   "km": 3136
+  },
+  {
+   "plate": "TM 69 CLU",
+   "date": "2025-12-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 850,
+   "liters": 138,
+   "km": 1982
+  },
+  {
+   "plate": "IS 93 SHG",
+   "date": "2025-12-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2586,
+   "liters": 420,
+   "km": 4337
+  },
+  {
+   "plate": "MS 76 PNH",
+   "date": "2025-12-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1170,
+   "liters": 190,
+   "km": 2878
+  },
+  {
+   "plate": "MS 25 ZBS",
+   "date": "2025-12-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 967,
+   "liters": 157,
+   "km": 2670
+  },
+  {
+   "plate": "B 60 XNU",
+   "date": "2025-12-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2808,
+   "liters": 456,
+   "km": 4485
+  },
+  {
+   "plate": "TM 74 AEJ",
+   "date": "2025-12-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1428,
+   "liters": 232,
+   "km": 3253
+  },
+  {
+   "plate": "IS 55 UFJ",
+   "date": "2025-12-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2734,
+   "liters": 444,
+   "km": 4953
+  },
+  {
+   "plate": "MS 59 KXR",
+   "date": "2025-12-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 880,
+   "liters": 143,
+   "km": 2182
+  },
+  {
+   "plate": "MS 83 BSG",
+   "date": "2025-12-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1330,
+   "liters": 216,
+   "km": 3494
+  },
+  {
+   "plate": "B 14 HDB",
+   "date": "2025-12-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1028,
+   "liters": 167,
+   "km": 2556
+  },
+  {
+   "plate": "TM 74 AEJ",
+   "date": "2026-01-14",
+   "cat": "admin",
+   "sub": "ITP",
+   "net": 224,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 81 DSN",
+   "date": "2026-01-15",
+   "cat": "oper",
+   "sub": "Reparație",
+   "net": 850,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 44 VUK",
+   "date": "2026-01-15",
+   "cat": "oper",
+   "sub": "Reparație",
+   "net": 699,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 74 AEJ",
+   "date": "2026-01-15",
+   "cat": "oper",
+   "sub": "Reparație",
+   "net": 662,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 44 VUK",
+   "date": "2026-01-24",
+   "cat": "admin",
+   "sub": "RCA",
+   "net": 2583,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 81 DSN",
+   "date": "2026-01-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1410,
+   "liters": 229,
+   "km": 3702
+  },
+  {
+   "plate": "TM 53 DMC",
+   "date": "2026-01-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 745,
+   "liters": 121,
+   "km": 1973
+  },
+  {
+   "plate": "TM 12 HZM",
+   "date": "2026-01-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2438,
+   "liters": 396,
+   "km": 4424
+  },
+  {
+   "plate": "MS 44 VUK",
+   "date": "2026-01-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2450,
+   "liters": 398,
+   "km": 4109
+  },
+  {
+   "plate": "CJ 31 BZT",
+   "date": "2026-01-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 868,
+   "liters": 141,
+   "km": 2363
+  },
+  {
+   "plate": "MS 47 NSC",
+   "date": "2026-01-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1244,
+   "liters": 202,
+   "km": 3403
+  },
+  {
+   "plate": "TM 69 CLU",
+   "date": "2026-01-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 917,
+   "liters": 149,
+   "km": 2244
+  },
+  {
+   "plate": "IS 93 SHG",
+   "date": "2026-01-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2364,
+   "liters": 384,
+   "km": 3906
+  },
+  {
+   "plate": "MS 76 PNH",
+   "date": "2026-01-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1318,
+   "liters": 214,
+   "km": 3302
+  },
+  {
+   "plate": "MS 25 ZBS",
+   "date": "2026-01-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 856,
+   "liters": 139,
+   "km": 2378
+  },
+  {
+   "plate": "B 60 XNU",
+   "date": "2026-01-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2543,
+   "liters": 413,
+   "km": 3978
+  },
+  {
+   "plate": "TM 74 AEJ",
+   "date": "2026-01-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1355,
+   "liters": 220,
+   "km": 3168
+  },
+  {
+   "plate": "IS 55 UFJ",
+   "date": "2026-01-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2537,
+   "liters": 412,
+   "km": 4391
+  },
+  {
+   "plate": "MS 59 KXR",
+   "date": "2026-01-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1041,
+   "liters": 169,
+   "km": 2589
+  },
+  {
+   "plate": "MS 83 BSG",
+   "date": "2026-01-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1545,
+   "liters": 251,
+   "km": 4049
+  },
+  {
+   "plate": "B 14 HDB",
+   "date": "2026-01-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 917,
+   "liters": 149,
+   "km": 2373
+  },
+  {
+   "plate": "B 60 XNU",
+   "date": "2026-02-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 780,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "IS 55 UFJ",
+   "date": "2026-02-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 780,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 25 ZBS",
+   "date": "2026-02-12",
+   "cat": "admin",
+   "sub": "RCA",
+   "net": 1407,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "B 60 XNU",
+   "date": "2026-02-12",
+   "cat": "admin",
+   "sub": "Alt cost administrativ",
+   "net": 450,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "IS 55 UFJ",
+   "date": "2026-02-12",
+   "cat": "admin",
+   "sub": "Alt cost administrativ",
+   "net": 900,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 53 DMC",
+   "date": "2026-02-13",
+   "cat": "admin",
+   "sub": "ITP",
+   "net": 177,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 47 NSC",
+   "date": "2026-02-15",
+   "cat": "oper",
+   "sub": "Reparație",
+   "net": 1686,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 76 PNH",
+   "date": "2026-02-15",
+   "cat": "oper",
+   "sub": "Reparație",
+   "net": 967,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "IS 55 UFJ",
+   "date": "2026-02-15",
+   "cat": "oper",
+   "sub": "Reparație",
+   "net": 1167,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 59 KXR",
+   "date": "2026-02-15",
+   "cat": "oper",
+   "sub": "Reparație",
+   "net": 684,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 53 DMC",
+   "date": "2026-02-18",
+   "cat": "admin",
+   "sub": "RCA",
+   "net": 1385,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 44 VUK",
+   "date": "2026-02-20",
+   "cat": "oper",
+   "sub": "Piese / consumabile",
+   "net": 93,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "IS 93 SHG",
+   "date": "2026-02-20",
+   "cat": "oper",
+   "sub": "Piese / consumabile",
+   "net": 182,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 81 DSN",
+   "date": "2026-02-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1632,
+   "liters": 265,
+   "km": 4239
+  },
+  {
+   "plate": "TM 53 DMC",
+   "date": "2026-02-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 868,
+   "liters": 141,
+   "km": 2312
+  },
+  {
+   "plate": "TM 12 HZM",
+   "date": "2026-02-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2198,
+   "liters": 357,
+   "km": 4017
+  },
+  {
+   "plate": "MS 44 VUK",
+   "date": "2026-02-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2100,
+   "liters": 341,
+   "km": 3650
+  },
+  {
+   "plate": "CJ 31 BZT",
+   "date": "2026-02-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 751,
+   "liters": 122,
+   "km": 1984
+  },
+  {
+   "plate": "MS 47 NSC",
+   "date": "2026-02-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1053,
+   "liters": 171,
+   "km": 2946
+  },
+  {
+   "plate": "TM 69 CLU",
+   "date": "2026-02-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1004,
+   "liters": 163,
+   "km": 2344
+  },
+  {
+   "plate": "IS 93 SHG",
+   "date": "2026-02-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2512,
+   "liters": 408,
+   "km": 3979
+  },
+  {
+   "plate": "MS 76 PNH",
+   "date": "2026-02-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1311,
+   "liters": 213,
+   "km": 3285
+  },
+  {
+   "plate": "MS 25 ZBS",
+   "date": "2026-02-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 985,
+   "liters": 160,
+   "km": 2700
+  },
+  {
+   "plate": "B 60 XNU",
+   "date": "2026-02-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2524,
+   "liters": 410,
+   "km": 4123
+  },
+  {
+   "plate": "TM 74 AEJ",
+   "date": "2026-02-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1164,
+   "liters": 189,
+   "km": 2767
+  },
+  {
+   "plate": "IS 55 UFJ",
+   "date": "2026-02-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2537,
+   "liters": 412,
+   "km": 4325
+  },
+  {
+   "plate": "MS 59 KXR",
+   "date": "2026-02-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 887,
+   "liters": 144,
+   "km": 2173
+  },
+  {
+   "plate": "MS 83 BSG",
+   "date": "2026-02-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1453,
+   "liters": 236,
+   "km": 4008
+  },
+  {
+   "plate": "B 14 HDB",
+   "date": "2026-02-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1102,
+   "liters": 179,
+   "km": 2847
+  },
+  {
+   "plate": "B 60 XNU",
+   "date": "2026-03-05",
+   "cat": "admin",
+   "sub": "ITP",
+   "net": 160,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 12 HZM",
+   "date": "2026-03-07",
+   "cat": "admin",
+   "sub": "ITP",
+   "net": 153,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 12 HZM",
+   "date": "2026-03-07",
+   "cat": "admin",
+   "sub": "CASCO",
+   "net": 3458,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 44 VUK",
+   "date": "2026-03-07",
+   "cat": "admin",
+   "sub": "Impozit auto",
+   "net": 691,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "CJ 31 BZT",
+   "date": "2026-03-07",
+   "cat": "admin",
+   "sub": "Impozit auto",
+   "net": 269,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "B 14 HDB",
+   "date": "2026-03-08",
+   "cat": "admin",
+   "sub": "Impozit auto",
+   "net": 395,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 69 CLU",
+   "date": "2026-03-09",
+   "cat": "admin",
+   "sub": "Impozit auto",
+   "net": 198,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 44 VUK",
+   "date": "2026-03-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 780,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "CJ 31 BZT",
+   "date": "2026-03-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 520,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 76 PNH",
+   "date": "2026-03-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 520,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "B 14 HDB",
+   "date": "2026-03-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 520,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "IS 93 SHG",
+   "date": "2026-03-11",
+   "cat": "admin",
+   "sub": "Impozit auto",
+   "net": 649,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 76 PNH",
+   "date": "2026-03-11",
+   "cat": "admin",
+   "sub": "Impozit auto",
+   "net": 187,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 76 PNH",
+   "date": "2026-03-13",
+   "cat": "admin",
+   "sub": "CASCO",
+   "net": 2168,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "B 60 XNU",
+   "date": "2026-03-15",
+   "cat": "admin",
+   "sub": "Impozit auto",
+   "net": 808,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "IS 55 UFJ",
+   "date": "2026-03-15",
+   "cat": "admin",
+   "sub": "Impozit auto",
+   "net": 804,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 59 KXR",
+   "date": "2026-03-17",
+   "cat": "admin",
+   "sub": "RCA",
+   "net": 1262,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 25 ZBS",
+   "date": "2026-03-18",
+   "cat": "admin",
+   "sub": "Impozit auto",
+   "net": 254,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 53 DMC",
+   "date": "2026-03-19",
+   "cat": "admin",
+   "sub": "Impozit auto",
+   "net": 194,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 12 HZM",
+   "date": "2026-03-20",
+   "cat": "oper",
+   "sub": "Piese / consumabile",
+   "net": 235,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 83 BSG",
+   "date": "2026-03-20",
+   "cat": "admin",
+   "sub": "Impozit auto",
+   "net": 181,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 12 HZM",
+   "date": "2026-03-21",
+   "cat": "admin",
+   "sub": "Impozit auto",
+   "net": 866,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 59 KXR",
+   "date": "2026-03-21",
+   "cat": "admin",
+   "sub": "Impozit auto",
+   "net": 186,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 81 DSN",
+   "date": "2026-03-22",
+   "cat": "admin",
+   "sub": "Impozit auto",
+   "net": 282,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 47 NSC",
+   "date": "2026-03-22",
+   "cat": "admin",
+   "sub": "Impozit auto",
+   "net": 212,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 74 AEJ",
+   "date": "2026-03-22",
+   "cat": "admin",
+   "sub": "Impozit auto",
+   "net": 229,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "IS 93 SHG",
+   "date": "2026-03-24",
+   "cat": "admin",
+   "sub": "ITP",
+   "net": 222,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 81 DSN",
+   "date": "2026-03-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1607,
+   "liters": 261,
+   "km": 4148
+  },
+  {
+   "plate": "TM 53 DMC",
+   "date": "2026-03-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 745,
+   "liters": 121,
+   "km": 1923
+  },
+  {
+   "plate": "TM 12 HZM",
+   "date": "2026-03-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2223,
+   "liters": 361,
+   "km": 3838
+  },
+  {
+   "plate": "MS 44 VUK",
+   "date": "2026-03-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2278,
+   "liters": 370,
+   "km": 3878
+  },
+  {
+   "plate": "CJ 31 BZT",
+   "date": "2026-03-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 936,
+   "liters": 152,
+   "km": 2489
+  },
+  {
+   "plate": "MS 47 NSC",
+   "date": "2026-03-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1022,
+   "liters": 166,
+   "km": 2716
+  },
+  {
+   "plate": "TM 69 CLU",
+   "date": "2026-03-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 819,
+   "liters": 133,
+   "km": 2019
+  },
+  {
+   "plate": "IS 93 SHG",
+   "date": "2026-03-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2463,
+   "liters": 400,
+   "km": 4072
+  },
+  {
+   "plate": "MS 76 PNH",
+   "date": "2026-03-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1558,
+   "liters": 253,
+   "km": 3754
+  },
+  {
+   "plate": "MS 25 ZBS",
+   "date": "2026-03-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1016,
+   "liters": 165,
+   "km": 2641
+  },
+  {
+   "plate": "B 60 XNU",
+   "date": "2026-03-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 3115,
+   "liters": 506,
+   "km": 4907
+  },
+  {
+   "plate": "TM 74 AEJ",
+   "date": "2026-03-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1311,
+   "liters": 213,
+   "km": 3076
+  },
+  {
+   "plate": "IS 55 UFJ",
+   "date": "2026-03-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2666,
+   "liters": 433,
+   "km": 4757
+  },
+  {
+   "plate": "MS 59 KXR",
+   "date": "2026-03-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1133,
+   "liters": 184,
+   "km": 2767
+  },
+  {
+   "plate": "MS 83 BSG",
+   "date": "2026-03-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1515,
+   "liters": 246,
+   "km": 4210
+  },
+  {
+   "plate": "B 14 HDB",
+   "date": "2026-03-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1225,
+   "liters": 199,
+   "km": 3002
+  },
+  {
+   "plate": "CJ 31 BZT",
+   "date": "2026-04-05",
+   "cat": "admin",
+   "sub": "ITP",
+   "net": 167,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 83 BSG",
+   "date": "2026-04-06",
+   "cat": "admin",
+   "sub": "Rovinietă",
+   "net": 140,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "IS 55 UFJ",
+   "date": "2026-04-09",
+   "cat": "admin",
+   "sub": "RCA",
+   "net": 2922,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 53 DMC",
+   "date": "2026-04-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 520,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 83 BSG",
+   "date": "2026-04-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 520,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 44 VUK",
+   "date": "2026-04-11",
+   "cat": "admin",
+   "sub": "Rovinietă",
+   "net": 379,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "CJ 31 BZT",
+   "date": "2026-04-11",
+   "cat": "admin",
+   "sub": "RCA",
+   "net": 1216,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 44 VUK",
+   "date": "2026-04-12",
+   "cat": "admin",
+   "sub": "Alt cost administrativ",
+   "net": 450,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 81 DSN",
+   "date": "2026-04-14",
+   "cat": "oper",
+   "sub": "Anvelope",
+   "net": 180,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 12 HZM",
+   "date": "2026-04-14",
+   "cat": "oper",
+   "sub": "Anvelope",
+   "net": 240,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 76 PNH",
+   "date": "2026-04-14",
+   "cat": "oper",
+   "sub": "Anvelope",
+   "net": 180,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "B 60 XNU",
+   "date": "2026-04-14",
+   "cat": "oper",
+   "sub": "Anvelope",
+   "net": 240,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 83 BSG",
+   "date": "2026-04-14",
+   "cat": "oper",
+   "sub": "Anvelope",
+   "net": 180,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 69 CLU",
+   "date": "2026-04-18",
+   "cat": "admin",
+   "sub": "Rovinietă",
+   "net": 153,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 74 AEJ",
+   "date": "2026-04-18",
+   "cat": "admin",
+   "sub": "CASCO",
+   "net": 3271,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 59 KXR",
+   "date": "2026-04-20",
+   "cat": "oper",
+   "sub": "Piese / consumabile",
+   "net": 320,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 53 DMC",
+   "date": "2026-04-21",
+   "cat": "admin",
+   "sub": "Rovinietă",
+   "net": 142,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 47 NSC",
+   "date": "2026-04-21",
+   "cat": "admin",
+   "sub": "Rovinietă",
+   "net": 158,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 81 DSN",
+   "date": "2026-04-22",
+   "cat": "admin",
+   "sub": "CASCO",
+   "net": 2338,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 44 VUK",
+   "date": "2026-04-22",
+   "cat": "admin",
+   "sub": "CASCO",
+   "net": 3367,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 81 DSN",
+   "date": "2026-04-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1625,
+   "liters": 264,
+   "km": 4230
+  },
+  {
+   "plate": "TM 53 DMC",
+   "date": "2026-04-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 751,
+   "liters": 122,
+   "km": 1950
+  },
+  {
+   "plate": "TM 12 HZM",
+   "date": "2026-04-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2592,
+   "liters": 421,
+   "km": 4438
+  },
+  {
+   "plate": "MS 44 VUK",
+   "date": "2026-04-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2383,
+   "liters": 387,
+   "km": 4101
+  },
+  {
+   "plate": "CJ 31 BZT",
+   "date": "2026-04-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 837,
+   "liters": 136,
+   "km": 2223
+  },
+  {
+   "plate": "MS 47 NSC",
+   "date": "2026-04-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1059,
+   "liters": 172,
+   "km": 2849
+  },
+  {
+   "plate": "TM 69 CLU",
+   "date": "2026-04-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 967,
+   "liters": 157,
+   "km": 2418
+  },
+  {
+   "plate": "IS 93 SHG",
+   "date": "2026-04-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2290,
+   "liters": 372,
+   "km": 3642
+  },
+  {
+   "plate": "MS 76 PNH",
+   "date": "2026-04-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1139,
+   "liters": 185,
+   "km": 2865
+  },
+  {
+   "plate": "MS 25 ZBS",
+   "date": "2026-04-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 844,
+   "liters": 137,
+   "km": 2276
+  },
+  {
+   "plate": "B 60 XNU",
+   "date": "2026-04-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2648,
+   "liters": 430,
+   "km": 4408
+  },
+  {
+   "plate": "TM 74 AEJ",
+   "date": "2026-04-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1121,
+   "liters": 182,
+   "km": 2763
+  },
+  {
+   "plate": "IS 55 UFJ",
+   "date": "2026-04-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2771,
+   "liters": 450,
+   "km": 4685
+  },
+  {
+   "plate": "MS 59 KXR",
+   "date": "2026-04-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1114,
+   "liters": 181,
+   "km": 2799
+  },
+  {
+   "plate": "MS 83 BSG",
+   "date": "2026-04-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1398,
+   "liters": 227,
+   "km": 3872
+  },
+  {
+   "plate": "B 14 HDB",
+   "date": "2026-04-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1084,
+   "liters": 176,
+   "km": 2763
+  },
+  {
+   "plate": "B 60 XNU",
+   "date": "2026-05-06",
+   "cat": "admin",
+   "sub": "Rovinietă",
+   "net": 353,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 25 ZBS",
+   "date": "2026-05-07",
+   "cat": "admin",
+   "sub": "CASCO",
+   "net": 2687,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 69 CLU",
+   "date": "2026-05-08",
+   "cat": "admin",
+   "sub": "ITP",
+   "net": 189,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 47 NSC",
+   "date": "2026-05-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 520,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "IS 93 SHG",
+   "date": "2026-05-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 780,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 74 AEJ",
+   "date": "2026-05-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 520,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "B 14 HDB",
+   "date": "2026-05-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 520,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "IS 93 SHG",
+   "date": "2026-05-12",
+   "cat": "admin",
+   "sub": "Rovinietă",
+   "net": 373,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "CJ 31 BZT",
+   "date": "2026-05-15",
+   "cat": "oper",
+   "sub": "Reparație",
+   "net": 1871,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "IS 93 SHG",
+   "date": "2026-05-16",
+   "cat": "admin",
+   "sub": "RCA",
+   "net": 2564,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 76 PNH",
+   "date": "2026-05-20",
+   "cat": "oper",
+   "sub": "Piese / consumabile",
+   "net": 170,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "B 60 XNU",
+   "date": "2026-05-20",
+   "cat": "oper",
+   "sub": "Piese / consumabile",
+   "net": 116,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 81 DSN",
+   "date": "2026-05-24",
+   "cat": "admin",
+   "sub": "Rovinietă",
+   "net": 156,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 81 DSN",
+   "date": "2026-05-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1348,
+   "liters": 219,
+   "km": 3514
+  },
+  {
+   "plate": "TM 53 DMC",
+   "date": "2026-05-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 739,
+   "liters": 120,
+   "km": 2046
+  },
+  {
+   "plate": "TM 12 HZM",
+   "date": "2026-05-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1952,
+   "liters": 317,
+   "km": 3515
+  },
+  {
+   "plate": "MS 44 VUK",
+   "date": "2026-05-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2401,
+   "liters": 390,
+   "km": 3997
+  },
+  {
+   "plate": "CJ 31 BZT",
+   "date": "2026-05-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 850,
+   "liters": 138,
+   "km": 2386
+  },
+  {
+   "plate": "MS 47 NSC",
+   "date": "2026-05-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1158,
+   "liters": 188,
+   "km": 3148
+  },
+  {
+   "plate": "TM 69 CLU",
+   "date": "2026-05-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 825,
+   "liters": 134,
+   "km": 1912
+  },
+  {
+   "plate": "IS 93 SHG",
+   "date": "2026-05-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2678,
+   "liters": 435,
+   "km": 4315
+  },
+  {
+   "plate": "MS 76 PNH",
+   "date": "2026-05-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1472,
+   "liters": 239,
+   "km": 3445
+  },
+  {
+   "plate": "MS 25 ZBS",
+   "date": "2026-05-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 800,
+   "liters": 130,
+   "km": 2221
+  },
+  {
+   "plate": "B 60 XNU",
+   "date": "2026-05-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2943,
+   "liters": 478,
+   "km": 4609
+  },
+  {
+   "plate": "TM 74 AEJ",
+   "date": "2026-05-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1478,
+   "liters": 240,
+   "km": 3553
+  },
+  {
+   "plate": "IS 55 UFJ",
+   "date": "2026-05-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2949,
+   "liters": 479,
+   "km": 5243
+  },
+  {
+   "plate": "MS 59 KXR",
+   "date": "2026-05-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1194,
+   "liters": 194,
+   "km": 2850
+  },
+  {
+   "plate": "MS 83 BSG",
+   "date": "2026-05-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1484,
+   "liters": 241,
+   "km": 3916
+  },
+  {
+   "plate": "B 14 HDB",
+   "date": "2026-05-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1065,
+   "liters": 173,
+   "km": 2561
+  },
+  {
+   "plate": "MS 59 KXR",
+   "date": "2026-06-09",
+   "cat": "admin",
+   "sub": "CASCO",
+   "net": 2443,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 81 DSN",
+   "date": "2026-06-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 520,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 53 DMC",
+   "date": "2026-06-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 520,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 12 HZM",
+   "date": "2026-06-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 780,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "B 60 XNU",
+   "date": "2026-06-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 780,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "IS 55 UFJ",
+   "date": "2026-06-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 780,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 12 HZM",
+   "date": "2026-06-12",
+   "cat": "admin",
+   "sub": "Alt cost administrativ",
+   "net": 900,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 25 ZBS",
+   "date": "2026-06-18",
+   "cat": "admin",
+   "sub": "Rovinietă",
+   "net": 157,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 53 DMC",
+   "date": "2026-06-20",
+   "cat": "oper",
+   "sub": "Piese / consumabile",
+   "net": 115,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 25 ZBS",
+   "date": "2026-06-20",
+   "cat": "oper",
+   "sub": "Piese / consumabile",
+   "net": 140,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "B 14 HDB",
+   "date": "2026-06-20",
+   "cat": "oper",
+   "sub": "Piese / consumabile",
+   "net": 212,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 81 DSN",
+   "date": "2026-06-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1521,
+   "liters": 247,
+   "km": 4028
+  },
+  {
+   "plate": "TM 53 DMC",
+   "date": "2026-06-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 671,
+   "liters": 109,
+   "km": 1789
+  },
+  {
+   "plate": "TM 12 HZM",
+   "date": "2026-06-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2537,
+   "liters": 412,
+   "km": 4293
+  },
+  {
+   "plate": "MS 44 VUK",
+   "date": "2026-06-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2315,
+   "liters": 376,
+   "km": 4117
+  },
+  {
+   "plate": "CJ 31 BZT",
+   "date": "2026-06-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 776,
+   "liters": 126,
+   "km": 2084
+  },
+  {
+   "plate": "MS 47 NSC",
+   "date": "2026-06-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1121,
+   "liters": 182,
+   "km": 3039
+  },
+  {
+   "plate": "TM 69 CLU",
+   "date": "2026-06-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 954,
+   "liters": 155,
+   "km": 2249
+  },
+  {
+   "plate": "IS 93 SHG",
+   "date": "2026-06-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2881,
+   "liters": 468,
+   "km": 4691
+  },
+  {
+   "plate": "MS 76 PNH",
+   "date": "2026-06-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1391,
+   "liters": 226,
+   "km": 3444
+  },
+  {
+   "plate": "MS 25 ZBS",
+   "date": "2026-06-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1121,
+   "liters": 182,
+   "km": 2932
+  },
+  {
+   "plate": "B 60 XNU",
+   "date": "2026-06-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 3115,
+   "liters": 506,
+   "km": 5096
+  },
+  {
+   "plate": "TM 74 AEJ",
+   "date": "2026-06-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1435,
+   "liters": 233,
+   "km": 3288
+  },
+  {
+   "plate": "IS 55 UFJ",
+   "date": "2026-06-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2518,
+   "liters": 409,
+   "km": 4310
+  },
+  {
+   "plate": "MS 59 KXR",
+   "date": "2026-06-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 868,
+   "liters": 141,
+   "km": 2141
+  },
+  {
+   "plate": "MS 83 BSG",
+   "date": "2026-06-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1632,
+   "liters": 265,
+   "km": 4415
+  },
+  {
+   "plate": "B 14 HDB",
+   "date": "2026-06-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1194,
+   "liters": 194,
+   "km": 2941
+  },
+  {
+   "plate": "MS 81 DSN",
+   "date": "2026-07-09",
+   "cat": "admin",
+   "sub": "ITP",
+   "net": 211,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "IS 55 UFJ",
+   "date": "2026-07-09",
+   "cat": "admin",
+   "sub": "CASCO",
+   "net": 1958,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 12 HZM",
+   "date": "2026-07-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 780,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "IS 93 SHG",
+   "date": "2026-07-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 780,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 25 ZBS",
+   "date": "2026-07-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 520,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 83 BSG",
+   "date": "2026-07-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 520,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 47 NSC",
+   "date": "2026-07-12",
+   "cat": "admin",
+   "sub": "RCA",
+   "net": 1329,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "IS 93 SHG",
+   "date": "2026-07-12",
+   "cat": "admin",
+   "sub": "Alt cost administrativ",
+   "net": 900,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 59 KXR",
+   "date": "2026-07-12",
+   "cat": "admin",
+   "sub": "ITP",
+   "net": 164,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 69 CLU",
+   "date": "2026-07-15",
+   "cat": "oper",
+   "sub": "Reparație",
+   "net": 2032,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 83 BSG",
+   "date": "2026-07-15",
+   "cat": "oper",
+   "sub": "Reparație",
+   "net": 1793,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 76 PNH",
+   "date": "2026-07-19",
+   "cat": "admin",
+   "sub": "Rovinietă",
+   "net": 146,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "B 14 HDB",
+   "date": "2026-07-19",
+   "cat": "admin",
+   "sub": "Rovinietă",
+   "net": 157,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 76 PNH",
+   "date": "2026-07-20",
+   "cat": "admin",
+   "sub": "RCA",
+   "net": 1252,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 81 DSN",
+   "date": "2026-07-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1558,
+   "liters": 253,
+   "km": 3944
+  },
+  {
+   "plate": "TM 53 DMC",
+   "date": "2026-07-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 720,
+   "liters": 117,
+   "km": 1864
+  },
+  {
+   "plate": "TM 12 HZM",
+   "date": "2026-07-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2684,
+   "liters": 436,
+   "km": 4569
+  },
+  {
+   "plate": "MS 44 VUK",
+   "date": "2026-07-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2728,
+   "liters": 443,
+   "km": 4612
+  },
+  {
+   "plate": "CJ 31 BZT",
+   "date": "2026-07-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 831,
+   "liters": 135,
+   "km": 2260
+  },
+  {
+   "plate": "MS 47 NSC",
+   "date": "2026-07-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1016,
+   "liters": 165,
+   "km": 2704
+  },
+  {
+   "plate": "TM 69 CLU",
+   "date": "2026-07-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1047,
+   "liters": 170,
+   "km": 2524
+  },
+  {
+   "plate": "IS 93 SHG",
+   "date": "2026-07-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2500,
+   "liters": 406,
+   "km": 3922
+  },
+  {
+   "plate": "MS 76 PNH",
+   "date": "2026-07-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1256,
+   "liters": 204,
+   "km": 3004
+  },
+  {
+   "plate": "MS 25 ZBS",
+   "date": "2026-07-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 973,
+   "liters": 158,
+   "km": 2526
+  },
+  {
+   "plate": "B 60 XNU",
+   "date": "2026-07-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 3165,
+   "liters": 514,
+   "km": 5163
+  },
+  {
+   "plate": "TM 74 AEJ",
+   "date": "2026-07-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1428,
+   "liters": 232,
+   "km": 3416
+  },
+  {
+   "plate": "IS 55 UFJ",
+   "date": "2026-07-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2758,
+   "liters": 448,
+   "km": 4902
+  },
+  {
+   "plate": "MS 59 KXR",
+   "date": "2026-07-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1102,
+   "liters": 179,
+   "km": 2728
+  },
+  {
+   "plate": "MS 83 BSG",
+   "date": "2026-07-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1515,
+   "liters": 246,
+   "km": 4158
+  },
+  {
+   "plate": "B 14 HDB",
+   "date": "2026-07-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1133,
+   "liters": 184,
+   "km": 2823
+  },
+  {
+   "plate": "TM 12 HZM",
+   "date": "2026-08-06",
+   "cat": "admin",
+   "sub": "RCA",
+   "net": 2515,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 81 DSN",
+   "date": "2026-08-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 520,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "CJ 31 BZT",
+   "date": "2026-08-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 520,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 76 PNH",
+   "date": "2026-08-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 520,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "B 60 XNU",
+   "date": "2026-08-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 780,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "IS 55 UFJ",
+   "date": "2026-08-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 780,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 81 DSN",
+   "date": "2026-08-20",
+   "cat": "oper",
+   "sub": "Piese / consumabile",
+   "net": 286,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 69 CLU",
+   "date": "2026-08-20",
+   "cat": "admin",
+   "sub": "RCA",
+   "net": 1419,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "IS 55 UFJ",
+   "date": "2026-08-20",
+   "cat": "oper",
+   "sub": "Piese / consumabile",
+   "net": 155,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "B 14 HDB",
+   "date": "2026-08-22",
+   "cat": "admin",
+   "sub": "ITP",
+   "net": 204,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "IS 55 UFJ",
+   "date": "2026-08-24",
+   "cat": "admin",
+   "sub": "Rovinietă",
+   "net": 335,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 81 DSN",
+   "date": "2026-08-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1582,
+   "liters": 257,
+   "km": 4135
+  },
+  {
+   "plate": "TM 53 DMC",
+   "date": "2026-08-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 813,
+   "liters": 132,
+   "km": 2191
+  },
+  {
+   "plate": "TM 12 HZM",
+   "date": "2026-08-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2611,
+   "liters": 424,
+   "km": 4489
+  },
+  {
+   "plate": "MS 44 VUK",
+   "date": "2026-08-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2851,
+   "liters": 463,
+   "km": 4733
+  },
+  {
+   "plate": "CJ 31 BZT",
+   "date": "2026-08-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 837,
+   "liters": 136,
+   "km": 2209
+  },
+  {
+   "plate": "MS 47 NSC",
+   "date": "2026-08-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1552,
+   "liters": 252,
+   "km": 3112
+  },
+  {
+   "plate": "TM 69 CLU",
+   "date": "2026-08-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 899,
+   "liters": 146,
+   "km": 2211
+  },
+  {
+   "plate": "IS 93 SHG",
+   "date": "2026-08-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2580,
+   "liters": 419,
+   "km": 4068
+  },
+  {
+   "plate": "MS 76 PNH",
+   "date": "2026-08-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1404,
+   "liters": 228,
+   "km": 3278
+  },
+  {
+   "plate": "MS 25 ZBS",
+   "date": "2026-08-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 844,
+   "liters": 137,
+   "km": 2242
+  },
+  {
+   "plate": "B 60 XNU",
+   "date": "2026-08-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2783,
+   "liters": 452,
+   "km": 4317
+  },
+  {
+   "plate": "TM 74 AEJ",
+   "date": "2026-08-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1293,
+   "liters": 210,
+   "km": 3024
+  },
+  {
+   "plate": "IS 55 UFJ",
+   "date": "2026-08-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 3183,
+   "liters": 517,
+   "km": 5400
+  },
+  {
+   "plate": "MS 59 KXR",
+   "date": "2026-08-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 948,
+   "liters": 154,
+   "km": 2314
+  },
+  {
+   "plate": "MS 83 BSG",
+   "date": "2026-08-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1595,
+   "liters": 259,
+   "km": 4227
+  },
+  {
+   "plate": "B 14 HDB",
+   "date": "2026-08-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1127,
+   "liters": 183,
+   "km": 2702
+  },
+  {
+   "plate": "MS 59 KXR",
+   "date": "2026-09-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 520,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 83 BSG",
+   "date": "2026-09-15",
+   "cat": "oper",
+   "sub": "Reparație",
+   "net": 1341,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "CJ 31 BZT",
+   "date": "2026-09-20",
+   "cat": "oper",
+   "sub": "Piese / consumabile",
+   "net": 100,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 76 PNH",
+   "date": "2026-09-24",
+   "cat": "admin",
+   "sub": "ITP",
+   "net": 214,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 81 DSN",
+   "date": "2026-09-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1342,
+   "liters": 218,
+   "km": 3518
+  },
+  {
+   "plate": "TM 53 DMC",
+   "date": "2026-09-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 677,
+   "liters": 110,
+   "km": 1658
+  },
+  {
+   "plate": "TM 12 HZM",
+   "date": "2026-09-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2611,
+   "liters": 424,
+   "km": 4295
+  },
+  {
+   "plate": "MS 44 VUK",
+   "date": "2026-09-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2414,
+   "liters": 392,
+   "km": 4010
+  },
+  {
+   "plate": "CJ 31 BZT",
+   "date": "2026-09-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 905,
+   "liters": 147,
+   "km": 2299
+  },
+  {
+   "plate": "MS 47 NSC",
+   "date": "2026-09-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1108,
+   "liters": 180,
+   "km": 2934
+  },
+  {
+   "plate": "TM 69 CLU",
+   "date": "2026-09-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 924,
+   "liters": 150,
+   "km": 2361
+  },
+  {
+   "plate": "IS 93 SHG",
+   "date": "2026-09-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2728,
+   "liters": 443,
+   "km": 4497
+  },
+  {
+   "plate": "MS 76 PNH",
+   "date": "2026-09-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1028,
+   "liters": 167,
+   "km": 2765
+  },
+  {
+   "plate": "MS 25 ZBS",
+   "date": "2026-09-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1084,
+   "liters": 176,
+   "km": 2786
+  },
+  {
+   "plate": "B 60 XNU",
+   "date": "2026-09-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2666,
+   "liters": 433,
+   "km": 4551
+  },
+  {
+   "plate": "TM 74 AEJ",
+   "date": "2026-09-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1207,
+   "liters": 196,
+   "km": 3221
+  },
+  {
+   "plate": "IS 55 UFJ",
+   "date": "2026-09-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2838,
+   "liters": 461,
+   "km": 4768
+  },
+  {
+   "plate": "MS 59 KXR",
+   "date": "2026-09-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 880,
+   "liters": 143,
+   "km": 2267
+  },
+  {
+   "plate": "MS 83 BSG",
+   "date": "2026-09-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1601,
+   "liters": 260,
+   "km": 3868
+  },
+  {
+   "plate": "B 14 HDB",
+   "date": "2026-09-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1016,
+   "liters": 165,
+   "km": 2561
+  },
+  {
+   "plate": "TM 12 HZM",
+   "date": "2026-10-05",
+   "cat": "admin",
+   "sub": "Rovinietă",
+   "net": 328,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 44 VUK",
+   "date": "2026-10-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 780,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 69 CLU",
+   "date": "2026-10-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 520,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 74 AEJ",
+   "date": "2026-10-10",
+   "cat": "oper",
+   "sub": "Schimb ulei + filtre",
+   "net": 520,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "B 60 XNU",
+   "date": "2026-10-12",
+   "cat": "admin",
+   "sub": "RCA",
+   "net": 2749,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 74 AEJ",
+   "date": "2026-10-13",
+   "cat": "admin",
+   "sub": "RCA",
+   "net": 1275,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "IS 55 UFJ",
+   "date": "2026-10-16",
+   "cat": "admin",
+   "sub": "ITP",
+   "net": 205,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "B 14 HDB",
+   "date": "2026-10-19",
+   "cat": "admin",
+   "sub": "RCA",
+   "net": 1420,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "TM 74 AEJ",
+   "date": "2026-10-20",
+   "cat": "oper",
+   "sub": "Piese / consumabile",
+   "net": 339,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 83 BSG",
+   "date": "2026-10-20",
+   "cat": "oper",
+   "sub": "Piese / consumabile",
+   "net": 114,
+   "liters": 0,
+   "km": 0
+  },
+  {
+   "plate": "MS 81 DSN",
+   "date": "2026-10-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1564,
+   "liters": 254,
+   "km": 4143
+  },
+  {
+   "plate": "TM 53 DMC",
+   "date": "2026-10-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 800,
+   "liters": 130,
+   "km": 2091
+  },
+  {
+   "plate": "TM 12 HZM",
+   "date": "2026-10-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2623,
+   "liters": 426,
+   "km": 4225
+  },
+  {
+   "plate": "MS 44 VUK",
+   "date": "2026-10-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2518,
+   "liters": 409,
+   "km": 3979
+  },
+  {
+   "plate": "CJ 31 BZT",
+   "date": "2026-10-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 887,
+   "liters": 144,
+   "km": 2224
+  },
+  {
+   "plate": "MS 47 NSC",
+   "date": "2026-10-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1084,
+   "liters": 176,
+   "km": 2403
+  },
+  {
+   "plate": "TM 69 CLU",
+   "date": "2026-10-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 905,
+   "liters": 147,
+   "km": 2295
+  },
+  {
+   "plate": "IS 93 SHG",
+   "date": "2026-10-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2118,
+   "liters": 344,
+   "km": 3557
+  },
+  {
+   "plate": "MS 76 PNH",
+   "date": "2026-10-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1361,
+   "liters": 221,
+   "km": 3519
+  },
+  {
+   "plate": "MS 25 ZBS",
+   "date": "2026-10-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 862,
+   "liters": 140,
+   "km": 2291
+  },
+  {
+   "plate": "B 60 XNU",
+   "date": "2026-10-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2475,
+   "liters": 402,
+   "km": 5176
+  },
+  {
+   "plate": "TM 74 AEJ",
+   "date": "2026-10-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 905,
+   "liters": 147,
+   "km": 2936
+  },
+  {
+   "plate": "IS 55 UFJ",
+   "date": "2026-10-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 2660,
+   "liters": 432,
+   "km": 4507
+  },
+  {
+   "plate": "MS 59 KXR",
+   "date": "2026-10-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 880,
+   "liters": 143,
+   "km": 2750
+  },
+  {
+   "plate": "MS 83 BSG",
+   "date": "2026-10-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 1681,
+   "liters": 273,
+   "km": 4165
+  },
+  {
+   "plate": "B 14 HDB",
+   "date": "2026-10-28",
+   "cat": "fuel",
+   "sub": "Combustibil",
+   "net": 985,
+   "liters": 160,
+   "km": 2569
+  }
+ ],
+ "exceptions": [
+  {
+   "plate": "MS 47 NSC",
+   "month": "2026-08",
+   "kind": "fuel_anomaly",
+   "detail": "Consum 8.1 l/100 km · media 6.3 (+29%)"
+  },
+  {
+   "plate": "TM 74 AEJ",
+   "month": "2026-10",
+   "kind": "fill_check",
+   "detail": "29.10.2026 · 33.3 l · doar 3.0 l/100 km pe 1110 km — lipsește o alimentare?"
+  },
+  {
+   "plate": "TM 74 AEJ",
+   "month": "2026-10",
+   "kind": "fill_check",
+   "detail": "24.10.2026 · 39.6 l · km lipsă la alimentare"
+  },
+  {
+   "plate": "MS 44 VUK",
+   "month": "2026-10",
+   "kind": "fill_check",
+   "detail": "22.10.2026 · 18 l · a doua alimentare în aceeași zi"
+  },
+  {
+   "plate": "MS 76 PNH",
+   "month": "2026-10",
+   "kind": "fill_check",
+   "detail": "22.10.2026 · 32.8 l · doar 2.8 l/100 km pe 1180 km — lipsește o alimentare?"
+  },
+  {
+   "plate": "MS 59 KXR",
+   "month": "2026-10",
+   "kind": "fill_check",
+   "detail": "22.10.2026 · 37.3 l · doar 3.3 l/100 km pe 1147 km — lipsește o alimentare?"
+  },
+  {
+   "plate": "MS 47 NSC",
+   "month": "2026-10",
+   "kind": "fill_check",
+   "detail": "17.10.2026 · 65 l · 65 l — peste capacitatea rezervorului (50 l)"
+  },
+  {
+   "plate": "MS 76 PNH",
+   "month": "2026-10",
+   "kind": "fill_check",
+   "detail": "17.10.2026 · 40.2 l · km mai mic decât la alimentarea anterioară (206.398)"
+  },
+  {
+   "plate": "B 60 XNU",
+   "month": "2026-10",
+   "kind": "km_mismatch",
+   "detail": "decont 5.176 km ≠ calculat 4.243 km"
+  }
+ ],
+ "operations": [
+  {
+   "plate": "MS 81 DSN",
+   "date": "2026-04-14",
+   "type": "Schimb sezonier",
+   "cost": 180
+  },
+  {
+   "plate": "TM 53 DMC",
+   "date": "2025-11-05",
+   "type": "Schimb sezonier",
+   "cost": 180
+  },
+  {
+   "plate": "TM 12 HZM",
+   "date": "2026-04-14",
+   "type": "Schimb sezonier",
+   "cost": 240
+  },
+  {
+   "plate": "MS 44 VUK",
+   "date": "2025-11-05",
+   "type": "Schimb sezonier",
+   "cost": 240
+  },
+  {
+   "plate": "CJ 31 BZT",
+   "date": "2025-11-05",
+   "type": "Schimb sezonier",
+   "cost": 180
+  },
+  {
+   "plate": "MS 47 NSC",
+   "date": "2025-11-05",
+   "type": "Schimb sezonier",
+   "cost": 180
+  },
+  {
+   "plate": "TM 69 CLU",
+   "date": "2025-11-05",
+   "type": "Schimb sezonier",
+   "cost": 180
+  },
+  {
+   "plate": "IS 93 SHG",
+   "date": "2025-11-05",
+   "type": "Schimb sezonier",
+   "cost": 240
+  },
+  {
+   "plate": "MS 76 PNH",
+   "date": "2026-04-14",
+   "type": "Schimb sezonier",
+   "cost": 180
+  },
+  {
+   "plate": "MS 25 ZBS",
+   "date": "2025-11-05",
+   "type": "Schimb sezonier",
+   "cost": 180
+  },
+  {
+   "plate": "B 60 XNU",
+   "date": "2026-04-14",
+   "type": "Schimb sezonier",
+   "cost": 240
+  },
+  {
+   "plate": "TM 74 AEJ",
+   "date": "2025-11-05",
+   "type": "Schimb sezonier",
+   "cost": 180
+  },
+  {
+   "plate": "IS 55 UFJ",
+   "date": "2025-11-05",
+   "type": "Schimb sezonier",
+   "cost": 240
+  },
+  {
+   "plate": "MS 59 KXR",
+   "date": "2025-11-05",
+   "type": "Schimb sezonier",
+   "cost": 180
+  },
+  {
+   "plate": "MS 83 BSG",
+   "date": "2026-04-14",
+   "type": "Schimb sezonier",
+   "cost": 180
+  },
+  {
+   "plate": "B 14 HDB",
+   "date": "2025-11-05",
+   "type": "Schimb sezonier",
+   "cost": 180
+  }
+ ],
+ "state": {
+  "tyres": {
+   "ok": 7,
+   "soon": 7,
+   "now": 2
+  },
+  "blocked": [
+   "TM 12 HZM",
+   "MS 44 VUK",
+   "CJ 31 BZT",
+   "B 60 XNU"
+  ],
+  "summerTyresInWinter": [
+   "MS 81 DSN",
+   "TM 12 HZM",
+   "MS 76 PNH",
+   "B 60 XNU",
+   "MS 83 BSG"
+  ],
+  "documents": [
+   {
+    "label": "Atestat profesional (CPC)",
+    "for": "Csaba K. · TM 12 HZM",
+    "due": "2026-09-26",
+    "expired": true
+   },
+   {
+    "label": "Aviz medical (medicina muncii)",
+    "for": "Elena S. · CJ 31 BZT",
+    "due": "2026-10-05",
+    "expired": true
+   },
+   {
+    "label": "Verificare periodică tahograf",
+    "for": "B 60 XNU · Marius C.",
+    "due": "2026-10-10",
+    "expired": true
+   },
+   {
+    "label": "Aviz psihologic",
+    "for": "Marius C. · B 60 XNU",
+    "due": "2026-10-14",
+    "expired": true
+   },
+   {
+    "label": "Aviz medical (medicina muncii)",
+    "for": "Csaba K. · TM 12 HZM",
+    "due": "2026-10-16",
+    "expired": true
+   },
+   {
+    "label": "ITP",
+    "for": "MS 44 VUK · Dan I.",
+    "due": "2026-10-17",
+    "expired": true
+   },
+   {
+    "label": "Carte de identitate (buletin)",
+    "for": "Marius C. · B 60 XNU",
+    "due": "2026-10-29",
+    "expired": true
+   },
+   {
+    "label": "RCA",
+    "for": "B 60 XNU · Marius C.",
+    "due": "2026-11-02",
+    "expired": false
+   },
+   {
+    "label": "CASCO",
+    "for": "TM 74 AEJ · Nicolae F.",
+    "due": "2026-11-02",
+    "expired": false
+   },
+   {
+    "label": "Autorizație de mediu · viză anuală",
+    "for": "Curier Demo SRL",
+    "due": "2026-11-03",
+    "expired": false
+   },
+   {
+    "label": "Rovinietă",
+    "for": "TM 12 HZM · Csaba K.",
+    "due": "2026-11-03",
+    "expired": false
+   },
+   {
+    "label": "Trusă medicală",
+    "for": "B 60 XNU · Marius C.",
+    "due": "2026-11-07",
+    "expired": false
+   },
+   {
+    "label": "RCA",
+    "for": "TM 69 CLU · Gabriel R.",
+    "due": "2026-11-09",
+    "expired": false
+   },
+   {
+    "label": "CASCO",
+    "for": "MS 83 BSG · Radu L.",
+    "due": "2026-11-10",
+    "expired": false
+   },
+   {
+    "label": "RCA",
+    "for": "MS 83 BSG · Radu L.",
+    "due": "2026-11-12",
+    "expired": false
+   },
+   {
+    "label": "Carte de identitate (buletin)",
+    "for": "Csaba K. · TM 12 HZM",
+    "due": "2026-11-15",
+    "expired": false
+   },
+   {
+    "label": "Permis de conducere",
+    "for": "Levente B. · MS 25 ZBS",
+    "due": "2026-11-15",
+    "expired": false
+   },
+   {
+    "label": "CASCO",
+    "for": "IS 55 UFJ · Ovidiu G.",
+    "due": "2026-11-16",
+    "expired": false
+   },
+   {
+    "label": "Permis de conducere",
+    "for": "Paul H. · MS 59 KXR",
+    "due": "2026-11-16",
+    "expired": false
+   },
+   {
+    "label": "Verificare periodică tahograf",
+    "for": "MS 44 VUK · Dan I.",
+    "due": "2026-11-17",
+    "expired": false
+   },
+   {
+    "label": "Carte de identitate (buletin)",
+    "for": "Gabriel R. · TM 69 CLU",
+    "due": "2026-11-22",
+    "expired": false
+   },
+   {
+    "label": "CASCO",
+    "for": "IS 93 SHG · Horia V.",
+    "due": "2026-11-23",
+    "expired": false
+   },
+   {
+    "label": "BRML · verificare metrologică (manometre, chei dinamometrice)",
+    "for": "Curier Demo SRL",
+    "due": "2026-11-24",
+    "expired": false
+   },
+   {
+    "label": "ITP",
+    "for": "TM 53 DMC · Bogdan M.",
+    "due": "2026-11-24",
+    "expired": false
+   },
+   {
+    "label": "Carte de identitate (buletin)",
+    "for": "Levente B. · MS 25 ZBS",
+    "due": "2026-11-24",
+    "expired": false
+   },
+   {
+    "label": "Aviz medical (medicina muncii)",
+    "for": "Bogdan M. · TM 53 DMC",
+    "due": "2026-11-25",
+    "expired": false
+   },
+   {
+    "label": "Carte de identitate (buletin)",
+    "for": "Horia V. · IS 93 SHG",
+    "due": "2026-11-28",
+    "expired": false
+   },
+   {
+    "label": "RCA",
+    "for": "B 14 HDB · Sorin N.",
+    "due": "2026-11-28",
+    "expired": false
+   },
+   {
+    "label": "Aviz medical (medicina muncii)",
+    "for": "Florin T. · MS 47 NSC",
+    "due": "2026-11-29",
+    "expired": false
+   },
+   {
+    "label": "Carte de identitate (buletin)",
+    "for": "Radu L. · MS 83 BSG",
+    "due": "2026-11-29",
+    "expired": false
+   },
+   {
+    "label": "Rovinietă",
+    "for": "MS 59 KXR · Paul H.",
+    "due": "2026-11-18",
+    "expired": false
+   },
+   {
+    "label": "Rovinietă",
+    "for": "MS 83 BSG · Radu L.",
+    "due": "2026-11-19",
+    "expired": false
+   },
+   {
+    "label": "Stingător auto",
+    "for": "IS 93 SHG · Horia V.",
+    "due": "2026-11-20",
+    "expired": false
+   },
+   {
+    "label": "Stingător auto",
+    "for": "B 14 HDB · Sorin N.",
+    "due": "2026-11-26",
+    "expired": false
+   },
+   {
+    "label": "Trusă medicală",
+    "for": "TM 69 CLU · Gabriel R.",
+    "due": "2026-11-28",
+    "expired": false
+   },
+   {
+    "label": "Rovinietă",
+    "for": "TM 69 CLU · Gabriel R.",
+    "due": "2026-11-29",
+    "expired": false
+   }
+  ],
+  "tyreOrders3m": {
+   "count": 5,
+   "cost": 8600
+  },
+  "setsWithoutProof": 3
+ }
+}

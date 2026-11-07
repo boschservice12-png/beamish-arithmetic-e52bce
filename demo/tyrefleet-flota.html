@@ -1663,7 +1663,7 @@ function vRaport() {
     + (R.anom.length + R.fills.length ? '<b>' + (R.anom.length + R.fills.length) + '</b> semnale de combustibil de verificat.' : 'Fără anomalii de combustibil.');
   const nextSend = new Date(TODAY.getFullYear(), TODAY.getMonth() + 1, S.rep.day);
   return '<div class="filters noprint"><label class="f">Luna raportată<select class="sel" id="repM">' + REP_MONTHS.slice().reverse().map(m => '<option value="' + m + '"' + (m === S.rep.m ? ' selected' : '') + '>' + mLabel(m) + '</option>').join('') + '</select></label>'
-    + '<button class="btn sm" data-act="repPrint">Tipărește / PDF</button><button class="btn gray sm" data-act="repCsv">Export CSV</button><button class="btn gray sm" data-act="repSend">Trimite acum</button>'
+    + '<button class="btn sm" data-act="repPrint">Tipărește / PDF</button><button class="btn gray sm" data-act="repCsv">Export CSV</button><button class="btn gray sm" data-act="repSend">Trimite acum</button><button class="btn gray sm" data-act="repJson" title="Pentru trimiterea reală de pe server (app:fleet-report:send)">Date JSON (server)</button>'
     + '<span class="note">' + (S.rep.on ? 'Automat: pe ' + S.rep.day + ' ale lunii la ' + esc(S.rep.hour) + ' · următorul ' + fmtD(nextSend) + ' (' + mLabel(MONTHS[12]) + ')' : 'Trimiterea automată e oprită') + '</span></div>'
     + '<div class="rep" id="rep">'
     + '<div class="rhead"><div><div class="eyebrow">TyreFleet · Raport lunar flotă</div><h2>Curier Demo SRL · ' + mLabel(R.m) + '</h2><div class="note">' + S.veh.length + ' vehicule · lei fără TVA (TVA 21% separat) · generat ' + fmtD(TODAY) + '</div></div>'
@@ -1739,6 +1739,31 @@ function repSend(m, auto) {
     else { notify('Raport lunar ' + mLabel(m) + ' · trimis', body, null); S.push[0].tab = 'raport'; S.push[0].m = m; }
   }
   if (!auto) { log('Flotă · manager', 'Raport lunar ' + mLabel(m) + ' trimis manual → ' + to + ' (' + fmt + ')'); toast('Trimis (simulat) → ' + to); }
+}
+/** the server contract (tyrefleet.fleet-report/1): the same data the report uses, for app:fleet-report:send */
+function repSnapshot() {
+  const docs = remAll().filter(it => it.kmDue == null).map(it => [it, remState(it)]).filter(([it, st]) => st.lvl === 'red' || st.days <= 30);
+  const n = { ok: 0, amb: 0, red: 0 }; S.veh.forEach(v => n[status(v).lvl]++);
+  const r2 = x => Math.round(x * 100) / 100;
+  return {
+    schema: 'tyrefleet.fleet-report/1',
+    fleet: { id: 'curier-demo', name: 'Curier Demo SRL' },
+    generatedAt: iso(TODAY),
+    budget: { fleetMonth: S.bud.fleetM, fleetYear: S.bud.fleetY, vehicleMonth: S.bud.vehM, warnPct: S.bud.warn, vehicles: Object.fromEntries(Object.entries(S.bud.veh).map(([id, b]) => [V(id).plate, b])) },
+    vehicles: S.veh.map(v => ({ plate: v.plate, model: v.model, driver: v.drv })),
+    costs: costRows().sort((a, b) => a.date - b.date).map(x => ({ plate: V(x.v).plate, date: iso(x.date), cat: x.cat, sub: x.sub, net: r2(x.net), liters: x.l || 0, km: x.km || 0 })),
+    exceptions: fuelAnomalies().map(a => ({ plate: a.v.plate, month: a.m, kind: 'fuel_anomaly', detail: 'Consum ' + a.c.toFixed(1) + ' l/100 km · media ' + a.avg.toFixed(1) + ' (+' + Math.round(100 * (a.c / a.avg - 1)) + '%)' }))
+      .concat(fillChecks().map(c => c.o ? { plate: c.v.plate, month: mOf(c.o.f.date), kind: 'fill_check', detail: fmtD(c.o.f.date) + ' · ' + c.o.f.l + ' l · ' + c.o.flags.join(' · ') } : { plate: c.v.plate, month: c.mm.m, kind: 'km_mismatch', detail: 'decont ' + kmf(c.mm.decl) + ' ≠ calculat ' + kmf(c.mm.calc) })),
+    operations: S.ops.map(o => ({ plate: V(o.v).plate, date: iso(pdate(o.d)), type: o.type, cost: o.cost || 0 })),
+    state: {
+      tyres: { ok: n.ok, soon: n.amb, now: n.red },
+      blocked: S.veh.filter(v => { const b = blocks(v); return b.veh.length || b.drv.length; }).map(v => v.plate),
+      summerTyresInWinter: WINTER ? S.veh.filter(v => mounted(v).sez === 'vara').map(v => v.plate) : [],
+      documents: docs.sort((a, b) => remSort(a[0], b[0])).map(([it, st]) => ({ label: RT(it.k).label, for: remWho(it), due: iso(it.exp), expired: st.lvl === 'red' })),
+      tyreOrders3m: (() => { const o = S.veh.filter(v => wear(v).months <= 3); return { count: o.length, cost: sum(o, v => PRICE[v.van ? 'van' : 'normal']) }; })(),
+      setsWithoutProof: S.sets.filter(s => s.where.t === 'unk' || s.where.t === 'sofer' || (s.where.t === 'loc' && !s.where.proof)).length,
+    },
+  };
 }
 function repCsv(m) {
   const R = repData(m), c = R.cur, p = R.prev || {};
@@ -1960,6 +1985,7 @@ document.addEventListener('click', e => {
   if (act === 'openN') { const n = S.push.find(x => x.id === id); n.read = true; renderAll(); if (n.v) vehModal(V(n.v)); else if (n.tab) { S.mod = 'flota'; S.tab = n.tab; if (n.m) S.rep.m = n.m; closeModal(); render(); } return; }
   if (act === 'repPrint') { S.rep.m = S.rep.m || MONTHS[11]; log('Flotă · manager', 'Raport lunar ' + mLabel(S.rep.m) + ' · tipărit / salvat PDF'); try { window.print(); } catch (x) { toast('Tipărirea nu e disponibilă aici — folosește Ctrl+P'); } return; }
   if (act === 'repCsv') { repCsv(S.rep.m); return; }
+  if (act === 'repJson') { const txt = JSON.stringify(repSnapshot(), null, 1); log('Flotă · manager', 'Raport · date JSON pentru server (' + Math.round(txt.length / 1024) + ' KB)'); modal('<div class="head"><h2>Date pentru server · tyrefleet.fleet-report/1</h2><button class="btn gray sm" data-act="close">Închide</button></div><div class="note">Salvează ca <span class="mm">curier-demo.json</span> și trimite de pe server: <span class="mm">php bin/console app:fleet-report:send --input=curier-demo.json</span> — PDF + CSV pe e-mail, o singură dată pe lună.</div><textarea class="inp" id="csvTxt" readonly style="min-height:240px;font-family:var(--f-mono);font-size:.74rem">' + esc(txt) + '</textarea><div class="pills"><button class="btn sm" data-act="copyCsv">Copiază</button></div>'); return; }
   if (act === 'repSend') { repSend(S.rep.m, false); renderAll(); return; }
   if (act === 'repOpen') { S.rep.m = b.dataset.val; render(); window.scrollTo({ top: 0 }); return; }
   if (act === 'repSave') { repSave(); return; }
