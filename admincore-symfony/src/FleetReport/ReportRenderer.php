@@ -16,14 +16,19 @@ final class ReportRenderer
     {
     }
 
-    public function html(Report $r, string $variant = 'internal'): string
+    /** internal = a flotta vezetőjének (költség, keret, kivételek); client = a szerviz arculatával az ügyfélnek. */
+    public function html(Report $r, ?Brand $brand = null): string
     {
-        return $this->twig->render('fleet_report/report.html.twig', ['r' => $r, 'variant' => $variant]);
+        return null === $brand
+            ? $this->twig->render('fleet_report/report.html.twig', ['r' => $r])
+            : $this->twig->render('fleet_report/client.html.twig', ['r' => $r, 'brand' => $brand, 'actions' => ClientActions::for($r, $brand)]);
     }
 
-    public function emailHtml(Report $r, bool $withCsv): string
+    public function emailHtml(Report $r, bool $withCsv, ?Brand $brand = null): string
     {
-        return $this->twig->render('fleet_report/email.html.twig', ['r' => $r, 'csv' => $withCsv]);
+        return null === $brand
+            ? $this->twig->render('fleet_report/email.html.twig', ['r' => $r, 'csv' => $withCsv])
+            : $this->twig->render('fleet_report/email_client.html.twig', ['r' => $r, 'csv' => $withCsv, 'brand' => $brand, 'actions' => ClientActions::for($r, $brand)]);
     }
 
     public function pdf(string $html): string

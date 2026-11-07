@@ -80,4 +80,19 @@ final class ReportBuilderTest extends TestCase
         $this->expectExceptionMessage($message);
         FleetSnapshot::fromArray($mutate($d));
     }
+
+    public function testClientActionsOnlyOfferWhatTheServiceProvides(): void
+    {
+        $r = (new ReportBuilder())->build(FleetSnapshot::fromFile(self::fixture()), Period::parse('2026-10'));
+        $all = \App\FleetReport\ClientActions::for($r, \App\FleetReport\Brand::fromArray(['name' => 'S', 'services' => ['anvelope', 'depozitare']]));
+        self::assertSame('red', $all[0]['level']);
+        self::assertStringContainsString('TM 69 CLU', $all[0]['text']);
+        self::assertTrue((bool) array_filter($all, static fn (array $a) => str_contains($a['text'], 'depozitul nostru')));
+
+        $noStorage = \App\FleetReport\ClientActions::for($r, \App\FleetReport\Brand::fromArray(['name' => 'S', 'services' => ['anvelope']]));
+        self::assertFalse((bool) array_filter($noStorage, static fn (array $a) => str_contains($a['text'], 'depozitul nostru')));
+
+        $nothing = \App\FleetReport\ClientActions::for($r, \App\FleetReport\Brand::fromArray(['name' => 'S', 'services' => []]));
+        self::assertSame('ok', $nothing[0]['level']);
+    }
 }

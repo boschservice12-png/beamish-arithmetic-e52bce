@@ -114,4 +114,47 @@ final class FleetReportSendTest extends KernelTestCase
         self::assertEmailCount(0);
         self::assertFileDoesNotExist($this->ledger);
     }
+
+    public function testClientVariantIsBrandedSeparateAndWithoutInternalData(): void
+    {
+        $this->cmd(['--to' => ['flota@exemplu.ro']]);
+        $t = $this->cmd(['--variant' => 'client', '--to' => ['achizitii@client.ro']]);
+        self::assertSame(Command::SUCCESS, $t->getStatusCode(), $t->getDisplay());
+        self::assertEmailCount(2); // a belső és a B2B külön számít: az egyik nem akasztja meg a másikat
+        $mail = self::getMailerMessage(1);
+        self::assertInstanceOf(Email::class, $mail);
+        self::assertSame('Red Assistance · Raport flotă Curier Demo SRL · oct 2026', $mail->getSubject());
+        self::assertSame('Red Assistance', $mail->getFrom()[0]->getName());
+        self::assertSame('contact@redassistance.net', $mail->getReplyTo()[0]->getAddress());
+        self::assertSame(['raport-flota-curier-demo-2026-10-client.pdf', 'raport-flota-curier-demo-2026-10-client.csv'], array_map(static fn ($a) => $a->getFilename(), $mail->getAttachments()));
+        $html = (string) $mail->getHtmlBody();
+        self::assertStringContainsString('Ce vă recomandăm', $html);
+        self::assertStringContainsString('TM 69 CLU', $html);
+        // belső adat nem megy ki az ügyfélnek: keret, üzemanyag-gyanú, sofőrnév
+        foreach (['buget', 'combustibil', 'Gabriel R.'] as $internal) {
+            self::assertStringNotContainsStringIgnoringCase($internal, $html.$mail->getTextBody().$mail->getAttachments()[1]->getBody());
+        }
+        $ledger = json_decode((string) file_get_contents($this->ledger), true);
+        self::assertArrayHasKey('curier-demo|2026-10|internal', $ledger);
+        self::assertArrayHasKey('curier-demo|2026-10|client', $ledger);
+    }
+
+    public function testClientVariantSkipsQuietlyWhenNoRecipientIsConfigured(): void
+    {
+        $t = $this->cmd(['--variant' => 'client', '--if-due' => true, '--now' => '2026-11-01 09:00']);
+        self::assertSame(Command::SUCCESS, $t->getStatusCode());
+        self::assertStringContainsString('nincs címzettje', $t->getDisplay());
+        self::assertEmailCount(0);
+    }
+
+    public function testBadBrandFileIsRejected(): void
+    {
+        $f = tempnam(sys_get_temp_dir(), 'brand');
+        file_put_contents($f, '{"name":"X","color":"red"}');
+        $t = $this->cmd(['--variant' => 'client', '--to' => ['a@b.ro'], '--brand' => $f]);
+        unlink($f);
+        self::assertSame(Command::INVALID, $t->getStatusCode());
+        self::assertStringContainsString('#RRGGBB', $t->getDisplay());
+        self::assertEmailCount(0);
+    }
 }

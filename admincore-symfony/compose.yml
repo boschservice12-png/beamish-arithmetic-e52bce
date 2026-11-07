@@ -35,6 +35,7 @@ services:
   # Flotta-riport ütemező (opcionális): óránként megnézi, esedékes-e a havi riport; a küldési napló miatt
   # egy időszakot pontosan egyszer küld, és ha a szerver a küldés napján állt, a következő órában pótolja.
   # Bekapcsolás:  docker compose --profile fleet-report --env-file .env.prod up -d
+  # Két riport: belső (FLEET_REPORT_TO) és B2B a szerviz arculatával (FLEET_REPORT_CLIENT_TO; üresen kimarad).
   # Bemenet: a fleet-report kötet in/ mappája (FLEET_REPORT_INPUT), napló: ledger.json ugyanott.
   fleet-report:
     image: ${APP_IMAGE:-ghcr.io/boschservice12-png/redassistance-admincore}:${APP_TAG:-latest}
@@ -44,7 +45,7 @@ services:
     environment:
       APP_ENV: prod
       TZ: Europe/Bucharest
-    entrypoint: ["sh", "-c", "while :; do php bin/console app:fleet-report:send --if-due --no-interaction || echo 'fleet-report: hiba, a következő órában újra'; sleep 3600; done"]
+    entrypoint: ["sh", "-c", "while :; do for v in internal client; do php bin/console app:fleet-report:send --variant=$$v --if-due --no-interaction || echo \"fleet-report $$v: hiba, a következő órában újra\"; done; sleep 3600; done"]
     healthcheck:
       disable: true
     volumes:

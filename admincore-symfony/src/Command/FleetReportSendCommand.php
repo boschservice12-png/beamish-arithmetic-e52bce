@@ -2,6 +2,8 @@
 
 namespace App\Command;
 
+use App\FleetReport\Brand;
+use App\FleetReport\ClientActions;
 use App\FleetReport\FleetReportSender;
 use App\FleetReport\FleetSnapshot;
 use App\FleetReport\Money;
@@ -22,6 +24,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  *   php bin/console app:fleet-report:send --input=… --period=2026-09 --to=a@b.ro --cc=c@d.ro
  *   php bin/console app:fleet-report:send --input=… --dry-run --out=var/share/fleet-report/out        (csak fájlok)
  *   php bin/console app:fleet-report:send --if-due                                                   (ütemező)
+ *   php bin/console app:fleet-report:send --variant=client --if-due     (B2B: a szerviz küldi az ügyfélnek, márka-fájllal)
  */
 #[AsCommand(name: 'app:fleet-report:send', description: 'Flotta-riport (PDF + CSV) küldése e-mailben — ütemezve is')]
 final class FleetReportSendCommand extends Command
@@ -42,6 +45,12 @@ final class FleetReportSendCommand extends Command
         private readonly ?string $day,
         #[Autowire('%env(default::FLEET_REPORT_HOUR)%')]
         private readonly ?string $hour,
+        #[Autowire('%env(default::FLEET_REPORT_CLIENT_TO)%')]
+        private readonly ?string $clientTo,
+        #[Autowire('%env(default::FLEET_REPORT_CLIENT_CC)%')]
+        private readonly ?string $clientCc,
+        #[Autowire('%env(default::FLEET_REPORT_BRAND)%')]
+        private readonly ?string $brandFile,
     ) {
         parent::__construct();
     }
@@ -53,6 +62,8 @@ final class FleetReportSendCommand extends Command
             ->addOption('period', 'p', InputOption::VALUE_REQUIRED, 'ÉÉÉÉ-HH · ÉÉÉÉ-Q1…Q4 · ÉÉÉÉ — alap: az előző (lezárt) hónap')
             ->addOption('to', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Címzett(ek) — alap: FLEET_REPORT_TO')
             ->addOption('cc', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Másolat — alap: FLEET_REPORT_CC')
+            ->addOption('variant', null, InputOption::VALUE_REQUIRED, 'internal = a flotta vezetőjének · client = B2B, a szerviz arculatával (FLEET_REPORT_CLIENT_TO, FLEET_REPORT_BRAND)', 'internal')
+            ->addOption('brand', null, InputOption::VALUE_REQUIRED, 'Márka-fájl a client változathoz — alap: FLEET_REPORT_BRAND, különben config/fleet-report/brand.json')
             ->addOption('no-csv', null, InputOption::VALUE_NONE, 'Csak PDF, CSV nélkül')
             ->addOption('if-due', null, InputOption::VALUE_NONE, 'Csak ha elérkezett a küldés ideje (FLEET_REPORT_DAY, FLEET_REPORT_HOUR) — az ütemezőnek')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Nem küld: a PDF-et, CSV-t és HTML-t az --out mappába írja')
@@ -68,6 +79,18 @@ final class FleetReportSendCommand extends Command
         try {
             $now = new \DateTimeImmutable((string) ($input->getOption('now') ?? 'now'), $tz);
             $period = $input->getOption('period') ? Period::parse((string) $input->getOption('period')) : Period::lastClosed('month', $now);
+            $variant = (string) $input->getOption('variant');
+            if (!\in_array($variant, ['internal', 'client'], true)) {
+                throw new \InvalidArgumentException('--variant: internal | client');
+            }
+            $client = 'client' === $variant;
+            $to = self::strings($input->getOption('to')) ?: self::strings($client ? $this->clientTo : $this->defaultTo);
+            $cc = self::strings($input->getOption('cc')) ?: self::strings($client ? $this->clientCc : $this->defaultCc);
+            if ($input->getOption('if-due') && !$to && !$input->getOption('dry-run')) {
+                $io->writeln(\sprintf('A %s riportnak nincs címzettje (%s) — kihagyva.', $variant, $client ? 'FLEET_REPORT_CLIENT_TO' : 'FLEET_REPORT_TO'));
+
+                return Command::SUCCESS;
+            }
 
             if ($input->getOption('if-due')) {
                 $day = max(1, min(28, (int) ($this->day ?: 1)));
@@ -93,8 +116,14 @@ final class FleetReportSendCommand extends Command
                     $snapshot->generatedAt->format('Y-m-d'), $period->end()->format('Y-m-d'), $period->label()));
             }
 
+            $brand = null;
+            if ($client) {
+                $bf = (string) ($input->getOption('brand') ?: $this->brandFile ?: 'config/fleet-report/brand.json');
+                $brand = Brand::fromFile(str_starts_with($bf, '/') ? $bf : $this->projectDir.'/'.$bf);
+            }
+
             if ($input->getOption('dry-run')) {
-                $f = $this->sender->render($snapshot, $period);
+                $f = $this->sender->render($snapshot, $period, $brand);
                 $dir = (string) $input->getOption('out');
                 if (!str_starts_with($dir, '/')) {
                     $dir = $this->projectDir.'/'.$dir;
@@ -102,26 +131,26 @@ final class FleetReportSendCommand extends Command
                 if (!is_dir($dir) && !mkdir($dir, 0770, true) && !is_dir($dir)) {
                     throw new \RuntimeException('A kimeneti mappa nem hozható létre: '.$dir);
                 }
-                $stem = $dir.'/'.$f['report']->fileStem();
+                $stem = $dir.'/'.$f['stem'];
                 file_put_contents($stem.'.pdf', $f['pdf']);
                 file_put_contents($stem.'.csv', $f['csv']);
                 file_put_contents($stem.'.html', $f['html']);
-                $io->success(\sprintf('%s · %s · %s (%s%% din buget) · %d decizii → %s.{pdf,csv,html}',
-                    $f['report']->fleetName, $period->label(), Money::lei($f['report']->totals->total()),
-                    Money::num($f['report']->budgetPct()), $f['report']->openDecisions(), $stem));
+                $io->success(null === $brand
+                    ? \sprintf('%s · %s · %s (%s%% din buget) · %d decizii → %s.{pdf,csv,html}', $f['report']->fleetName, $period->label(),
+                        Money::lei($f['report']->totals->total()), Money::num($f['report']->budgetPct()), $f['report']->openDecisions(), $stem)
+                    : \sprintf('B2B · %s → %s · %s · %d recomandări → %s.{pdf,csv,html}', $brand->name, $f['report']->fleetName, $period->label(),
+                        \count(ClientActions::for($f['report'], $brand)), $stem));
 
                 return Command::SUCCESS;
             }
 
-            $to = self::strings($input->getOption('to')) ?: self::strings($this->defaultTo);
-            $cc = self::strings($input->getOption('cc')) ?: self::strings($this->defaultCc);
-            $res = $this->sender->send($snapshot, $period, $to, $cc, !$input->getOption('no-csv'), (bool) $input->getOption('force'));
+            $res = $this->sender->send($snapshot, $period, $to, $cc, !$input->getOption('no-csv'), (bool) $input->getOption('force'), $brand);
             if ('already_sent' === $res['status']) {
-                $io->writeln(\sprintf('Már kiment: %s · %s (%s). Újraküldés: --force.', $snapshot->fleetName, $period->label(), $res['sentAt'] ?? ''));
+                $io->writeln(\sprintf('Már kiment (%s): %s · %s (%s). Újraküldés: --force.', $variant, $snapshot->fleetName, $period->label(), $res['sentAt'] ?? ''));
 
                 return Command::SUCCESS;
             }
-            $io->success(\sprintf('Elküldve: %s · %s → %s', $snapshot->fleetName, $period->label(), implode(', ', FleetReportSender::addresses(array_merge($to, $cc), 'to'))));
+            $io->success(\sprintf('Elküldve (%s): %s · %s → %s', $variant, $snapshot->fleetName, $period->label(), implode(', ', FleetReportSender::addresses(array_merge($to, $cc), 'to'))));
 
             return Command::SUCCESS;
         } catch (\InvalidArgumentException $e) {

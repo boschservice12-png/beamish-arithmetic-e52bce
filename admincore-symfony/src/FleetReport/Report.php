@@ -9,12 +9,12 @@ namespace App\FleetReport;
 final class Report
 {
     /**
-     * @param list<array{plate: string, model: string, driver: string, totals: CostTotals, budget: float, budgetPct: float, baseline: float|null, vsBaseline: float|null}> $vehicles
+     * @param list<array{plate: string, model: string, driver: string, tyres: array{status: string, minMm: float, season: string, replaceBy: string|null}|null, totals: CostTotals, budget: float, budgetPct: float, baseline: float|null, vsBaseline: float|null}> $vehicles
      * @param list<array{month: string, label: string, total: float, over: bool}> $trend
      * @param list<array{cat: string, sub: string, net: float, pct: float}> $bySub
      * @param list<array{plate: string, month: string, kind: string, detail: string}> $exceptions
      * @param list<array{plate: string, date: string, type: string, cost: float}> $operations
-     * @param array{tyres: array{ok: int, soon: int, now: int}, blocked: list<string>, summerTyresInWinter: list<string>, documents: list<array{label: string, for: string, due: string, expired: bool}>, tyreOrders3m: array{count: int, cost: float}, setsWithoutProof: int} $state
+     * @param array{tyres: array{ok: int, soon: int, now: int}, blocked: list<string>, summerTyresInWinter: list<string>, documents: list<array{label: string, for: string, due: string, expired: bool}>, tyreOrders3m: array{count: int, cost: float}, setsWithoutProof: int, storedSets: int} $state
      * @param list<array{level: string, text: string}> $decisions
      * @param list<string> $overBudget
      */

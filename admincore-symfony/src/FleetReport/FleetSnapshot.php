@@ -16,11 +16,11 @@ final class FleetSnapshot
 
     /**
      * @param array{fleetMonth: float, fleetYear: float|null, vehicleMonth: float, warnPct: float, vehicles: array<string, float>} $budget
-     * @param array<string, array{plate: string, model: string, driver: string}> $vehicles
+     * @param array<string, array{plate: string, model: string, driver: string, tyres: array{status: string, minMm: float, season: string, replaceBy: string|null}|null}> $vehicles
      * @param list<array{plate: string, month: string, date: string, cat: string, sub: string, net: float, liters: float, km: float}> $costs
      * @param list<array{plate: string, month: string, kind: string, detail: string}> $exceptions
      * @param list<array{plate: string, date: string, type: string, cost: float}> $operations
-     * @param array{tyres: array{ok: int, soon: int, now: int}, blocked: list<string>, summerTyresInWinter: list<string>, documents: list<array{label: string, for: string, due: string, expired: bool}>, tyreOrders3m: array{count: int, cost: float}, setsWithoutProof: int} $state
+     * @param array{tyres: array{ok: int, soon: int, now: int}, blocked: list<string>, summerTyresInWinter: list<string>, documents: list<array{label: string, for: string, due: string, expired: bool}>, tyreOrders3m: array{count: int, cost: float}, setsWithoutProof: int, storedSets: int} $state
      */
     private function __construct(
         public readonly string $fleetId,
@@ -93,7 +93,8 @@ final class FleetSnapshot
             if (isset($vehicles[$p])) {
                 throw new \InvalidArgumentException("vehicles[$i]: a rendszám kétszer szerepel ($p).");
             }
-            $vehicles[$p] = ['plate' => $p, 'model' => self::str($v, 'model', "vehicles[$i].model", true), 'driver' => self::str($v, 'driver', "vehicles[$i].driver", true)];
+            $vehicles[$p] = ['plate' => $p, 'model' => self::str($v, 'model', "vehicles[$i].model", true), 'driver' => self::str($v, 'driver', "vehicles[$i].driver", true),
+                'tyres' => \is_array($v['tyres'] ?? null) ? self::tyres($v['tyres'], "vehicles[$i].tyres") : null];
         }
         if (!$vehicles) {
             throw new \InvalidArgumentException('vehicles: legalább egy jármű kell.');
@@ -162,6 +163,7 @@ final class FleetSnapshot
             'documents' => $docs,
             'tyreOrders3m' => ['count' => self::int($orders['count'] ?? 0), 'cost' => self::num($orders['cost'] ?? 0, 'state.tyreOrders3m.cost')],
             'setsWithoutProof' => self::int($s['setsWithoutProof'] ?? 0),
+            'storedSets' => self::int($s['storedSets'] ?? 0),
         ];
 
         return new self($id, self::str($fleet, 'name', 'fleet.name'), $generated, $budget, $vehicles, $costs, $exceptions, $operations, $state);
@@ -246,6 +248,32 @@ final class FleetSnapshot
         }
 
         return $f;
+    }
+
+    /**
+     * Opcionális, járművenkénti gumiállapot (a B2B riporthoz): status ok|soon|now, legkisebb mm, évszak, csere várható dátuma.
+     *
+     * @param array<mixed> $t
+     *
+     * @return array{status: string, minMm: float, season: string, replaceBy: string|null}
+     */
+    private static function tyres(array $t, string $where): array
+    {
+        $status = $t['status'] ?? null;
+        if (!\in_array($status, ['ok', 'soon', 'now'], true)) {
+            throw new \InvalidArgumentException("$where.status: ok | soon | now.");
+        }
+        $season = $t['season'] ?? null;
+        if (!\in_array($season, ['vara', 'iarna'], true)) {
+            throw new \InvalidArgumentException("$where.season: vara | iarna.");
+        }
+        $by = $t['replaceBy'] ?? null;
+        if (null !== $by) {
+            $by = self::str($t, 'replaceBy', "$where.replaceBy");
+            self::date($by, "$where.replaceBy");
+        }
+
+        return ['status' => $status, 'minMm' => self::num($t['minMm'] ?? null, "$where.minMm"), 'season' => $season, 'replaceBy' => $by];
     }
 
     private static function int(mixed $v): int

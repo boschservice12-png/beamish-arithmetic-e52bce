@@ -16,82 +16,178 @@
   {
    "plate": "MS 81 DSN",
    "model": "SKODA OCTAVIA",
-   "driver": "Andrei P."
+   "driver": "Andrei P.",
+   "tyres": {
+    "status": "soon",
+    "minMm": 3.5,
+    "season": "vara",
+    "replaceBy": "2027-01-05"
+   }
   },
   {
    "plate": "TM 53 DMC",
    "model": "SKODA OCTAVIA",
-   "driver": "Bogdan M."
+   "driver": "Bogdan M.",
+   "tyres": {
+    "status": "ok",
+    "minMm": 6.4,
+    "season": "iarna",
+    "replaceBy": "2027-11-27"
+   }
   },
   {
    "plate": "TM 12 HZM",
    "model": "RENAULT KANGOO",
-   "driver": "Csaba K."
+   "driver": "Csaba K.",
+   "tyres": {
+    "status": "soon",
+    "minMm": 3.9,
+    "season": "vara",
+    "replaceBy": "2027-02-07"
+   }
   },
   {
    "plate": "MS 44 VUK",
    "model": "FORD TRANSIT",
-   "driver": "Dan I."
+   "driver": "Dan I.",
+   "tyres": {
+    "status": "ok",
+    "minMm": 4.7,
+    "season": "iarna",
+    "replaceBy": "2027-03-02"
+   }
   },
   {
    "plate": "CJ 31 BZT",
    "model": "SKODA OCTAVIA",
-   "driver": "Elena S."
+   "driver": "Elena S.",
+   "tyres": {
+    "status": "ok",
+    "minMm": 5.6,
+    "season": "iarna",
+    "replaceBy": "2027-09-30"
+   }
   },
   {
    "plate": "MS 47 NSC",
    "model": "SKODA OCTAVIA",
-   "driver": "Florin T."
+   "driver": "Florin T.",
+   "tyres": {
+    "status": "ok",
+    "minMm": 6.7,
+    "season": "iarna",
+    "replaceBy": "2027-09-05"
+   }
   },
   {
    "plate": "TM 69 CLU",
    "model": "DACIA LOGAN",
-   "driver": "Gabriel R."
+   "driver": "Gabriel R.",
+   "tyres": {
+    "status": "now",
+    "minMm": 2.5,
+    "season": "iarna",
+    "replaceBy": "2026-11-01"
+   }
   },
   {
    "plate": "IS 93 SHG",
    "model": "RENAULT KANGOO",
-   "driver": "Horia V."
+   "driver": "Horia V.",
+   "tyres": {
+    "status": "soon",
+    "minMm": 6.5,
+    "season": "iarna",
+    "replaceBy": "2027-05-26"
+   }
   },
   {
    "plate": "MS 76 PNH",
    "model": "DACIA LOGAN",
-   "driver": "Ioana D."
+   "driver": "Ioana D.",
+   "tyres": {
+    "status": "soon",
+    "minMm": 6.1,
+    "season": "vara",
+    "replaceBy": "2027-07-16"
+   }
   },
   {
    "plate": "MS 25 ZBS",
    "model": "SKODA OCTAVIA",
-   "driver": "Levente B."
+   "driver": "Levente B.",
+   "tyres": {
+    "status": "soon",
+    "minMm": 4.2,
+    "season": "iarna",
+    "replaceBy": "2027-03-15"
+   }
   },
   {
    "plate": "B 60 XNU",
    "model": "FORD TRANSIT",
-   "driver": "Marius C."
+   "driver": "Marius C.",
+   "tyres": {
+    "status": "soon",
+    "minMm": 3.6,
+    "season": "vara",
+    "replaceBy": "2026-12-28"
+   }
   },
   {
    "plate": "TM 74 AEJ",
    "model": "DACIA LOGAN",
-   "driver": "Nicolae F."
+   "driver": "Nicolae F.",
+   "tyres": {
+    "status": "ok",
+    "minMm": 4.8,
+    "season": "iarna",
+    "replaceBy": "2027-03-27"
+   }
   },
   {
    "plate": "IS 55 UFJ",
    "model": "RENAULT KANGOO",
-   "driver": "Ovidiu G."
+   "driver": "Ovidiu G.",
+   "tyres": {
+    "status": "ok",
+    "minMm": 6.6,
+    "season": "iarna",
+    "replaceBy": "2027-05-18"
+   }
   },
   {
    "plate": "MS 59 KXR",
    "model": "DACIA LOGAN",
-   "driver": "Paul H."
+   "driver": "Paul H.",
+   "tyres": {
+    "status": "now",
+    "minMm": 1.9,
+    "season": "iarna",
+    "replaceBy": "2026-11-01"
+   }
   },
   {
    "plate": "MS 83 BSG",
    "model": "DACIA LOGAN",
-   "driver": "Radu L."
+   "driver": "Radu L.",
+   "tyres": {
+    "status": "soon",
+    "minMm": 3.4,
+    "season": "vara",
+    "replaceBy": "2026-12-18"
+   }
   },
   {
    "plate": "B 14 HDB",
    "model": "DACIA LOGAN",
-   "driver": "Sorin N."
+   "driver": "Sorin N.",
+   "tyres": {
+    "status": "ok",
+    "minMm": 4.5,
+    "season": "iarna",
+    "replaceBy": "2027-02-28"
+   }
   }
  ],
  "costs": [
@@ -3722,6 +3818,7 @@
    "count": 5,
    "cost": 8600
   },
-  "setsWithoutProof": 3
+  "setsWithoutProof": 3,
+  "storedSets": 15
  }
 }

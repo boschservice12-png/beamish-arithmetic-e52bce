@@ -344,7 +344,7 @@ details summary{cursor:pointer;font-weight:700;font-size:.9rem;margin-top:6px}
     <div>
       <div class="eyebrow">TyreFleet · Flottamodul · demó, éles adat nélkül</div>
       <h1>Flotta: Ce facem azi csempékkel — lejáratok, gumik, sofőrök, pénzügy egy rendszerben</h1>
-      <p class="lead">A flotta-manager külön ablaka (és ugyanez a telefonján): a cég engedélyei (ISCIR, RAR, földelés, környezetvédelmi, ISCTR, ISU…), az autók papírjai (RCA, ITP, rovinietă, tahográf, ATP hűtőkocsi…), a sofőrök dokumentumai (személyi, jogosítvány, atestat, orvosi…) és a műszaki emlékeztetők beállítása — plusz a gumikezelés. Lejárat előtt push megy; a sofőr az appjában fotóval tölti fel az új dokumentumot, a manager jóváhagyja. Új (v10): <b>Raport lunar</b> — havi vezetői riport (költség vs keret, lei/km, fogyasztás, kivételek, jövő havi teendők), PDF-be nyomtatható, CSV-be exportálható, és minden hónap elején automatikusan megy a managernek. Kitalált cég, autók és helyek; semmi nem megy szerverre.</p>
+      <p class="lead">A flotta-manager külön ablaka (és ugyanez a telefonján): a cég engedélyei (ISCIR, RAR, földelés, környezetvédelmi, ISCTR, ISU…), az autók papírjai (RCA, ITP, rovinietă, tahográf, ATP hűtőkocsi…), a sofőrök dokumentumai (személyi, jogosítvány, atestat, orvosi…) és a műszaki emlékeztetők beállítása — plusz a gumikezelés. Lejárat előtt push megy; a sofőr az appjában fotóval tölti fel az új dokumentumot, a manager jóváhagyja. Új (v10–v11): <b>Raport lunar</b> belső és <b>B2B</b> változatban (a szerviz arculatával az ügyfélnek) — havi vezetői riport (költség vs keret, lei/km, fogyasztás, kivételek, jövő havi teendők), PDF-be nyomtatható, CSV-be exportálható, és minden hónap elején automatikusan megy a managernek. Kitalált cég, autók és helyek; semmi nem megy szerverre.</p>
     </div>
     <div class="pills"><span class="tag">STANDALONE DEMÓ</span><button class="btn gray sm" data-act="reset">↺ Újrakezdés</button></div>
   </header>
@@ -395,6 +395,11 @@ details summary{cursor:pointer;font-weight:700;font-size:.9rem;margin-top:6px}
       <li>Kivételek: kereten felüli autók, fogyasztási anomália, tankolás ≠ km, gumi, lejárt papír</li>
       <li>Jövő hónap: lejáratok 30 napon belül, szettrendelés költséggel, döntési lista</li>
       <li>Export: PDF (A4 nyomtatás) · CSV (Excel, „;”) · automatikus küldés minden hónap 1-jén</li></ul></div>
+    <div class="bcard"><b>B2B riport (v11)</b><ul>
+      <li>Ugyanaz az adat, a szerviz arculatával: név, CUI, elérhetőség, szín</li>
+      <li>Csak ami az ügyfélre tartozik: műveletek, gumiállapot autónként, depó, ajánlások</li>
+      <li>Keret, üzemanyag-gyanú, sofőrnév nem megy ki az ügyfélnek</li>
+      <li>Csak a bejelölt szolgáltatást ajánlja (ITP csak RAR-engedéllyel)</li></ul></div>
   </section>
 </div>
 <div class="modal" id="modal" hidden><div class="mbox" id="mbox" role="dialog" aria-modal="true"></div></div>
@@ -1597,7 +1602,8 @@ const nextOf = m => { const d = new Date(+m.slice(0, 4), +m.slice(5), 1); return
 const p2 = n => String(n).padStart(2, '0');
 function repDefaults() {
   const at = (m, day, hour) => p2(day) + '.' + nextOf(m).slice(5) + '.' + nextOf(m).slice(0, 4) + ' ' + hour;
-  return { m: MONTHS[11], on: true, to: 'flota@exemplu.ro', cc: 'contabilitate@exemplu.ro', day: 1, hour: '08:00', pdf: true, csv: true, push: true,
+  return { m: MONTHS[11], view: 'int', on: true, to: 'flota@exemplu.ro', cc: 'contabilitate@exemplu.ro', day: 1, hour: '08:00', pdf: true, csv: true, push: true,
+    clientTo: 'achizitii@exemplu.ro', brand: { name: 'Red Assistance', legal: 'SC RED ASSISTANCE SRL', cui: '47746920', phone: '', email: 'contact@redassistance.net', web: 'redassistance.net', color: '#c8102e', services: { anvelope: true, depozitare: true, itp: false } },
     sent: [MONTHS[10], MONTHS[9], MONTHS[8]].map(m => ({ m, at: at(m, 1, '08:00'), to: 'flota@exemplu.ro, contabilitate@exemplu.ro', auto: true })) };
 }
 function repAgg(rows) {
@@ -1649,8 +1655,10 @@ function repDecisions(R) {
 }
 const dlt = (a, b) => { if (b == null || !b) return '<span class="dlt eq">—</span>'; const d = (a / b - 1) * 100; return '<span class="dlt ' + (Math.abs(d) < 1 ? 'eq' : d > 0 ? 'up' : 'dn') + '">' + (d > 0 ? '+' : '') + d.toFixed(Math.abs(d) < 10 ? 1 : 0).replace('.', ',') + '%</span>'; };
 const dec2 = (x, n) => x == null ? '—' : x.toFixed(n).replace('.', ',');
+const repViewSw = () => '<div class="seg noprint" style="max-width:340px" role="tablist" aria-label="Variantă raport">' + [['int', 'Intern · manager flotă'], ['cli', 'Client (B2B) · arcul service']].map(x => '<button class="segb' + (S.rep.view === x[0] ? ' on' : '') + '" data-act="repView" data-val="' + x[0] + '" role="tab" aria-selected="' + (S.rep.view === x[0]) + '">' + x[1] + '</button>').join('') + '</div>';
 function vRaport() {
   if (!REP_MONTHS.includes(S.rep.m)) S.rep.m = MONTHS[11];
+  if (S.rep.view === 'cli') return repViewSw() + vRaportClient();
   const R = repData(S.rep.m), c = R.cur, p = R.prev, dec = repDecisions(R);
   const bPct = c.total / R.budget * 100, top = R.veh[0];
   const maxT = Math.max(1, R.budget, ...R.trend.map(x => x[1]));
@@ -1662,7 +1670,7 @@ function vRaport() {
     + (R.overBud.length ? '<b>' + R.overBud.length + '</b> vehicule peste buget. ' : 'Toate vehiculele în buget. ')
     + (R.anom.length + R.fills.length ? '<b>' + (R.anom.length + R.fills.length) + '</b> semnale de combustibil de verificat.' : 'Fără anomalii de combustibil.');
   const nextSend = new Date(TODAY.getFullYear(), TODAY.getMonth() + 1, S.rep.day);
-  return '<div class="filters noprint"><label class="f">Luna raportată<select class="sel" id="repM">' + REP_MONTHS.slice().reverse().map(m => '<option value="' + m + '"' + (m === S.rep.m ? ' selected' : '') + '>' + mLabel(m) + '</option>').join('') + '</select></label>'
+  return repViewSw() + '<div class="filters noprint"><label class="f">Luna raportată<select class="sel" id="repM">' + REP_MONTHS.slice().reverse().map(m => '<option value="' + m + '"' + (m === S.rep.m ? ' selected' : '') + '>' + mLabel(m) + '</option>').join('') + '</select></label>'
     + '<button class="btn sm" data-act="repPrint">Tipărește / PDF</button><button class="btn gray sm" data-act="repCsv">Export CSV</button><button class="btn gray sm" data-act="repSend">Trimite acum</button><button class="btn gray sm" data-act="repJson" title="Pentru trimiterea reală de pe server (app:fleet-report:send)">Date JSON (server)</button>'
     + '<span class="note">' + (S.rep.on ? 'Automat: pe ' + S.rep.day + ' ale lunii la ' + esc(S.rep.hour) + ' · următorul ' + fmtD(nextSend) + ' (' + mLabel(MONTHS[12]) + ')' : 'Trimiterea automată e oprită') + '</span></div>'
     + '<div class="rep" id="rep">'
@@ -1700,6 +1708,66 @@ function vRaport() {
     + '<div class="rfoot">Sursa: TyreFleet · facturi introduse sau importate, decont card carburant, alimentări cu km, fișe TyreFleet, aplicația șoferului. Costuri și km = luna raportată; starea flotei = la data generării. TyreFleet nu emite facturi — este evidența costurilor. Document generat automat, fără date personale (CNP, date medicale).</div>'
     + '</div>'
     + repSettings();
+}
+/* ── B2B (v11): the same data, as the service sends it to the fleet client — the service's brand, only what concerns the
+ * client (operations, tyre state, storage, recommendations), no budget, fuel suspicion or driver names. Server twin:
+ * app:fleet-report:send --variant=client (ClientActions.php — same rules). ── */
+function clientActions(R) {
+  const b = S.rep.brand, sv = b.services, out = [];
+  const byLvl = l => S.veh.filter(v => status(v).lvl === l).map(v => v.plate);
+  const list = p => p.slice(0, 6).join(', ') + (p.length > 6 ? ' și încă ' + (p.length - 6) : '');
+  const now = byLvl('red'), soon = byLvl('amb');
+  if (sv.anvelope && now.length) out.push(['red', now.length + ' vehicule (' + list(now) + ') au anvelope sub pragul de siguranță — recomandăm înlocuirea înainte de următoarea cursă. Vă trimitem oferta la cerere.']);
+  if (sv.anvelope && R.season.length) out.push(['red', R.season.length + ' vehicule circulă încă pe anvelope de vară (' + list(R.season.map(v => v.plate)) + ') — programați schimbul sezonier.']);
+  if (sv.anvelope && R.order3.length) out.push(['amb', R.order3.length + ' seturi ajung la limită în următoarele 3 luni (estimat ' + lei(R.order3Cost) + ' fără TVA) — rezervarea din timp asigură dimensiunea și prețul.']);
+  if (sv.depozitare && R.badSets.length) out.push(['amb', R.badSets.length + ' seturi nu au un depozit confirmat — le putem prelua în depozitul nostru, cu etichetă QR, fișă de evaluare și foto la predare.']);
+  const itp = R.exp.concat(R.soon).filter(it => it.k === 'itp');
+  if (sv.itp && itp.length) out.push([itp.some(it => remState(it).lvl === 'red') ? 'red' : 'amb', itp.length + ' ITP în următoarele 30 de zile — vă putem face programarea.']);
+  if (sv.anvelope && soon.length) out.push(['amb', soon.length + ' vehicule se apropie de pragul de schimb (' + list(soon) + ') — le verificăm la următoarea vizită.']);
+  if (!out.length) out.push(['ok', 'Flota dumneavoastră este în regulă pentru perioada următoare. Vă anunțăm din timp când apare ceva.']);
+  return out;
+}
+function vRaportClient() {
+  const R = repData(S.rep.m), b = S.rep.brand, acts = clientActions(R), col = b.color;
+  const n = R.tyres, stored = S.sets.filter(s => s.where.t === 'loc').length, opsCost = sum(R.ops, o => o.cost || 0);
+  const contact = [b.phone, b.email, b.web].filter(Boolean).join(' · ');
+  const rank = { red: 0, amb: 1, ok: 2 };
+  const veh = S.veh.slice().sort((a, c) => rank[status(a).lvl] - rank[status(c).lvl] || a.plate.localeCompare(c.plate));
+  const lbl = { red: 'schimb acum', amb: 'curând', ok: 'în regulă' }, pl = { red: 'red', amb: 'amb', ok: 'ok' };
+  return '<div class="filters noprint"><label class="f">Luna raportată<select class="sel" id="repM">' + REP_MONTHS.slice().reverse().map(m => '<option value="' + m + '"' + (m === S.rep.m ? ' selected' : '') + '>' + mLabel(m) + '</option>').join('') + '</select></label>'
+    + '<button class="btn sm" data-act="repPrint">Tipărește / PDF</button><button class="btn gray sm" data-act="repSendCli">Trimite clientului</button><span class="note">către ' + esc(S.rep.clientTo || '—') + ' · din partea ' + esc(b.name) + '</span></div>'
+    + '<div class="rep" id="rep">'
+    + '<div class="rhead" style="border-bottom-color:' + esc(col) + '"><div><div style="font-family:var(--f-disp);font-size:1.5rem;font-weight:700;color:' + esc(col) + '">' + esc(b.name) + '</div></div><div class="note" style="text-align:right">' + esc(b.legal) + (b.cui ? ' · CUI ' + esc(b.cui) : '') + '<br>' + esc(contact) + '</div></div>'
+    + '<div><div class="eyebrow" style="color:' + esc(col) + '">Raport flotă · lunar</div><h2 style="font-size:1.6rem">Curier Demo SRL · ' + mLabel(R.m) + '</h2></div>'
+    + '<p class="rsum">' + (R.ops.length ? 'În ' + mLabel(R.m) + ' am efectuat <b>' + R.ops.length + '</b> operațiuni pentru flota dumneavoastră' + (opsCost ? ' (<b>' + lei(opsCost) + '</b> fără TVA)' : '') + '. ' : 'Starea flotei dumneavoastră după ' + mLabel(R.m) + '. ')
+    + 'Din ' + S.veh.length + ' vehicule: <b>' + n.ok + '</b> în regulă, <b>' + n.amb + '</b> se apropie de schimb, <b>' + n.red + '</b> necesită schimb acum.' + (stored ? ' <b>' + stored + '</b> seturi sunt depozitate.' : '') + '</p>'
+    + '<div class="kpis"><div class="kpi"><span class="v">' + R.ops.length + '</span><span class="l">operațiuni în perioadă</span></div><div class="kpi' + (n.red ? ' red' : ' ok') + '"><span class="v">' + n.red + '</span><span class="l">vehicule cu anvelope de schimbat acum</span></div><div class="kpi' + (R.season.length ? ' red' : ' ok') + '"><span class="v">' + R.season.length + '</span><span class="l">pe anvelope de vară iarna</span></div><div class="kpi"><span class="v">' + R.order3.length + '</span><span class="l">seturi noi în 3 luni · ' + lei(R.order3Cost) + '</span></div></div>'
+    + '<div class="card" style="border-color:' + esc(col) + '"><h3 style="color:' + esc(col) + '">Ce vă recomandăm</h3>' + acts.map((a, k) => '<div class="dec ' + a[0] + '"><span class="n">' + (a[0] === 'ok' ? '✓' : k + 1) + '</span><span>' + esc(a[1]) + '</span></div>').join('') + '</div>'
+    + '<div class="card"><h3>Starea anvelopelor pe vehicul · la ' + fmtD(TODAY) + '</h3><div class="tscroll"><table class="tbl"><tr><th>Vehicul</th><th class="hide-s">Model</th><th>Sezon</th><th class="r">Min. mm</th><th>Stare</th><th class="r">Schimb estimat</th></tr>'
+    + veh.map(v => { const st = status(v), w = wear(v), sz = mounted(v).sez; return '<tr class="click" data-act="veh" data-id="' + v.id + '"><td class="mm"><b>' + esc(v.plate) + '</b></td><td class="hide-s note">' + esc(v.model) + '</td><td>' + SEZ[sz] + (WINTER && sz === 'vara' ? ' ⚠' : '') + '</td><td class="r mm">' + w.minMm.toFixed(1) + '</td><td><span class="pill ' + pl[st.lvl] + '">' + lbl[st.lvl] + '</span></td><td class="r">' + (w.kmLeft < 1 ? fmtD(TODAY) : fmtD(w.date)) + '</td></tr>'; }).join('')
+    + '</table></div><div class="note">Praguri de schimb: vară 2,5 mm · iarnă 3,0 mm · utilitare 2,5 mm (minim legal 1,6 mm). „Schimb estimat” = din uzura măsurată și kilometrajul lunar.</div></div>'
+    + '<div class="card"><h3>Operațiuni efectuate · ' + mLabel(R.m) + '</h3>' + (R.ops.length ? '<table class="tbl">' + R.ops.map(o => '<tr><td class="mm">' + esc(o.d) + '</td><td class="mm">' + esc(V(o.v).plate) + '</td><td>' + esc(o.type) + '</td><td class="r money">' + (o.cost ? lei(o.cost) : '—') + '</td></tr>').join('') + '</table>' : '<div class="note">Nicio operațiune în această perioadă.</div>') + '</div>'
+    + (contact ? '<div style="background:' + esc(col) + ';color:#fff;border-radius:10px;padding:11px 14px;font-weight:600">Programări și oferte: <b>' + esc(contact) + '</b></div>' : '')
+    + '<div class="rfoot">Raport întocmit de ' + esc(b.legal) + (b.cui ? ' (CUI ' + esc(b.cui) + ')' : '') + ' pentru Curier Demo SRL, din datele înregistrate în TyreFleet. Starea anvelopelor este la data generării; estimările nu înlocuiesc verificarea la service. Fără buget intern, consum de combustibil sau nume de șoferi — acestea rămân doar în raportul intern.</div>'
+    + '</div>'
+    + '<div class="card noprint"><h3>Arcul service-ului (B2B)</h3><div class="three">'
+    + '<label class="f">Nume afișat<input class="inp" id="bnN" value="' + esc(b.name) + '"></label><label class="f">Denumire legală<input class="inp" id="bnL" value="' + esc(b.legal) + '"></label><label class="f">CUI<input class="inp" id="bnC" value="' + esc(b.cui) + '"></label>'
+    + '<label class="f">Telefon<input class="inp" id="bnP" value="' + esc(b.phone) + '" placeholder="opțional"></label><label class="f">E-mail (răspunsurile vin aici)<input class="inp" id="bnE" value="' + esc(b.email) + '"></label><label class="f">Web<input class="inp" id="bnW" value="' + esc(b.web) + '"></label>'
+    + '<label class="f">Culoare<input class="inp" id="bnK" type="color" value="' + esc(col) + '" style="min-height:40px"></label><label class="f">Trimite clientului la<input class="inp" id="bnT" value="' + esc(S.rep.clientTo) + '"></label>'
+    + '<div class="f">Servicii oferite<label class="chk"><input type="checkbox" id="bsA"' + (b.services.anvelope ? ' checked' : '') + '> anvelope</label><label class="chk"><input type="checkbox" id="bsD"' + (b.services.depozitare ? ' checked' : '') + '> depozitare</label><label class="chk"><input type="checkbox" id="bsI"' + (b.services.itp ? ' checked' : '') + '> ITP (doar cu autorizație RAR)</label></div></div>'
+    + '<div class="miss" id="bnErr"></div><div class="pills"><button class="btn sm" data-act="brandSave">Salvează arcul</button><span class="note">Pe server: <span class="mm">config/fleet-report/brand.json</span> + <span class="mm">FLEET_REPORT_CLIENT_TO</span>. Recomandările apar doar pentru serviciile bifate.</span></div></div>';
+}
+function brandSave() {
+  const g = id => $(id).value.trim(), name = g('bnN'), email = g('bnE'), to = g('bnT'), col = $('bnK').value;
+  const okMail = x => /^[^\s@,;]+@[^\s@,;]+\.[a-z]{2,}$/i.test(x);
+  if (name.length < 2) { $('bnErr').textContent = 'Numele afișat: min. 2 caractere.'; return; }
+  if (email && !okMail(email)) { $('bnErr').textContent = 'E-mail invalid.'; return; }
+  if (to && to.split(',').map(x => x.trim()).some(x => !okMail(x))) { $('bnErr').textContent = 'Destinatar invalid (ex. achizitii@client.ro).'; return; }
+  if (!/^#[0-9a-f]{6}$/i.test(col)) { $('bnErr').textContent = 'Culoare #RRGGBB.'; return; }
+  Object.assign(S.rep.brand, { name: name.slice(0, 60), legal: (g('bnL') || name).slice(0, 120), cui: g('bnC').slice(0, 20), phone: g('bnP').slice(0, 30), email, web: g('bnW').slice(0, 80), color: col.toLowerCase(), services: { anvelope: $('bsA').checked, depozitare: $('bsD').checked, itp: $('bsI').checked } });
+  S.rep.clientTo = to;
+  log('Flotă · manager', 'Arcul raportului B2B: ' + S.rep.brand.name + ' · ' + S.rep.brand.color + (to ? ' → ' + to : ''));
+  toast('Arcul salvat'); render();
 }
 function repSettings() {
   return '<div class="card noprint"><h3>Trimitere automată</h3><div class="three">'
@@ -1750,7 +1818,7 @@ function repSnapshot() {
     fleet: { id: 'curier-demo', name: 'Curier Demo SRL' },
     generatedAt: iso(TODAY),
     budget: { fleetMonth: S.bud.fleetM, fleetYear: S.bud.fleetY, vehicleMonth: S.bud.vehM, warnPct: S.bud.warn, vehicles: Object.fromEntries(Object.entries(S.bud.veh).map(([id, b]) => [V(id).plate, b])) },
-    vehicles: S.veh.map(v => ({ plate: v.plate, model: v.model, driver: v.drv })),
+    vehicles: S.veh.map(v => { const st = status(v), w = wear(v); return { plate: v.plate, model: v.model, driver: v.drv, tyres: { status: { ok: 'ok', amb: 'soon', red: 'now' }[st.lvl], minMm: w.minMm, season: mounted(v).sez, replaceBy: iso(w.kmLeft < 1 ? TODAY : w.date) } }; }),
     costs: costRows().sort((a, b) => a.date - b.date).map(x => ({ plate: V(x.v).plate, date: iso(x.date), cat: x.cat, sub: x.sub, net: r2(x.net), liters: x.l || 0, km: x.km || 0 })),
     exceptions: fuelAnomalies().map(a => ({ plate: a.v.plate, month: a.m, kind: 'fuel_anomaly', detail: 'Consum ' + a.c.toFixed(1) + ' l/100 km · media ' + a.avg.toFixed(1) + ' (+' + Math.round(100 * (a.c / a.avg - 1)) + '%)' }))
       .concat(fillChecks().map(c => c.o ? { plate: c.v.plate, month: mOf(c.o.f.date), kind: 'fill_check', detail: fmtD(c.o.f.date) + ' · ' + c.o.f.l + ' l · ' + c.o.flags.join(' · ') } : { plate: c.v.plate, month: c.mm.m, kind: 'km_mismatch', detail: 'decont ' + kmf(c.mm.decl) + ' ≠ calculat ' + kmf(c.mm.calc) })),
@@ -1762,6 +1830,7 @@ function repSnapshot() {
       documents: docs.sort((a, b) => remSort(a[0], b[0])).map(([it, st]) => ({ label: RT(it.k).label, for: remWho(it), due: iso(it.exp), expired: st.lvl === 'red' })),
       tyreOrders3m: (() => { const o = S.veh.filter(v => wear(v).months <= 3); return { count: o.length, cost: sum(o, v => PRICE[v.van ? 'van' : 'normal']) }; })(),
       setsWithoutProof: S.sets.filter(s => s.where.t === 'unk' || s.where.t === 'sofer' || (s.where.t === 'loc' && !s.where.proof)).length,
+      storedSets: S.sets.filter(s => s.where.t === 'loc').length,
     },
   };
 }
@@ -1985,6 +2054,15 @@ document.addEventListener('click', e => {
   if (act === 'openN') { const n = S.push.find(x => x.id === id); n.read = true; renderAll(); if (n.v) vehModal(V(n.v)); else if (n.tab) { S.mod = 'flota'; S.tab = n.tab; if (n.m) S.rep.m = n.m; closeModal(); render(); } return; }
   if (act === 'repPrint') { S.rep.m = S.rep.m || MONTHS[11]; log('Flotă · manager', 'Raport lunar ' + mLabel(S.rep.m) + ' · tipărit / salvat PDF'); try { window.print(); } catch (x) { toast('Tipărirea nu e disponibilă aici — folosește Ctrl+P'); } return; }
   if (act === 'repCsv') { repCsv(S.rep.m); return; }
+  if (act === 'repView') { S.rep.view = b.dataset.val; render(); return; }
+  if (act === 'brandSave') { brandSave(); return; }
+  if (act === 'repSendCli') {
+    if (!S.rep.clientTo) { toast('Scrie adresa clientului în „Arcul service-ului”.'); return; }
+    const R = repData(S.rep.m), n = clientActions(R).filter(a => a[0] !== 'ok').length;
+    S.rep.sent.unshift({ m: S.rep.m, at: fmtD(TODAY) + ' ' + nowTxt().replace('azi ', ''), to: S.rep.clientTo + ' (B2B · ' + S.rep.brand.name + ')', auto: false });
+    log('Flotă · manager', 'Raport B2B ' + mLabel(S.rep.m) + ' trimis (simulat) → ' + S.rep.clientTo + ' · ' + n + ' recomandări');
+    toast('Trimis clientului (simulat) → ' + S.rep.clientTo); render(); return;
+  }
   if (act === 'repJson') { const txt = JSON.stringify(repSnapshot(), null, 1); log('Flotă · manager', 'Raport · date JSON pentru server (' + Math.round(txt.length / 1024) + ' KB)'); modal('<div class="head"><h2>Date pentru server · tyrefleet.fleet-report/1</h2><button class="btn gray sm" data-act="close">Închide</button></div><div class="note">Salvează ca <span class="mm">curier-demo.json</span> și trimite de pe server: <span class="mm">php bin/console app:fleet-report:send --input=curier-demo.json</span> — PDF + CSV pe e-mail, o singură dată pe lună.</div><textarea class="inp" id="csvTxt" readonly style="min-height:240px;font-family:var(--f-mono);font-size:.74rem">' + esc(txt) + '</textarea><div class="pills"><button class="btn sm" data-act="copyCsv">Copiază</button></div>'); return; }
   if (act === 'repSend') { repSend(S.rep.m, false); renderAll(); return; }
   if (act === 'repOpen') { S.rep.m = b.dataset.val; render(); window.scrollTo({ top: 0 }); return; }

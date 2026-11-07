@@ -210,3 +210,13 @@ Minden küldés az auditnaplóban: `fleet_report.sent`.
 | „a … még nem teljes” | Friss export a demóból / adatbázisból az időszak lezárása után. |
 | „Nincs feladó / Nincs címzett” | `FLEET_REPORT_FROM` / `FLEET_REPORT_TO` a `.env.prod`-ban. |
 | SMTP-hiba a logban | `MAILER_DSN` (host, port 587, jelszó); az ütemező egy óra múlva újrapróbálja. |
+
+### B2B riport a flotta-ügyfélnek (`--variant=client`)
+
+Ugyanabból a pillanatképből a **szerviz arculatával**: műveletek, gumiállapot járművenként, depó, ajánlások. Az ügyfél
+**nem** kapja meg a belső keretet, az üzemanyag-gyanút és a sofőrneveket (teszt őrzi: `FleetReportSendTest`).
+1. Arculat: `config/fleet-report/brand.json` (név, cégnév, CUI, cím, telefon, e-mail = válaszcím, web, szín, logó,
+   `services`). Csak a felsorolt szolgáltatást ajánlja a riport — **ITP csak RAR-engedéllyel** kerüljön be.
+2. `.env.prod`: `FLEET_REPORT_CLIENT_TO` (+ `_CC`); üresen a B2B riport egyszerűen kimarad.
+3. Próba: `… app:fleet-report:send --variant=client --dry-run`. Az ütemező mindkét változatot futtatja; a napló külön
+   vezeti őket (`<flotta>|<időszak>|internal` és `…|client`).

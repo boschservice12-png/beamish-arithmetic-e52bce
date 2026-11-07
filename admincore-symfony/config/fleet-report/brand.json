@@ -1,0 +1,15 @@
+{
+  "_readme": "A B2B flotta-riport arculata. A null mező kimarad a riportból. Logó: PNG/JPEG/SVG ebben a mappában, max. 300 KB (\"logo\": \"logo.png\"). services: anvelope, depozitare, itp, service — csak azt ajánlja fel a riport, ami itt szerepel (ITP csak RAR-engedéllyel). Felülírás: FLEET_REPORT_BRAND=/útvonal/brand.json",
+  "name": "Red Assistance",
+  "legalName": "SC RED ASSISTANCE SRL",
+  "cui": "47746920",
+  "regcom": "J2023000388268",
+  "address": "Str. Petki David nr. 27, Sângeorgiu de Mureș, jud. Mureș",
+  "phone": null,
+  "email": "contact@redassistance.net",
+  "web": "https://redassistance.net",
+  "color": "#c8102e",
+  "colorSoft": "#fbe9ec",
+  "logo": null,
+  "services": ["anvelope", "depozitare", "service"]
+}

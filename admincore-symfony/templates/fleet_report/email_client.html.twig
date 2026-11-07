@@ -1,0 +1,31 @@
+{# B2B riport-levél: a szerviz arculatával, rövid; a teljes riport a PDF-ben. Csak inline stílus. #}
+{% set st = r.state %}{% set col = brand.color %}
+<!doctype html>
+<html lang="ro"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f3f4f6;font-family:Arial,Helvetica,sans-serif;color:#1b1d22">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6"><tr><td align="center" style="padding:16px">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:10px">
+<tr><td style="padding:16px 20px;border-bottom:3px solid {{ col }}">
+  {% if brand.logoDataUri %}<img src="{{ brand.logoDataUri }}" alt="{{ brand.name }}" height="32" style="height:32px">{% else %}<span style="font-size:20px;font-weight:bold;color:{{ col }}">{{ brand.name }}</span>{% endif %}
+</td></tr>
+<tr><td style="padding:14px 20px 4px">
+  <div style="font-size:20px;font-weight:bold">Raport flotă · {{ r.period.label }}</div>
+  <div style="font-size:14px;color:#646a75">{{ r.fleetName }}</div>
+</td></tr>
+<tr><td style="padding:8px 20px;font-size:15px;line-height:1.5">
+  Bună ziua,<br>vă trimitem raportul flotei pentru {{ r.period.label }}{% if r.operations %}: <b>{{ r.operations|length }}</b> operațiuni efectuate{% endif %};
+  anvelope: <b>{{ st.tyres.ok }}</b> în regulă · <b>{{ st.tyres.soon }}</b> curând · <b style="color:{{ st.tyres.now ? '#c8102e' : '#16733a' }}">{{ st.tyres.now }}</b> de schimbat acum.
+</td></tr>
+<tr><td style="padding:4px 20px 8px">
+  <div style="background:{{ brand.colorSoft }};border:1px solid {{ col }};border-radius:8px;padding:10px 12px">
+  <div style="font-size:16px;font-weight:bold;color:{{ col }};margin-bottom:4px">Ce vă recomandăm</div>
+  {% for a in actions %}<div style="font-size:14px;line-height:1.45;padding:5px 0;border-bottom:1px solid #eadadd"><b style="color:{{ a.level == 'red' ? '#c8102e' : (a.level == 'amb' ? '#a86400' : '#16833f') }}">{{ a.level == 'ok' ? '✓' : loop.index ~ '.' }}</b> {{ a.text }}</div>{% endfor %}
+  </div>
+</td></tr>
+{% if brand.contactLine %}<tr><td style="padding:6px 20px 4px"><div style="background:{{ col }};color:#ffffff;border-radius:8px;padding:11px 14px;font-size:15px">Programări și oferte: <b>{{ brand.contactLine }}</b></div></td></tr>{% endif %}
+<tr><td style="padding:10px 20px 18px;font-size:12px;color:#646a75;line-height:1.5">
+  Atașat: raportul complet (PDF){{ csv ? ' și lista pentru Excel (CSV)' : '' }}.<br>
+  {{ brand.legalName }}{% if brand.cui %} · CUI {{ brand.cui }}{% endif %}{% if brand.address %} · {{ brand.address }}{% endif %}
+</td></tr>
+</table></td></tr></table>
+</body></html>
