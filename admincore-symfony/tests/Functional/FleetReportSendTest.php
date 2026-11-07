@@ -33,7 +33,8 @@ final class FleetReportSendTest extends KernelTestCase
     private function cmd(array $args): CommandTester
     {
         $t = new CommandTester((new Application(self::$kernel))->find('app:fleet-report:send'));
-        $t->execute($args + ['--input' => ReportBuilderTest::fixture(), '--period' => '2026-10']);
+        $args += ['--input' => ReportBuilderTest::fixture(), '--period' => '2026-10'];
+        $t->execute(array_filter($args, static fn ($v) => null !== $v)); // '--period' => null: az ütemező választ időszakot
 
         return $t;
     }
@@ -51,7 +52,7 @@ final class FleetReportSendTest extends KernelTestCase
         $names = array_map(static fn ($a) => $a->getFilename(), $mail->getAttachments());
         self::assertSame(['raport-flota-curier-demo-2026-10.pdf', 'raport-flota-curier-demo-2026-10.csv'], $names);
         self::assertStringStartsWith('%PDF-', $mail->getAttachments()[0]->getBody());
-        self::assertStringContainsString('Ce trebuie decis (8)', (string) $mail->getHtmlBody());
+        self::assertStringContainsString('Ce trebuie decis (9)', (string) $mail->getHtmlBody());
         self::assertFileExists($this->ledger);
 
         $again = $this->cmd(['--to' => ['flota@exemplu.ro']]);
@@ -143,7 +144,7 @@ final class FleetReportSendTest extends KernelTestCase
     {
         $t = $this->cmd(['--variant' => 'client', '--if-due' => true, '--now' => '2026-11-01 09:00']);
         self::assertSame(Command::SUCCESS, $t->getStatusCode());
-        self::assertStringContainsString('nincs címzettje', $t->getDisplay());
+        self::assertStringContainsString('nincs címzett', $t->getDisplay());
         self::assertEmailCount(0);
     }
 
@@ -155,6 +156,30 @@ final class FleetReportSendTest extends KernelTestCase
         unlink($f);
         self::assertSame(Command::INVALID, $t->getStatusCode());
         self::assertStringContainsString('#RRGGBB', $t->getDisplay());
+        self::assertEmailCount(0);
+    }
+
+    public function testSchedulerSendsEachDueKindOnce(): void
+    {
+        $args = ['--to' => ['flota@exemplu.ro'], '--if-due' => true, '--kind' => ['month', 'quarter'], '--now' => '2026-11-01 09:00', '--period' => null];
+        $t = $this->cmd($args);
+        self::assertSame(Command::SUCCESS, $t->getStatusCode(), $t->getDisplay());
+        self::assertEmailCount(2);
+        $subjects = array_map(static fn ($m) => $m instanceof Email ? $m->getSubject() : null, self::getMailerMessages());
+        self::assertSame(['Raport flotă · Curier Demo SRL · oct 2026 · 32.558 lei (90% din buget)', 'Raport flotă · Curier Demo SRL · T3 2026 · 101.096 lei (94% din buget)'], $subjects);
+        $ledger = json_decode((string) file_get_contents($this->ledger), true);
+        self::assertArrayHasKey('curier-demo|2026-Q3|internal', $ledger);
+
+        $this->cmd($args); // egy órával később újra fut: semmi új
+        self::assertEmailCount(2);
+    }
+
+    public function testYearReportWaitsForAClosedYearSnapshot(): void
+    {
+        $t = $this->cmd(['--to' => ['flota@exemplu.ro'], '--if-due' => true, '--kind' => ['year', 'month'], '--now' => '2027-01-01 09:00', '--period' => null]);
+        // a 2026-os év és a decemberi hónap még nincs a pillanatképben (2026-11-01): mindkettő hibát jelez, semmi nem megy ki
+        self::assertSame(Command::INVALID, $t->getStatusCode());
+        self::assertStringContainsString('anul 2026', $t->getDisplay());
         self::assertEmailCount(0);
     }
 }

@@ -26,6 +26,32 @@ final class ReportCsv
         $rows[] = ['l/100 km', $n($c->consumption(), 1), $n($p?->consumption(), 1), $d(CostTotals::delta($c->consumption(), $p?->consumption()))];
         $rows[] = ['Buget parc', $n($r->budget), '', ''];
         $rows[] = ['% din buget', $n($r->budgetPct()), '', ''];
+        if ($r->sameLastYear) {
+            $rows[] = ['Aceeasi perioada anul trecut', $n($r->sameLastYear->total()), '', $d(CostTotals::delta($c->total(), $r->sameLastYear->total()))];
+        }
+        if ($r->monthly) {
+            $rows[] = [];
+            $rows[] = ['Luna', 'Admin', 'Functionare', 'Combustibil', 'Total', 'km'];
+            foreach ($r->monthly as $m) {
+                $t = $m['totals'];
+                $rows[] = [$m['month'], $n($t->admin), $n($t->oper), $n($t->fuel), $n($t->total()), $n($t->km)];
+            }
+        }
+        if ($f = $r->forecast) {
+            $rows[] = [];
+            $rows[] = ['Prognoza '.$f->year, 'Valoare lei', 'Nota'];
+            $rows[] = ['Realizat', $n($f->ytd), $f->closedMonths.' luni'.($f->partialYear() ? ' din '.$f->closedMonthsInYear.' (date incomplete)' : '')];
+            if ($f->remainingMonths > 0) {
+                $rows[] = ['Estimat la 31.12', $n($f->expected), $n($f->expectedPct()).'% din buget anual'];
+                $rows[] = ['Interval minim', $n($f->low), ''];
+                $rows[] = ['Interval maxim', $n($f->high), ''];
+                $rows[] = ['Anvelope planificate', $n($f->planned), 'inclus'];
+            }
+            $rows[] = ['Buget anual', $n($f->budgetYear), ''];
+            if (null !== $f->nextYearProposal) {
+                $rows[] = ['Propunere buget '.($f->year + 1), $n($f->nextYearProposal), 'media 6 luni x 12 + anvelope'];
+            }
+        }
         $rows[] = [];
         $rows[] = ['Inmatriculare', 'Model', 'Sofer', 'Admin', 'Functionare', 'Combustibil', 'Total', 'km', 'lei/km', 'l/100 km', 'Buget', '% buget', 'vs medie 6 luni %'];
         foreach ($r->vehicles as $v) {

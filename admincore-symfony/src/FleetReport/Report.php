@@ -17,6 +17,7 @@ final class Report
      * @param array{tyres: array{ok: int, soon: int, now: int}, blocked: list<string>, summerTyresInWinter: list<string>, documents: list<array{label: string, for: string, due: string, expired: bool}>, tyreOrders3m: array{count: int, cost: float}, setsWithoutProof: int, storedSets: int} $state
      * @param list<array{level: string, text: string}> $decisions
      * @param list<string> $overBudget
+     * @param list<array{month: string, label: string, totals: CostTotals}> $monthly több hónapos időszaknál a hónapok bontása
      */
     public function __construct(
         public readonly Period $period,
@@ -37,6 +38,9 @@ final class Report
         public readonly array $decisions,
         public readonly array $overBudget,
         public readonly int $vehicleCount,
+        public readonly ?Forecast $forecast = null,
+        public readonly array $monthly = [],
+        public readonly ?CostTotals $sameLastYear = null,
     ) {
     }
 

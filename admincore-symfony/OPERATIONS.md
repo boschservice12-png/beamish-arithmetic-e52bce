@@ -220,3 +220,15 @@ Ugyanabból a pillanatképből a **szerviz arculatával**: műveletek, gumiálla
 2. `.env.prod`: `FLEET_REPORT_CLIENT_TO` (+ `_CC`); üresen a B2B riport egyszerűen kimarad.
 3. Próba: `… app:fleet-report:send --variant=client --dry-run`. Az ütemező mindkét változatot futtatja; a napló külön
    vezeti őket (`<flotta>|<időszak>|internal` és `…|client`).
+
+### Negyedéves és éves riport, év végi előrejelzés
+
+- Időszak: `--period=2026-10` (hónap) · `2026-Q3` (negyedév) · `2025` (lezárt év) · `2026-YTD-10` (év eleje óta).
+  Ütemezve: `FLEET_REPORT_KINDS=month,quarter,year` — a negyedéves a negyedév utáni hónap, az éves január
+  `FLEET_REPORT_DAY`-adik napján megy; mindegyik pontosan egyszer (`ledger.json`).
+- Több hónapos riport: havi bontás + ugyanaz az időszak tavaly (csak ha minden hónapjára van adat).
+- **Előrejelzés** minden riportban (az időszak évére): eddigi tény + hátralévő hónaponként működés/üzemanyag =
+  utolsó 3 hónap átlaga, admin = ugyanaz a hónap tavaly (különben 12 havi átlag) + tervezett gumirendelés; sáv = az
+  utolsó 6 hónap legolcsóbb / legdrágább hónapja. Ha a várható év vége az éves keret fölött van, a döntési lista
+  első helyeire kerül. Lezárt évre (december) keretjavaslat a következő évre — csak 6 teljes hónap adatból.
+- Ha az év elejéről hiányzik adat (a rendszer év közben indult), a riport kiírja, és nem állít keret-túllépést.

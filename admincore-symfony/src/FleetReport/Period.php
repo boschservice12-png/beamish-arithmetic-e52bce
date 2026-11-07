@@ -3,7 +3,8 @@
 namespace App\FleetReport;
 
 /**
- * A riport időszaka: egy lezárt hónap ("2026-10"), negyedév ("2026-Q3") vagy év ("2026").
+ * A riport időszaka: egy lezárt hónap ("2026-10"), negyedév ("2026-Q3"), év ("2026") vagy az év eleje óta
+ * eltelt lezárt hónapok ("2026-YTD-10" = jan–okt; év közbeni éves nézet, előrejelzéssel).
  * A hónapok "ÉÉÉÉ-HH" kulcsok — ugyanaz a kulcs, amivel a költségsorokat csoportosítjuk.
  */
 final class Period
@@ -29,11 +30,14 @@ final class Period
 
             return new self('quarter', $key, array_map(static fn (int $i) => \sprintf('%s-%02d', $m[1], $first + $i), [0, 1, 2]));
         }
+        if (preg_match('/^(\d{4})-YTD-(0[1-9]|1[0-2])$/', $key, $m)) {
+            return new self('ytd', $key, array_map(static fn (int $i) => \sprintf('%s-%02d', $m[1], $i), range(1, (int) $m[2])));
+        }
         if (preg_match('/^\d{4}$/', $key)) {
             return new self('year', $key, array_map(static fn (int $i) => \sprintf('%s-%02d', $key, $i), range(1, 12)));
         }
 
-        throw new \InvalidArgumentException(\sprintf('Időszak: "ÉÉÉÉ-HH", "ÉÉÉÉ-Q1…Q4" vagy "ÉÉÉÉ" — kaptam: "%s"', $key));
+        throw new \InvalidArgumentException(\sprintf('Időszak: "ÉÉÉÉ-HH", "ÉÉÉÉ-Q1…Q4", "ÉÉÉÉ" vagy "ÉÉÉÉ-YTD-HH" — kaptam: "%s"', $key));
     }
 
     /** Az utolsó lezárt hónap / negyedév / év a megadott naphoz képest. */
@@ -46,7 +50,8 @@ final class Period
             'month' => self::parse($today->modify('first day of last month')->format('Y-m')),
             'quarter' => self::parse(1 === intdiv($mo - 1, 3) + 1 ? ($y - 1).'-Q4' : $y.'-Q'.intdiv($mo - 1, 3)),
             'year' => self::parse((string) ($y - 1)),
-            default => throw new \InvalidArgumentException('Időszak-típus: month | quarter | year'),
+            'ytd' => self::parse($today->modify('first day of last month')->format('Y').'-YTD-'.$today->modify('first day of last month')->format('m')),
+            default => throw new \InvalidArgumentException('Időszak-típus: month | quarter | year | ytd'),
         };
     }
 
@@ -57,6 +62,7 @@ final class Period
         return match ($this->kind) {
             'month' => self::parse($first->modify('-1 month')->format('Y-m')),
             'quarter' => self::parse(self::quarterKey($first->modify('-3 months'))),
+            'ytd' => self::parse(((int) substr($this->key, 0, 4) - 1).substr($this->key, 4)),
             default => self::parse((string) ((int) $this->key - 1)),
         };
     }
@@ -103,6 +109,7 @@ final class Period
         return match ($this->kind) {
             'month' => self::monthLabel($this->key, true),
             'quarter' => 'T'.substr($this->key, -1).' '.substr($this->key, 0, 4),
+            'ytd' => substr($this->key, 0, 4).' · '.explode(' ', self::monthLabel($this->first()))[0].'–'.explode(' ', self::monthLabel($this->last()))[0],
             default => 'anul '.$this->key,
         };
     }

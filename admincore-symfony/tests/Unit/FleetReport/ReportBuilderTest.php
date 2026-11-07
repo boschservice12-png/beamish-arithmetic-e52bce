@@ -22,7 +22,7 @@ final class ReportBuilderTest extends TestCase
         self::assertSame(32558.0, round($r->totals->total()));
         self::assertSame(90.0, round($r->budgetPct()));
         self::assertSame('amb', $r->budgetLevel());
-        self::assertSame(8, $r->openDecisions());
+        self::assertSame(9, $r->openDecisions()); // a demó 8 döntése + az év végi előrejelzés (105% az éves keretből)
         self::assertSame('B 60 XNU', $r->vehicles[0]['plate']);
         self::assertCount(5, $r->overBudget);
         self::assertCount(8, $r->exceptions);
@@ -94,5 +94,44 @@ final class ReportBuilderTest extends TestCase
 
         $nothing = \App\FleetReport\ClientActions::for($r, \App\FleetReport\Brand::fromArray(['name' => 'S', 'services' => []]));
         self::assertSame('ok', $nothing[0]['level']);
+    }
+
+    public function testForecastForTheRestOfTheYear(): void
+    {
+        $s = FleetSnapshot::fromFile(self::fixture());
+        $f = (new ReportBuilder())->build($s, Period::parse('2026-10'))->forecast;
+        self::assertNotNull($f);
+        self::assertSame(2026, $f->year);
+        self::assertSame(10, $f->closedMonths);
+        self::assertSame(2, $f->remainingMonths);
+        self::assertFalse($f->partialYear());
+        self::assertSame(351252.0, round($f->ytd));
+        self::assertSame(8600.0, round($f->planned));
+        self::assertTrue($f->low <= $f->expected && $f->expected <= $f->high);
+        self::assertSame(421891.0, round($f->expected));
+        self::assertSame('red', $f->level());
+        self::assertCount(12, $f->months);
+        self::assertTrue($f->months[11]['forecast']);
+        self::assertNull($f->nextYearProposal);
+    }
+
+    public function testQuarterHasMonthlyBreakdownAndYtdLabel(): void
+    {
+        $s = FleetSnapshot::fromFile(self::fixture());
+        $q = (new ReportBuilder())->build($s, Period::parse('2026-Q3'));
+        self::assertCount(3, $q->monthly);
+        self::assertSame(round($q->totals->total()), round(array_sum(array_map(static fn (array $m) => $m['totals']->total(), $q->monthly))));
+        self::assertNull($q->sameLastYear); // 2025 Q3-ra nincs adat — nem hasonlítunk félévhez
+        self::assertSame('2026 · ian–oct', Period::parse('2026-YTD-10')->label());
+        self::assertSame('2025-YTD-10', Period::parse('2026-YTD-10')->previous()->key);
+    }
+
+    public function testNoBudgetProposalFromAPartialYear(): void
+    {
+        $f = (new ReportBuilder())->build(FleetSnapshot::fromFile(self::fixture()), Period::parse('2025-12'))->forecast;
+        self::assertNotNull($f);
+        self::assertTrue($f->partialYear()); // a rendszer 2025 novemberében indult
+        self::assertSame(0, $f->remainingMonths);
+        self::assertNull($f->nextYearProposal);
     }
 }

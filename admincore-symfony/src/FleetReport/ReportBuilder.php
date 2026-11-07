@@ -24,6 +24,7 @@ final class ReportBuilder
         $n = \count($period->months);
 
         $budget = 'year' === $period->kind && null !== $s->budget['fleetYear'] ? $s->budget['fleetYear'] : $s->budget['fleetMonth'] * $n;
+        // az előrejelzés és az éves keret évét az időszak utolsó hónapja adja
 
         $base = Period::monthsEndingAt((new \DateTimeImmutable($period->first().'-01'))->modify('-1 month')->format('Y-m'), 6);
         $baseMonths = array_values(array_intersect($base, $s->monthsWithData()));
@@ -66,11 +67,18 @@ final class ReportBuilder
         $state = $s->state;
         usort($state['documents'], static fn (array $a, array $b) => [$b['expired'], $a['due']] <=> [$a['expired'], $b['due']]);
 
+        $forecast = Forecast::build($s, $period);
+        $monthly = 1 === $n ? [] : array_map(static fn (string $m) => ['month' => $m, 'label' => Period::monthLabel($m),
+            'totals' => CostTotals::of(array_filter($s->costs, static fn (array $c) => $c['month'] === $m))], $period->months);
+        // ugyanaz az időszak tavaly — csak ha minden hónapjára van adat (fél év nem összehasonlítható)
+        $lastYear = array_map(static fn (string $m) => ((int) substr($m, 0, 4) - 1).substr($m, 4), $period->months);
+        $sameLastYear = !array_diff($lastYear, $s->monthsWithData()) ? CostTotals::of(array_filter($s->costs, static fn (array $c) => \in_array($c['month'], $lastYear, true))) : null;
+
         $r = new Report($period, $prevPeriod, $s->fleetId, $s->fleetName, $s->generatedAt, $cur, $prev, $budget, $s->budget['warnPct'],
-            $vehicles, $trend, $bySub, $exceptions, $operations, $state, [], $over, \count($s->vehicles));
+            $vehicles, $trend, $bySub, $exceptions, $operations, $state, [], $over, \count($s->vehicles), $forecast, $monthly, $sameLastYear);
 
         return new Report($period, $prevPeriod, $s->fleetId, $s->fleetName, $s->generatedAt, $cur, $prev, $budget, $s->budget['warnPct'],
-            $vehicles, $trend, $bySub, $exceptions, $operations, $state, $this->decisions($r), $over, \count($s->vehicles));
+            $vehicles, $trend, $bySub, $exceptions, $operations, $state, $this->decisions($r), $over, \count($s->vehicles), $forecast, $monthly, $sameLastYear);
     }
 
     /** @return list<array{level: string, text: string}> */
@@ -94,6 +102,11 @@ final class ReportBuilder
         if ($r->totals->total() > $r->budget) {
             $out[] = ['red', 'Buget parc depășit cu '.$fmt($r->totals->total() - $r->budget).' ('.round($r->budgetPct()).'%) — vezi vehiculele de mai jos sau ajustează bugetul.'];
         }
+        $f = $r->forecast;
+        if ($f && $f->remainingMonths > 0 && !$f->partialYear() && 'ok' !== $f->level()) {
+            $out[] = ['red' === $f->level() ? 'red' : 'amb', 'Prognoză '.$f->year.': '.$fmt($f->expected).' ('.round($f->expectedPct()).'% din bugetul anual de '.$fmt($f->budgetYear).', interval '.$fmt($f->low).' – '.$fmt($f->high).')'
+                .('red' === $f->level() ? ' — fără măsuri, bugetul anual se depășește cu '.$fmt($f->expected - $f->budgetYear).'.' : ' — în scenariul pesimist se depășește bugetul anual.')];
+        }
         if ($r->overBudget) {
             $pct = [];
             foreach ($r->vehicles as $v) {
@@ -114,6 +127,9 @@ final class ReportBuilder
         }
         if ($st['setsWithoutProof'] > 0) {
             $out[] = ['amb', $st['setsWithoutProof'].' seturi depozitate fără locație sigură / dovadă — cere foto șoferilor.'];
+        }
+        if ($f && null !== $f->nextYearProposal) {
+            $out[] = ['amb', 'Propunere buget '.($f->year + 1).': '.$fmt($f->nextYearProposal).' (media ultimelor 6 luni × 12 + anvelopele planificate) — de aprobat înainte de 1 ianuarie.'];
         }
         if (!$out) {
             $out[] = ['ok', 'Nimic de decis: costuri în buget, documente și anvelope în regulă.'];

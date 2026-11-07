@@ -344,7 +344,7 @@ details summary{cursor:pointer;font-weight:700;font-size:.9rem;margin-top:6px}
     <div>
       <div class="eyebrow">TyreFleet · Flottamodul · demó, éles adat nélkül</div>
       <h1>Flotta: Ce facem azi csempékkel — lejáratok, gumik, sofőrök, pénzügy egy rendszerben</h1>
-      <p class="lead">A flotta-manager külön ablaka (és ugyanez a telefonján): a cég engedélyei (ISCIR, RAR, földelés, környezetvédelmi, ISCTR, ISU…), az autók papírjai (RCA, ITP, rovinietă, tahográf, ATP hűtőkocsi…), a sofőrök dokumentumai (személyi, jogosítvány, atestat, orvosi…) és a műszaki emlékeztetők beállítása — plusz a gumikezelés. Lejárat előtt push megy; a sofőr az appjában fotóval tölti fel az új dokumentumot, a manager jóváhagyja. Új (v10–v11): <b>Raport lunar</b> belső és <b>B2B</b> változatban (a szerviz arculatával az ügyfélnek) — havi vezetői riport (költség vs keret, lei/km, fogyasztás, kivételek, jövő havi teendők), PDF-be nyomtatható, CSV-be exportálható, és minden hónap elején automatikusan megy a managernek. Kitalált cég, autók és helyek; semmi nem megy szerverre.</p>
+      <p class="lead">A flotta-manager külön ablaka (és ugyanez a telefonján): a cég engedélyei (ISCIR, RAR, földelés, környezetvédelmi, ISCTR, ISU…), az autók papírjai (RCA, ITP, rovinietă, tahográf, ATP hűtőkocsi…), a sofőrök dokumentumai (személyi, jogosítvány, atestat, orvosi…) és a műszaki emlékeztetők beállítása — plusz a gumikezelés. Lejárat előtt push megy; a sofőr az appjában fotóval tölti fel az új dokumentumot, a manager jóváhagyja. Új (v10–v12): <b>Raport</b> havi, negyedéves és éves (év végi előrejelzéssel), belső és <b>B2B</b> változatban (a szerviz arculatával az ügyfélnek) — havi vezetői riport (költség vs keret, lei/km, fogyasztás, kivételek, jövő havi teendők), PDF-be nyomtatható, CSV-be exportálható, és minden hónap elején automatikusan megy a managernek. Kitalált cég, autók és helyek; semmi nem megy szerverre.</p>
     </div>
     <div class="pills"><span class="tag">STANDALONE DEMÓ</span><button class="btn gray sm" data-act="reset">↺ Újrakezdés</button></div>
   </header>
@@ -400,6 +400,11 @@ details summary{cursor:pointer;font-weight:700;font-size:.9rem;margin-top:6px}
       <li>Csak ami az ügyfélre tartozik: műveletek, gumiállapot autónként, depó, ajánlások</li>
       <li>Keret, üzemanyag-gyanú, sofőrnév nem megy ki az ügyfélnek</li>
       <li>Csak a bejelölt szolgáltatást ajánlja (ITP csak RAR-engedéllyel)</li></ul></div>
+    <div class="bcard"><b>Negyedév · év · előrejelzés (v12)</b><ul>
+      <li>Időszak: hónap, negyedév, év eleje óta — havi bontással</li>
+      <li>Év vége = tény + futási ütem (3 hó) + tavalyi admin-hónap + tervezett gumi</li>
+      <li>Sáv: az utolsó 6 hónap legolcsóbb / legdrágább hónapjával</li>
+      <li>Keret-túllépés előre jelezve a döntési listában; lezárt évre keretjavaslat</li></ul></div>
   </section>
 </div>
 <div class="modal" id="modal" hidden><div class="mbox" id="mbox" role="dialog" aria-modal="true"></div></div>
@@ -1612,21 +1617,59 @@ function repAgg(rows) {
   o.total = o.admin + o.oper + o.fuel; o.lkm = o.km ? o.total / o.km : null; o.cons = o.km ? o.l / o.km * 100 : null; o.perVeh = o.total / S.veh.length;
   return o;
 }
+/* ── v12: periods (Ferenc, 2026-11-07: "negyedéves és éves riport, évközi előrejelzéssel") — the same report for a month,
+ * a quarter ("2026-Q3") or the year so far ("2026-YTD-10"); server twin: Period.php / Forecast.php (same rules). ── */
+const p2m = (y, n) => y + '-' + String(n).padStart(2, '0');
+function perMonths(key) {
+  if (/^\d{4}-\d{2}$/.test(key)) return [key];
+  const y = key.slice(0, 4);
+  if (/-Q[1-4]$/.test(key)) { const q = +key.slice(-1); return [0, 1, 2].map(i => p2m(y, (q - 1) * 3 + 1 + i)); }
+  return Array.from({ length: +key.slice(-2) }, (_, i) => p2m(y, i + 1)); // YYYY-YTD-MM
+}
+const perKindOf = key => /^\d{4}-\d{2}$/.test(key) ? 'month' : /-Q/.test(key) ? 'quarter' : 'ytd';
+const perKind = key => ({ month: 'lunar', quarter: 'trimestrial', ytd: 'anual' })[perKindOf(key)];
+function perLabel(key) {
+  if (!key) return '';
+  const k = perKindOf(key);
+  if (k === 'month') return mLabel(key);
+  if (k === 'quarter') return 'T' + key.slice(-1) + ' ' + key.slice(0, 4);
+  return key.slice(0, 4) + ' · ian–' + MNAME[+key.slice(-2) - 1];
+}
+function perPrev(key) {
+  const k = perKindOf(key), y = +key.slice(0, 4);
+  if (k === 'month') { const d = new Date(y, +key.slice(5) - 2, 1); return mOf(d); }
+  if (k === 'quarter') { const q = +key.slice(-1); return q === 1 ? (y - 1) + '-Q4' : y + '-Q' + (q - 1); }
+  return (y - 1) + key.slice(4);
+}
+/** periods the demo can report: closed months, closed quarters fully inside the data, the year so far */
+function repPeriods() {
+  const qs = [];
+  REP_MONTHS.forEach(m => { const q = m.slice(0, 4) + '-Q' + (Math.floor((+m.slice(5) - 1) / 3) + 1); if (!qs.includes(q) && perMonths(q).every(x => REP_MONTHS.includes(x))) qs.push(q); });
+  const last = REP_MONTHS[REP_MONTHS.length - 1];
+  return { months: REP_MONTHS.slice().reverse(), quarters: qs.reverse(), ytd: [last.slice(0, 4) + '-YTD-' + last.slice(5)] };
+}
+function repPeriodSel() {
+  const P = repPeriods(), opt = k => '<option value="' + k + '"' + (k === S.rep.m ? ' selected' : '') + '>' + perLabel(k) + '</option>';
+  return '<label class="f">Perioada<select class="sel" id="repM"><optgroup label="Lunar">' + P.months.map(opt).join('') + '</optgroup><optgroup label="Trimestrial">' + P.quarters.map(opt).join('') + '</optgroup><optgroup label="Anual (anul în curs, cu prognoză)">' + P.ytd.map(opt).join('') + '</optgroup></select></label>';
+}
 function repData(m) {
-  const all = costRows(), i = MONTHS.indexOf(m), pm = i > 0 ? MONTHS[i - 1] : null;
-  const inM = mm => all.filter(x => mOf(x.date) === mm);
-  const cur = repAgg(inM(m)), prev = pm ? repAgg(inM(pm)) : null;
-  const last6 = MONTHS.slice(Math.max(0, i - 6), i);
+  const all = costRows(), ms = perMonths(m), n = ms.length, pm = perPrev(m), pms = perMonths(pm);
+  const inP = list => all.filter(x => list.includes(mOf(x.date)));
+  const prevRows = inP(pms);
+  const cur = repAgg(inP(ms)), prev = prevRows.length && pms.every(x => MONTHS.includes(x)) ? repAgg(prevRows) : null;
+  const iFirst = MONTHS.indexOf(ms[0]), iLast = MONTHS.indexOf(ms[n - 1]);
+  const last6 = MONTHS.slice(Math.max(0, iFirst - 6), Math.max(0, iFirst));
   const veh = S.veh.map(v => {
-    const c = vehCost(v, inM(m)), b = S.bud.veh[v.id] || S.bud.vehM;
-    const avg6 = last6.length ? sum(all.filter(x => x.v === v.id && last6.includes(mOf(x.date))), x => x.net) / last6.length : null;
+    const c = vehCost(v, inP(ms)), b = (S.bud.veh[v.id] || S.bud.vehM) * n;
+    const avg6 = last6.length ? sum(all.filter(x => x.v === v.id && last6.includes(mOf(x.date))), x => x.net) / last6.length * n : null;
     return { v, c, b, pct: b ? c.total / b * 100 : 0, avg6, d6: avg6 ? (c.total / avg6 - 1) * 100 : null };
   }).sort((a, b) => b.c.total - a.c.total);
-  const trend = MONTHS.slice(Math.max(0, i - 5), i + 1).map(mm => [mm, repAgg(inM(mm)).total]);
-  const subs = Object.entries(COST_SUB).flatMap(([c, ls]) => ls.map(su => [c, su, sum(inM(m).filter(x => x.cat === c && x.sub === su), x => x.net)])).filter(x => x[2] > 0).sort((a, b) => b[2] - a[2]);
-  const anom = fuelAnomalies().filter(a => a.m === m);
-  const fills = fillChecks().filter(c => (c.o ? mOf(c.o.f.date) : c.mm.m) === m);
-  const ops = S.ops.filter(o => mOf(pdate(o.d)) === m);
+  const trend = MONTHS.slice(Math.max(0, iLast - Math.max(6, n) + 1), iLast + 1).map(mm => [mm, repAgg(inP([mm])).total]);
+  const monthly = n > 1 ? ms.map(mm => [mm, repAgg(inP([mm]))]) : [];
+  const subs = Object.entries(COST_SUB).flatMap(([c, ls]) => ls.map(su => [c, su, sum(inP(ms).filter(x => x.cat === c && x.sub === su), x => x.net)])).filter(x => x[2] > 0).sort((a, b) => b[2] - a[2]);
+  const anom = fuelAnomalies().filter(a => ms.includes(a.m));
+  const fills = fillChecks().filter(c => ms.includes(c.o ? mOf(c.o.f.date) : c.mm.m));
+  const ops = S.ops.filter(o => ms.includes(mOf(pdate(o.d))));
   // fleet state now (at generation)
   const tyres = { ok: 0, amb: 0, red: 0 }; S.veh.forEach(v => tyres[status(v).lvl]++);
   const blocked = S.veh.filter(v => { const b = blocks(v); return b.veh.length || b.drv.length; });
@@ -1636,7 +1679,49 @@ function repData(m) {
   const order3 = S.veh.filter(v => wear(v).months <= 3), order3Cost = sum(order3, v => PRICE[v.van ? 'van' : 'normal']);
   const season = WINTER ? S.veh.filter(v => mounted(v).sez === 'vara') : [];
   const overBud = veh.filter(x => x.pct >= 100);
-  return { m, pm, cur, prev, veh, trend, subs, anom, fills, ops, tyres, blocked, exp, soon, badSets, order3, order3Cost, season, overBud, budget: S.bud.fleetM };
+  const R = { m, ms, pm: prev ? pm : null, cur, prev, veh, trend, monthly, subs, anom, fills, ops, tyres, blocked, exp, soon, badSets, order3, order3Cost, season, overBud, budget: S.bud.fleetM * n };
+  R.fc = repForecast(ms[n - 1], order3Cost);
+  return R;
+}
+/**
+ * year-end forecast (server: Forecast.php): actual Jan → period end + for each remaining month: operating + fuel = average
+ * of the last 3 closed months, admin = the same month last year (RCA, tax, ITP recur yearly) or the 12-month admin average,
+ * + the planned tyre orders (next 3 months). Band: the cheapest / dearest of the last 6 months for the remaining ones.
+ */
+function repForecast(last, planned3) {
+  const all = costRows(), y = last.slice(0, 4), have = MONTHS.slice(0, 12).filter(m => all.some(x => mOf(x.date) === m));
+  const tot = m => sum(all.filter(x => mOf(x.date) === m), x => x.net), cat = (m, cs) => sum(all.filter(x => mOf(x.date) === m && cs.includes(x.cat)), x => x.net);
+  const yms = Array.from({ length: 12 }, (_, i) => p2m(y, i + 1)), closed = yms.filter(m => m <= last), rem = yms.filter(m => m > last);
+  const closedD = closed.filter(m => have.includes(m)); if (!closedD.length) return null;
+  const iL = MONTHS.indexOf(last), back = k => MONTHS.slice(Math.max(0, iL - k + 1), iL + 1).filter(m => have.includes(m));
+  const avg = (ms, f) => ms.length ? sum(ms, f) / ms.length : 0;
+  const run = avg(back(3), m => cat(m, ['oper', 'fuel'])), adminAvg = avg(back(12), m => cat(m, ['admin'])), t6 = back(6).map(tot);
+  const ytd = sum(closedD, tot); let rest = 0, planned = 0;
+  const months = closedD.map(m => [m, tot(m), false]);
+  rem.forEach((m, i) => { const ly = (+y - 1) + m.slice(4); let f = run + (have.includes(ly) ? cat(ly, ['admin']) : adminAvg); if (i < 3 && planned3 > 0) { const sh = planned3 / Math.min(3, rem.length); f += sh; planned += sh; } rest += f; months.push([m, f, true]); });
+  const k = rem.length, bY = S.bud.fleetY || S.bud.fleetM * 12, lo = t6.length ? Math.min(...t6) : 0, hi = t6.length ? Math.max(...t6) : 0;
+  const fc = { year: +y, ytd, closed: closedD.length, closedInYear: closed.length, rem: k, run: k ? rest / k : 0, planned, exp: ytd + rest, low: ytd + k * lo + planned, high: ytd + k * hi + planned, bY, months,
+    next: k === 0 && t6.length === 6 ? Math.round((sum(t6) / 6 * 12 + planned3) / 1000) * 1000 : null };
+  fc.partial = fc.closed < fc.closedInYear; fc.pct = fc.exp / bY * 100; fc.lvl = fc.exp > bY ? 'red' : fc.high > bY ? 'amb' : 'ok';
+  return fc;
+}
+function repForecastCard(R) {
+  const f = R.fc; if (!f) return '';
+  const mx = Math.max(1, ...f.months.map(x => x[1]));
+  return '<div class="card' + (f.rem && !f.partial && f.lvl !== 'ok' ? ' bad' : '') + '"><h3>' + (f.rem ? 'Prognoză final de an ' + f.year : 'Anul ' + f.year + ' · închis') + '</h3>'
+    + (f.partial ? '<div class="box amb">Date în sistem doar pentru ' + f.closed + ' din ' + f.closedInYear + ' luni ale anului ' + f.year + ' — prognoza este orientativă.</div>' : '')
+    + '<div class="kpis"><div class="kpi"><span class="v">' + lei(f.ytd) + '</span><span class="l">realizat ian → ' + mLabel(f.months.filter(x => !x[2]).slice(-1)[0][0]).split(' ')[0] + ' (' + f.closed + ' luni)</span></div>'
+    + (f.rem ? '<div class="kpi ' + (f.partial ? '' : f.lvl) + '"><span class="v">' + lei(f.exp) + '</span><span class="l">estimat la 31.12 · ' + Math.round(f.pct) + '% din bugetul anual</span></div><div class="kpi"><span class="v">' + lei(f.low) + '</span><span class="l">… până la ' + lei(f.high) + ' (interval)</span></div><div class="kpi"><span class="v">' + lei(f.bY) + '</span><span class="l">buget anual ' + f.year + '</span></div>'
+      : '<div class="kpi"><span class="v">' + (f.next != null ? lei(f.next) : '—') + '</span><span class="l">' + (f.next != null ? 'propunere buget ' + (f.year + 1) : 'propunerea apare după 6 luni complete') + '</span></div>') + '</div>'
+    + (f.rem ? '<div class="cols">' + f.months.map(([m, t, fc]) => '<div class="col"><b>' + Math.round(t / 1000) + 'k</b><i style="height:' + Math.max(2, 78 * t / mx) + '%;background:' + (fc ? 'var(--amb)' : 'var(--mute)') + '"></i><span>' + mLabel(m).split(' ')[0] + '</span></div>').join('') + '</div>'
+      + '<div class="note">Gri = realizat, portocaliu = estimat. Funcționare + combustibil = media ultimelor 3 luni; administrativ = aceeași lună de anul trecut (RCA, impozit, ITP revin anual), altfel media pe 12 luni; + anvelope planificate ' + lei(f.planned) + '. Intervalul: cea mai ieftină / cea mai scumpă lună din ultimele 6.</div>' : '')
+    + '</div>';
+}
+function repMonthlyCard(R) {
+  if (!R.monthly.length) return '';
+  const mb = R.budget / R.monthly.length;
+  return '<div class="card"><h3>Pe luni · ' + perLabel(R.m) + '</h3><div class="tscroll"><table class="tbl"><tr><th>Luna</th><th class="r hide-s">Admin</th><th class="r hide-s">Funcționare</th><th class="r hide-s">Combustibil</th><th class="r">Total</th><th class="r">km</th><th class="r">lei/km</th><th class="r">vs buget lunar</th></tr>'
+    + R.monthly.map(([m, t]) => '<tr><td>' + mLabel(m) + '</td><td class="r money hide-s">' + lei(t.admin) + '</td><td class="r money hide-s">' + lei(t.oper) + '</td><td class="r money hide-s">' + lei(t.fuel) + '</td><td class="r money"><b>' + lei(t.total) + '</b></td><td class="r mm">' + Math.round(t.km).toLocaleString('ro-RO') + '</td><td class="r mm">' + dec2(t.lkm, 2) + '</td><td class="r' + (t.total > mb ? ' warn' : '') + '">' + Math.round(100 * t.total / mb) + '%</td></tr>').join('') + '</table></div></div>';
 }
 /** what the manager has to decide next month — ranked, each with its money or its risk */
 function repDecisions(R) {
@@ -1645,7 +1730,10 @@ function repDecisions(R) {
   if (R.tyres.red) out.push(['red', R.tyres.red + ' vehicule cu anvelope sub limită — schimb imediat (risc de amendă, daună, refuz CASCO).']);
   if (R.season.length) out.push(['red', R.season.length + ' vehicule încă pe anvelope de vară în sezonul de iarnă — programează schimbul sezonier săptămâna aceasta.']);
   if (R.cur.total > R.budget) out.push(['red', 'Buget lunar parc depășit cu ' + lei(R.cur.total - R.budget) + ' (' + Math.round(R.cur.total / R.budget * 100) + '%) — vezi vehiculele de mai jos sau ajustează bugetul.']);
-  if (R.overBud.length) out.push(['amb', R.overBud.length + ' vehicule peste bugetul lunar: ' + R.overBud.slice(0, 5).map(x => x.v.plate + ' (' + Math.round(x.pct) + '%)').join(', ') + (R.overBud.length > 5 ? '…' : '') + '.']);
+  const fc = R.fc;
+  if (fc && fc.rem && !fc.partial && fc.lvl !== 'ok') out.push([fc.lvl === 'red' ? 'red' : 'amb', 'Prognoză ' + fc.year + ': ' + lei(fc.exp) + ' (' + Math.round(fc.pct) + '% din bugetul anual de ' + lei(fc.bY) + ', interval ' + lei(fc.low) + ' – ' + lei(fc.high) + ')' + (fc.lvl === 'red' ? ' — fără măsuri, bugetul anual se depășește cu ' + lei(fc.exp - fc.bY) + '.' : ' — în scenariul pesimist se depășește bugetul anual.')]);
+  if (fc && fc.next != null) out.push(['amb', 'Propunere buget ' + (fc.year + 1) + ': ' + lei(fc.next) + ' (media ultimelor 6 luni × 12 + anvelopele planificate).']);
+  if (R.overBud.length) out.push(['amb', R.overBud.length + ' vehicule peste buget: ' + R.overBud.slice(0, 5).map(x => x.v.plate + ' (' + Math.round(x.pct) + '%)').join(', ') + (R.overBud.length > 5 ? '…' : '') + '.']);
   if (R.anom.length || R.fills.length) out.push(['amb', (R.anom.length + R.fills.length) + ' semnale de combustibil de verificat (consum anormal, alimentări ≠ km) — cere bonurile, verifică cardul.']);
   if (R.exp.length) out.push(['amb', R.exp.length + ' documente expirate și ' + R.soon.length + ' care expiră în 30 de zile — lista mai jos.']);
   if (R.order3.length) out.push(['amb', 'Comandă ' + R.order3.length + ' seturi de anvelope în următoarele 3 luni · buget estimat ' + lei(R.order3Cost) + '.']);
@@ -1657,24 +1745,24 @@ const dlt = (a, b) => { if (b == null || !b) return '<span class="dlt eq">—</s
 const dec2 = (x, n) => x == null ? '—' : x.toFixed(n).replace('.', ',');
 const repViewSw = () => '<div class="seg noprint" style="max-width:340px" role="tablist" aria-label="Variantă raport">' + [['int', 'Intern · manager flotă'], ['cli', 'Client (B2B) · arcul service']].map(x => '<button class="segb' + (S.rep.view === x[0] ? ' on' : '') + '" data-act="repView" data-val="' + x[0] + '" role="tab" aria-selected="' + (S.rep.view === x[0]) + '">' + x[1] + '</button>').join('') + '</div>';
 function vRaport() {
-  if (!REP_MONTHS.includes(S.rep.m)) S.rep.m = MONTHS[11];
+  if (!perMonths(S.rep.m).every(x => REP_MONTHS.includes(x))) S.rep.m = MONTHS[11];
   if (S.rep.view === 'cli') return repViewSw() + vRaportClient();
   const R = repData(S.rep.m), c = R.cur, p = R.prev, dec = repDecisions(R);
   const bPct = c.total / R.budget * 100, top = R.veh[0];
   const maxT = Math.max(1, R.budget, ...R.trend.map(x => x[1]));
   const kpiRow = (l, a, b, f) => '<tr><td>' + l + '</td><td class="r money">' + f(a) + '</td><td class="r money">' + (b == null ? '—' : f(b)) + '</td><td class="r">' + dlt(a, b) + '</td></tr>';
-  const summary = 'Costul parcului în <b>' + mLabel(R.m) + '</b>: <b>' + lei(c.total) + '</b> fără TVA (' + (p ? dlt(c.total, p.total) + ' față de ' + mLabel(R.pm) : 'fără lună anterioară') + '), '
-    + '<b class="' + (bPct >= 100 ? 'tred' : '') + '">' + Math.round(bPct) + '%</b> din bugetul lunar de ' + lei(R.budget) + '. '
+  const summary = 'Costul parcului în <b>' + perLabel(R.m) + '</b>: <b>' + lei(c.total) + '</b> fără TVA (' + (p ? dlt(c.total, p.total) + ' față de ' + perLabel(R.pm) : 'fără lună anterioară') + '), '
+    + '<b class="' + (bPct >= 100 ? 'tred' : '') + '">' + Math.round(bPct) + '%</b> din bugetul ' + (R.ms.length > 1 ? 'perioadei' : 'lunar') + ' de ' + lei(R.budget) + '. '
     + 'Cost pe km: <b>' + dec2(c.lkm, 2) + ' lei</b> · consum <b>' + dec2(c.cons, 1) + ' l/100 km</b> pe ' + kmf(c.km) + '. '
     + (top ? 'Cel mai scump vehicul: <b>' + esc(top.v.plate) + '</b> (' + lei(top.c.total) + '). ' : '')
     + (R.overBud.length ? '<b>' + R.overBud.length + '</b> vehicule peste buget. ' : 'Toate vehiculele în buget. ')
     + (R.anom.length + R.fills.length ? '<b>' + (R.anom.length + R.fills.length) + '</b> semnale de combustibil de verificat.' : 'Fără anomalii de combustibil.');
   const nextSend = new Date(TODAY.getFullYear(), TODAY.getMonth() + 1, S.rep.day);
-  return repViewSw() + '<div class="filters noprint"><label class="f">Luna raportată<select class="sel" id="repM">' + REP_MONTHS.slice().reverse().map(m => '<option value="' + m + '"' + (m === S.rep.m ? ' selected' : '') + '>' + mLabel(m) + '</option>').join('') + '</select></label>'
+  return repViewSw() + '<div class="filters noprint">' + repPeriodSel()
     + '<button class="btn sm" data-act="repPrint">Tipărește / PDF</button><button class="btn gray sm" data-act="repCsv">Export CSV</button><button class="btn gray sm" data-act="repSend">Trimite acum</button><button class="btn gray sm" data-act="repJson" title="Pentru trimiterea reală de pe server (app:fleet-report:send)">Date JSON (server)</button>'
     + '<span class="note">' + (S.rep.on ? 'Automat: pe ' + S.rep.day + ' ale lunii la ' + esc(S.rep.hour) + ' · următorul ' + fmtD(nextSend) + ' (' + mLabel(MONTHS[12]) + ')' : 'Trimiterea automată e oprită') + '</span></div>'
     + '<div class="rep" id="rep">'
-    + '<div class="rhead"><div><div class="eyebrow">TyreFleet · Raport lunar flotă</div><h2>Curier Demo SRL · ' + mLabel(R.m) + '</h2><div class="note">' + S.veh.length + ' vehicule · lei fără TVA (TVA 21% separat) · generat ' + fmtD(TODAY) + '</div></div>'
+    + '<div class="rhead"><div><div class="eyebrow">TyreFleet · Raport ' + perKind(R.m) + ' flotă</div><h2>Curier Demo SRL · ' + perLabel(R.m) + '</h2><div class="note">' + S.veh.length + ' vehicule · lei fără TVA (TVA 21% separat) · generat ' + fmtD(TODAY) + '</div></div>'
     + '<div class="pills">' + (bPct >= 100 ? '<span class="pill red">peste buget</span>' : bPct >= S.bud.warn ? '<span class="pill amb">aproape de buget</span>' : '<span class="pill ok">în buget</span>') + '</div></div>'
     + '<p class="rsum">' + summary + '</p>'
     + '<div class="kpis"><div class="kpi' + (bPct >= 100 ? ' red' : bPct >= S.bud.warn ? ' amb' : ' ok') + '"><span class="v">' + lei(c.total) + '</span><span class="l">cost total · ' + Math.round(bPct) + '% din buget</span></div>'
@@ -1682,22 +1770,23 @@ function vRaport() {
     + '<div class="kpi"><span class="v">' + dec2(c.cons, 1) + '</span><span class="l">l / 100 km · ' + (p ? dlt(c.cons, p.cons) : '') + '</span></div>'
     + '<div class="kpi' + (R.blocked.length || R.tyres.red ? ' red' : '') + '"><span class="v">' + (R.blocked.length + R.tyres.red) + '</span><span class="l">vehicule cu risc acum (acte / anvelope)</span></div></div>'
     + '<div class="card"><h3>Ce trebuie decis (' + dec.filter(d => d[0] !== 'ok').length + ')</h3>' + dec.map((d, k) => '<div class="dec ' + d[0] + '"><span class="n">' + (d[0] === 'ok' ? '✓' : k + 1) + '</span><span>' + esc(d[1]) + '</span></div>').join('') + '</div>'
-    + '<div class="two"><div class="card"><h3>Indicatori · ' + mLabel(R.m) + (R.pm ? ' vs ' + mLabel(R.pm) : '') + '</h3><table class="tbl"><tr><th>Indicator</th><th class="r">Luna</th><th class="r">Anterior</th><th class="r">Δ</th></tr>'
+    + '<div class="two"><div class="card"><h3>Indicatori · ' + perLabel(R.m) + (R.pm ? ' vs ' + perLabel(R.pm) : '') + '</h3><table class="tbl"><tr><th>Indicator</th><th class="r">Perioada</th><th class="r">Anterior</th><th class="r">Δ</th></tr>'
     + kpiRow('Cost total', c.total, p && p.total, lei) + kpiRow('Administrativ', c.admin, p && p.admin, lei) + kpiRow('Funcționare', c.oper, p && p.oper, lei) + kpiRow('Combustibil', c.fuel, p && p.fuel, lei)
     + kpiRow('km parcurși', c.km, p && p.km, kmf) + kpiRow('Litri', c.l, p && p.l, x => Math.round(x).toLocaleString('ro-RO') + ' l') + kpiRow('lei / km', c.lkm, p && p.lkm, x => dec2(x, 2)) + kpiRow('l / 100 km', c.cons, p && p.cons, x => dec2(x, 1)) + kpiRow('Cost / vehicul', c.perVeh, p && p.perVeh, lei)
     + '</table></div>'
-    + '<div class="card"><h3>Cost total · ultimele ' + R.trend.length + ' luni</h3><div class="cols">' + R.trend.map(([m, t]) => '<div class="col"><b>' + Math.round(t / 1000) + 'k</b><i class="' + (t > R.budget ? 'over' : 'in') + '" style="height:' + Math.max(2, 78 * t / maxT) + '%' + (m === R.m ? ';outline:2px solid var(--ink);outline-offset:1px' : '') + '"></i><span>' + mLabel(m).split(' ')[0] + '</span></div>').join('')
+    + '<div class="card"><h3>Cost total · ultimele ' + R.trend.length + ' luni</h3><div class="cols">' + R.trend.map(([m, t]) => '<div class="col"><b>' + Math.round(t / 1000) + 'k</b><i class="' + (t > S.bud.fleetM ? 'over' : 'in') + '" style="height:' + Math.max(2, 78 * t / maxT) + '%' + (R.ms.includes(m) ? ';outline:2px solid var(--ink);outline-offset:1px' : '') + '"></i><span>' + mLabel(m).split(' ')[0] + '</span></div>').join('')
     + '</div>'
-    + '<div class="note">Verde = în bugetul lunar de ' + lei(R.budget) + ', roșu = peste. Bugetul = setarea actuală (' + (S.bud.mode === 'auto' ? 'media 6 luni' : 'manual') + ').</div>'
+    + '<div class="note">Verde = în bugetul lunar de ' + lei(S.bud.fleetM) + ', roșu = peste. Bugetul = setarea actuală (' + (S.bud.mode === 'auto' ? 'media 6 luni' : 'manual') + ').</div>'
     + '<table class="tbl">' + R.subs.slice(0, 6).map(([cat, su, n]) => '<tr><td><span class="dot c-' + cat + '"></span>' + esc(su) + '</td><td class="r money">' + lei(n) + '</td><td class="r mm">' + (c.total ? (100 * n / c.total).toFixed(1) : 0) + '%</td></tr>').join('') + '</table></div></div>'
-    + '<div class="card"><h3>Pe vehicul · ' + mLabel(R.m) + '</h3><div class="tscroll"><table class="tbl"><tr><th>Vehicul</th><th class="r hide-s">Admin</th><th class="r hide-s">Funcț.</th><th class="r hide-s">Comb.</th><th class="r">Total</th><th class="r">km</th><th class="r">lei/km</th><th class="r">l/100</th><th class="r">% buget</th><th class="r">vs medie 6 l.</th></tr>'
+    + repMonthlyCard(R) + repForecastCard(R)
+    + '<div class="card"><h3>Pe vehicul · ' + perLabel(R.m) + '</h3><div class="tscroll"><table class="tbl"><tr><th>Vehicul</th><th class="r hide-s">Admin</th><th class="r hide-s">Funcț.</th><th class="r hide-s">Comb.</th><th class="r">Total</th><th class="r">km</th><th class="r">lei/km</th><th class="r">l/100</th><th class="r">% buget</th><th class="r">vs medie 6 l.</th></tr>'
     + R.veh.map(x => '<tr class="click" data-act="veh" data-id="' + x.v.id + '"><td class="mm">' + esc(x.v.plate) + '<div class="note">' + esc(x.v.model) + ' · ' + esc(x.v.drv) + '</div></td><td class="r money hide-s">' + lei(x.c.admin) + '</td><td class="r money hide-s">' + lei(x.c.oper) + '</td><td class="r money hide-s">' + lei(x.c.fuel) + '</td><td class="r money"><b>' + lei(x.c.total) + '</b></td><td class="r mm">' + x.c.km.toLocaleString('ro-RO') + '</td><td class="r mm">' + (x.c.km ? dec2(x.c.total / x.c.km, 2) : '—') + '</td><td class="r mm">' + dec2(x.c.cons, 1) + '</td><td class="r' + (x.pct >= 100 ? ' warn' : '') + '">' + Math.round(x.pct) + '%</td><td class="r">' + (x.avg6 ? dlt(x.c.total, x.avg6) : '—') + '</td></tr>').join('')
     + '<tr><td><b>Parc</b></td><td class="r money hide-s"><b>' + lei(c.admin) + '</b></td><td class="r money hide-s"><b>' + lei(c.oper) + '</b></td><td class="r money hide-s"><b>' + lei(c.fuel) + '</b></td><td class="r money"><b>' + lei(c.total) + '</b></td><td class="r mm">' + c.km.toLocaleString('ro-RO') + '</td><td class="r mm">' + dec2(c.lkm, 2) + '</td><td class="r mm">' + dec2(c.cons, 1) + '</td><td class="r">' + Math.round(bPct) + '%</td><td></td></tr></table></div>'
     + '<div class="note">„% buget” = bugetul lunar al vehiculului (implicit ' + lei(S.bud.vehM) + '). „vs medie 6 l.” = față de media proprie a vehiculului în cele 6 luni dinainte. Anvelope: automat din modulul Flotă.</div></div>'
-    + '<div class="two"><div class="card' + (R.anom.length + R.fills.length ? ' bad' : '') + '"><h3>Excepții combustibil · ' + mLabel(R.m) + ' (' + (R.anom.length + R.fills.length) + ')</h3>'
+    + '<div class="two"><div class="card' + (R.anom.length + R.fills.length ? ' bad' : '') + '"><h3>Excepții combustibil · ' + perLabel(R.m) + ' (' + (R.anom.length + R.fills.length) + ')</h3>'
     + (R.anom.length + R.fills.length ? '<table class="tbl">' + R.anom.map(a => '<tr><td class="mm">' + esc(a.v.plate) + '</td><td>Consum ' + a.c.toFixed(1) + ' l/100 km · media ' + a.avg.toFixed(1) + ' (+' + Math.round(100 * (a.c / a.avg - 1)) + '%)</td></tr>').join('')
-      + R.fills.map(x => '<tr><td class="mm">' + esc(x.v.plate) + '</td><td>' + (x.o ? fmtD(x.o.f.date) + ' · ' + x.o.f.l + ' l · ' + esc(x.o.flags.join(' · ')) : 'decont ' + kmf(x.mm.decl) + ' ≠ calculat ' + kmf(x.mm.calc)) + '</td></tr>').join('') + '</table>' : '<div class="note">Nicio anomalie în această lună.</div>') + '</div>'
-    + '<div class="card"><h3>Operațiuni anvelope · ' + mLabel(R.m) + ' (' + R.ops.length + ')</h3>' + (R.ops.length ? '<table class="tbl">' + R.ops.map(o => '<tr><td class="mm">' + esc(o.d) + '</td><td class="mm">' + esc(V(o.v).plate) + '</td><td>' + esc(o.type) + '</td><td class="r money">' + (o.cost ? lei(o.cost) : '—') + '</td></tr>').join('') + '</table>' : '<div class="note">Nicio operațiune înregistrată în această lună.</div>') + '</div></div>'
+      + R.fills.map(x => '<tr><td class="mm">' + esc(x.v.plate) + '</td><td>' + (x.o ? fmtD(x.o.f.date) + ' · ' + x.o.f.l + ' l · ' + esc(x.o.flags.join(' · ')) : 'decont ' + kmf(x.mm.decl) + ' ≠ calculat ' + kmf(x.mm.calc)) + '</td></tr>').join('') + '</table>' : '<div class="note">Nicio anomalie în această perioadă.</div>') + '</div>'
+    + '<div class="card"><h3>Operațiuni anvelope · ' + perLabel(R.m) + ' (' + R.ops.length + ')</h3>' + (R.ops.length ? '<table class="tbl">' + R.ops.map(o => '<tr><td class="mm">' + esc(o.d) + '</td><td class="mm">' + esc(V(o.v).plate) + '</td><td>' + esc(o.type) + '</td><td class="r money">' + (o.cost ? lei(o.cost) : '—') + '</td></tr>').join('') + '</table>' : '<div class="note">Nicio operațiune înregistrată în această perioadă.</div>') + '</div></div>'
     + '<div class="card"><h3>Starea flotei la ' + fmtD(TODAY) + ' · luna următoare</h3><div class="kpis">'
     + '<div class="kpi' + (R.tyres.red ? ' red' : ' ok') + '"><span class="v">' + R.tyres.ok + ' / ' + R.tyres.amb + ' / ' + R.tyres.red + '</span><span class="l">anvelope: în regulă / curând / acum</span></div>'
     + '<div class="kpi' + (R.exp.length ? ' red' : ' ok') + '"><span class="v">' + R.exp.length + ' / ' + R.soon.length + '</span><span class="l">documente: expirate / în 30 zile</span></div>'
@@ -1734,19 +1823,19 @@ function vRaportClient() {
   const rank = { red: 0, amb: 1, ok: 2 };
   const veh = S.veh.slice().sort((a, c) => rank[status(a).lvl] - rank[status(c).lvl] || a.plate.localeCompare(c.plate));
   const lbl = { red: 'schimb acum', amb: 'curând', ok: 'în regulă' }, pl = { red: 'red', amb: 'amb', ok: 'ok' };
-  return '<div class="filters noprint"><label class="f">Luna raportată<select class="sel" id="repM">' + REP_MONTHS.slice().reverse().map(m => '<option value="' + m + '"' + (m === S.rep.m ? ' selected' : '') + '>' + mLabel(m) + '</option>').join('') + '</select></label>'
+  return '<div class="filters noprint">' + repPeriodSel()
     + '<button class="btn sm" data-act="repPrint">Tipărește / PDF</button><button class="btn gray sm" data-act="repSendCli">Trimite clientului</button><span class="note">către ' + esc(S.rep.clientTo || '—') + ' · din partea ' + esc(b.name) + '</span></div>'
     + '<div class="rep" id="rep">'
     + '<div class="rhead" style="border-bottom-color:' + esc(col) + '"><div><div style="font-family:var(--f-disp);font-size:1.5rem;font-weight:700;color:' + esc(col) + '">' + esc(b.name) + '</div></div><div class="note" style="text-align:right">' + esc(b.legal) + (b.cui ? ' · CUI ' + esc(b.cui) : '') + '<br>' + esc(contact) + '</div></div>'
-    + '<div><div class="eyebrow" style="color:' + esc(col) + '">Raport flotă · lunar</div><h2 style="font-size:1.6rem">Curier Demo SRL · ' + mLabel(R.m) + '</h2></div>'
-    + '<p class="rsum">' + (R.ops.length ? 'În ' + mLabel(R.m) + ' am efectuat <b>' + R.ops.length + '</b> operațiuni pentru flota dumneavoastră' + (opsCost ? ' (<b>' + lei(opsCost) + '</b> fără TVA)' : '') + '. ' : 'Starea flotei dumneavoastră după ' + mLabel(R.m) + '. ')
+    + '<div><div class="eyebrow" style="color:' + esc(col) + '">Raport flotă · ' + perKind(R.m) + '</div><h2 style="font-size:1.6rem">Curier Demo SRL · ' + perLabel(R.m) + '</h2></div>'
+    + '<p class="rsum">' + (R.ops.length ? 'În ' + perLabel(R.m) + ' am efectuat <b>' + R.ops.length + '</b> operațiuni pentru flota dumneavoastră' + (opsCost ? ' (<b>' + lei(opsCost) + '</b> fără TVA)' : '') + '. ' : 'Starea flotei dumneavoastră după ' + perLabel(R.m) + '. ')
     + 'Din ' + S.veh.length + ' vehicule: <b>' + n.ok + '</b> în regulă, <b>' + n.amb + '</b> se apropie de schimb, <b>' + n.red + '</b> necesită schimb acum.' + (stored ? ' <b>' + stored + '</b> seturi sunt depozitate.' : '') + '</p>'
     + '<div class="kpis"><div class="kpi"><span class="v">' + R.ops.length + '</span><span class="l">operațiuni în perioadă</span></div><div class="kpi' + (n.red ? ' red' : ' ok') + '"><span class="v">' + n.red + '</span><span class="l">vehicule cu anvelope de schimbat acum</span></div><div class="kpi' + (R.season.length ? ' red' : ' ok') + '"><span class="v">' + R.season.length + '</span><span class="l">pe anvelope de vară iarna</span></div><div class="kpi"><span class="v">' + R.order3.length + '</span><span class="l">seturi noi în 3 luni · ' + lei(R.order3Cost) + '</span></div></div>'
     + '<div class="card" style="border-color:' + esc(col) + '"><h3 style="color:' + esc(col) + '">Ce vă recomandăm</h3>' + acts.map((a, k) => '<div class="dec ' + a[0] + '"><span class="n">' + (a[0] === 'ok' ? '✓' : k + 1) + '</span><span>' + esc(a[1]) + '</span></div>').join('') + '</div>'
     + '<div class="card"><h3>Starea anvelopelor pe vehicul · la ' + fmtD(TODAY) + '</h3><div class="tscroll"><table class="tbl"><tr><th>Vehicul</th><th class="hide-s">Model</th><th>Sezon</th><th class="r">Min. mm</th><th>Stare</th><th class="r">Schimb estimat</th></tr>'
     + veh.map(v => { const st = status(v), w = wear(v), sz = mounted(v).sez; return '<tr class="click" data-act="veh" data-id="' + v.id + '"><td class="mm"><b>' + esc(v.plate) + '</b></td><td class="hide-s note">' + esc(v.model) + '</td><td>' + SEZ[sz] + (WINTER && sz === 'vara' ? ' ⚠' : '') + '</td><td class="r mm">' + w.minMm.toFixed(1) + '</td><td><span class="pill ' + pl[st.lvl] + '">' + lbl[st.lvl] + '</span></td><td class="r">' + (w.kmLeft < 1 ? fmtD(TODAY) : fmtD(w.date)) + '</td></tr>'; }).join('')
     + '</table></div><div class="note">Praguri de schimb: vară 2,5 mm · iarnă 3,0 mm · utilitare 2,5 mm (minim legal 1,6 mm). „Schimb estimat” = din uzura măsurată și kilometrajul lunar.</div></div>'
-    + '<div class="card"><h3>Operațiuni efectuate · ' + mLabel(R.m) + '</h3>' + (R.ops.length ? '<table class="tbl">' + R.ops.map(o => '<tr><td class="mm">' + esc(o.d) + '</td><td class="mm">' + esc(V(o.v).plate) + '</td><td>' + esc(o.type) + '</td><td class="r money">' + (o.cost ? lei(o.cost) : '—') + '</td></tr>').join('') + '</table>' : '<div class="note">Nicio operațiune în această perioadă.</div>') + '</div>'
+    + '<div class="card"><h3>Operațiuni efectuate · ' + perLabel(R.m) + '</h3>' + (R.ops.length ? '<table class="tbl">' + R.ops.map(o => '<tr><td class="mm">' + esc(o.d) + '</td><td class="mm">' + esc(V(o.v).plate) + '</td><td>' + esc(o.type) + '</td><td class="r money">' + (o.cost ? lei(o.cost) : '—') + '</td></tr>').join('') + '</table>' : '<div class="note">Nicio operațiune în această perioadă.</div>') + '</div>'
     + (contact ? '<div style="background:' + esc(col) + ';color:#fff;border-radius:10px;padding:11px 14px;font-weight:600">Programări și oferte: <b>' + esc(contact) + '</b></div>' : '')
     + '<div class="rfoot">Raport întocmit de ' + esc(b.legal) + (b.cui ? ' (CUI ' + esc(b.cui) + ')' : '') + ' pentru Curier Demo SRL, din datele înregistrate în TyreFleet. Starea anvelopelor este la data generării; estimările nu înlocuiesc verificarea la service. Fără buget intern, consum de combustibil sau nume de șoferi — acestea rămân doar în raportul intern.</div>'
     + '</div>'
@@ -1779,7 +1868,7 @@ function repSettings() {
     + '<div class="filters"><label class="chk"><input type="checkbox" id="rpPdf"' + (S.rep.pdf ? ' checked' : '') + '> PDF</label><label class="chk"><input type="checkbox" id="rpCsv"' + (S.rep.csv ? ' checked' : '') + '> CSV</label><label class="chk"><input type="checkbox" id="rpPush"' + (S.rep.push ? ' checked' : '') + '> Push pe telefonul managerului</label></div>'
     + '<div class="miss" id="rpErr"></div><div class="pills"><button class="btn sm" data-act="repSave">Salvează</button><span class="note">Se trimite raportul lunii închise. Demó: nu pleacă niciun e-mail — trimiterea se simulează și apare în istoric și ca push.</span></div></div>'
     + '<div class="card noprint"><h3>Istoric rapoarte (' + S.rep.sent.length + ')</h3><table class="tbl"><tr><th>Luna</th><th>Trimis</th><th class="hide-s">Către</th><th></th><th></th></tr>'
-    + S.rep.sent.map(x => '<tr><td class="mm">' + mLabel(x.m) + '</td><td class="mm">' + esc(x.at) + '</td><td class="hide-s note">' + esc(x.to) + '</td><td>' + (x.auto ? '<span class="pill blue">automat</span>' : '<span class="pill">manual</span>') + '</td><td><button class="btn gray sm" data-act="repOpen" data-val="' + x.m + '">Deschide</button></td></tr>').join('') + '</table></div>';
+    + S.rep.sent.map(x => '<tr><td class="mm">' + perLabel(x.m) + '</td><td class="mm">' + esc(x.at) + '</td><td class="hide-s note">' + esc(x.to) + '</td><td>' + (x.auto ? '<span class="pill blue">automat</span>' : '<span class="pill">manual</span>') + '</td><td><button class="btn gray sm" data-act="repOpen" data-val="' + x.m + '">Deschide</button></td></tr>').join('') + '</table></div>';
 }
 function repSave() {
   const day = parseInt($('rpDay').value, 10), hour = $('rpHour').value || '08:00';
@@ -1803,10 +1892,10 @@ function repSend(m, auto) {
   S.rep.sent.unshift({ m, at, to, auto: !!auto });
   const body = lei(R.cur.total) + ' (' + Math.round(R.cur.total / R.budget * 100) + '% din buget) · ' + dec2(R.cur.lkm, 2) + ' lei/km · ' + repDecisions(R).filter(d => d[0] !== 'ok').length + ' decizii · ' + fmt + ' → ' + to;
   if (S.rep.push) {
-    if (auto) S.push.push({ id: 'nr' + S.push.length, at: S.rep.hour, title: 'Raport lunar ' + mLabel(m) + ' · trimis automat', body, v: null, read: false, tab: 'raport', m });
-    else { notify('Raport lunar ' + mLabel(m) + ' · trimis', body, null); S.push[0].tab = 'raport'; S.push[0].m = m; }
+    if (auto) S.push.push({ id: 'nr' + S.push.length, at: S.rep.hour, title: 'Raport ' + perLabel(m) + ' · trimis automat', body, v: null, read: false, tab: 'raport', m });
+    else { notify('Raport ' + perLabel(m) + ' · trimis', body, null); S.push[0].tab = 'raport'; S.push[0].m = m; }
   }
-  if (!auto) { log('Flotă · manager', 'Raport lunar ' + mLabel(m) + ' trimis manual → ' + to + ' (' + fmt + ')'); toast('Trimis (simulat) → ' + to); }
+  if (!auto) { log('Flotă · manager', 'Raport ' + perLabel(m) + ' trimis manual → ' + to + ' (' + fmt + ')'); toast('Trimis (simulat) → ' + to); }
 }
 /** the server contract (tyrefleet.fleet-report/1): the same data the report uses, for app:fleet-report:send */
 function repSnapshot() {
@@ -1837,8 +1926,8 @@ function repSnapshot() {
 function repCsv(m) {
   const R = repData(m), c = R.cur, p = R.prev || {};
   const n0 = x => x == null ? '' : Math.round(x), n2 = x => x == null ? '' : x.toFixed(2).replace('.', ','), pc = (a, b) => b ? ((a / b - 1) * 100).toFixed(1).replace('.', ',') : '';
-  const rows = [['Raport lunar flota', 'Curier Demo SRL', mLabel(m), 'generat ' + fmtD(TODAY), 'lei fara TVA'], [],
-    ['Indicator', mLabel(m), R.pm ? mLabel(R.pm) : '', 'Delta %'],
+  const rows = [['Raport flota', 'Curier Demo SRL', perLabel(m), 'generat ' + fmtD(TODAY), 'lei fara TVA'], [],
+    ['Indicator', perLabel(m), R.pm ? perLabel(R.pm) : '', 'Delta %'],
     ['Cost total', n0(c.total), n0(p.total), pc(c.total, p.total)], ['Administrativ', n0(c.admin), n0(p.admin), pc(c.admin, p.admin)], ['Functionare', n0(c.oper), n0(p.oper), pc(c.oper, p.oper)], ['Combustibil', n0(c.fuel), n0(p.fuel), pc(c.fuel, p.fuel)],
     ['km', n0(c.km), n0(p.km), pc(c.km, p.km)], ['Litri', n0(c.l), n0(p.l), pc(c.l, p.l)], ['lei/km', n2(c.lkm), n2(p.lkm), pc(c.lkm, p.lkm)], ['l/100 km', n2(c.cons), n2(p.cons), pc(c.cons, p.cons)], ['Buget lunar parc', n0(R.budget), '', ''], ['% din buget', n0(c.total / R.budget * 100), '', ''], [],
     ['Inmatriculare', 'Model', 'Sofer', 'Admin', 'Functionare', 'Combustibil', 'Total', 'km', 'lei/km', 'l/100 km', 'Buget', '% buget', 'vs medie 6 luni %']]
@@ -1847,14 +1936,17 @@ function repCsv(m) {
     .concat(R.anom.map(a => ['Consum anormal', a.v.plate, a.c.toFixed(1) + ' l/100 km vs media ' + a.avg.toFixed(1)]))
     .concat(R.fills.map(x => ['Alimentare vs km', x.v.plate, x.o ? fmtD(x.o.f.date) + ' ' + x.o.f.l + ' l: ' + x.o.flags.join(' / ') : 'decont ' + x.mm.decl + ' km vs calculat ' + x.mm.calc + ' km']))
     .concat(R.overBud.map(x => ['Peste buget', x.v.plate, n0(x.c.total) + ' din ' + n0(x.b) + ' lei']))
-    .concat([[], ['Decizie', 'Prioritate']]).concat(repDecisions(R).map(d => [d[1], d[0] === 'red' ? 'urgent' : d[0] === 'amb' ? 'luna aceasta' : 'ok']));
+    .concat(R.fc ? [[], ['Prognoza ' + R.fc.year, 'Valoare lei', 'Nota'], ['Realizat', n0(R.fc.ytd), R.fc.closed + ' luni' + (R.fc.partial ? ' din ' + R.fc.closedInYear + ' (date incomplete)' : '')]]
+      .concat(R.fc.rem ? [['Estimat la 31.12', n0(R.fc.exp), Math.round(R.fc.pct) + '% din buget anual'], ['Interval minim', n0(R.fc.low), ''], ['Interval maxim', n0(R.fc.high), ''], ['Anvelope planificate', n0(R.fc.planned), 'inclus']] : [])
+      .concat([['Buget anual', n0(R.fc.bY), '']]).concat(R.fc.next != null ? [['Propunere buget ' + (R.fc.year + 1), n0(R.fc.next), 'media 6 luni x 12 + anvelope']] : []) : [])
+    .concat([[], ['Decizie', 'Prioritate']]).concat(repDecisions(R).map(d => [d[1], d[0] === 'red' ? 'urgent' : d[0] === 'amb' ? 'in aceasta perioada' : 'ok']));
   const txt = rows.map(r => r.map(x => '"' + String(x).replace(/"/g, '""') + '"').join(';')).join('\n');
-  log('Flotă · manager', 'Raport lunar ' + mLabel(m) + ' · export CSV');
+  log('Flotă · manager', 'Raport ' + perLabel(m) + ' · export CSV');
   modal('<div class="head"><h2>Export raport · ' + mLabel(m) + '</h2><button class="btn gray sm" data-act="close">Închide</button></div><textarea class="inp" id="csvTxt" readonly style="min-height:220px;font-family:var(--f-mono);font-size:.78rem">' + esc(txt) + '</textarea><div class="pills"><button class="btn sm" data-act="copyCsv">Copiază</button><span class="note">Lipește în Excel (separator ;). Secțiuni: indicatori · pe vehicul · excepții · decizii.</span></div>');
 }
 
 /* ══ render ══ */
-const TABS = [['panou', 'Panou'], ['firma', 'Firmă'], ['vehicule', 'Vehicule'], ['soferi', 'Șoferi'], ['anvelope', 'Anvelope'], ['operatiuni', 'Operațiuni'], ['raport', 'Raport lunar'], ['setari', 'Setări']];
+const TABS = [['panou', 'Panou'], ['firma', 'Firmă'], ['vehicule', 'Vehicule'], ['soferi', 'Șoferi'], ['anvelope', 'Anvelope'], ['operatiuni', 'Operațiuni'], ['raport', 'Raport'], ['setari', 'Setări']];
 const FIN_TABS = [['fpanou', 'Panou financiar'], ['facturi', 'Facturi'], ['fveh', 'Pe vehicul'], ['fuel', 'Combustibil'], ['fset', 'Setări']];
 const TYRE_SUB = [['tpanou', 'Rezumat'], ['lista', 'Stare'], ['depozit', 'Depozitare'], ['uzura', 'Uzură'], ['comutare', 'Comutare']];
 function vAnvelope() {
@@ -2052,7 +2144,7 @@ document.addEventListener('click', e => {
   if (act === 'notifs') { notifList(); return; }
   if (act === 'readAll') { S.push.forEach(n => (n.read = true)); closeModal(); renderAll(); return; }
   if (act === 'openN') { const n = S.push.find(x => x.id === id); n.read = true; renderAll(); if (n.v) vehModal(V(n.v)); else if (n.tab) { S.mod = 'flota'; S.tab = n.tab; if (n.m) S.rep.m = n.m; closeModal(); render(); } return; }
-  if (act === 'repPrint') { S.rep.m = S.rep.m || MONTHS[11]; log('Flotă · manager', 'Raport lunar ' + mLabel(S.rep.m) + ' · tipărit / salvat PDF'); try { window.print(); } catch (x) { toast('Tipărirea nu e disponibilă aici — folosește Ctrl+P'); } return; }
+  if (act === 'repPrint') { S.rep.m = S.rep.m || MONTHS[11]; log('Flotă · manager', 'Raport ' + perLabel(S.rep.m) + ' · tipărit / salvat PDF'); try { window.print(); } catch (x) { toast('Tipărirea nu e disponibilă aici — folosește Ctrl+P'); } return; }
   if (act === 'repCsv') { repCsv(S.rep.m); return; }
   if (act === 'repView') { S.rep.view = b.dataset.val; render(); return; }
   if (act === 'brandSave') { brandSave(); return; }
@@ -2060,7 +2152,7 @@ document.addEventListener('click', e => {
     if (!S.rep.clientTo) { toast('Scrie adresa clientului în „Arcul service-ului”.'); return; }
     const R = repData(S.rep.m), n = clientActions(R).filter(a => a[0] !== 'ok').length;
     S.rep.sent.unshift({ m: S.rep.m, at: fmtD(TODAY) + ' ' + nowTxt().replace('azi ', ''), to: S.rep.clientTo + ' (B2B · ' + S.rep.brand.name + ')', auto: false });
-    log('Flotă · manager', 'Raport B2B ' + mLabel(S.rep.m) + ' trimis (simulat) → ' + S.rep.clientTo + ' · ' + n + ' recomandări');
+    log('Flotă · manager', 'Raport B2B ' + perLabel(S.rep.m) + ' trimis (simulat) → ' + S.rep.clientTo + ' · ' + n + ' recomandări');
     toast('Trimis clientului (simulat) → ' + S.rep.clientTo); render(); return;
   }
   if (act === 'repJson') { const txt = JSON.stringify(repSnapshot(), null, 1); log('Flotă · manager', 'Raport · date JSON pentru server (' + Math.round(txt.length / 1024) + ' KB)'); modal('<div class="head"><h2>Date pentru server · tyrefleet.fleet-report/1</h2><button class="btn gray sm" data-act="close">Închide</button></div><div class="note">Salvează ca <span class="mm">curier-demo.json</span> și trimite de pe server: <span class="mm">php bin/console app:fleet-report:send --input=curier-demo.json</span> — PDF + CSV pe e-mail, o singură dată pe lună.</div><textarea class="inp" id="csvTxt" readonly style="min-height:240px;font-family:var(--f-mono);font-size:.74rem">' + esc(txt) + '</textarea><div class="pills"><button class="btn sm" data-act="copyCsv">Copiază</button></div>'); return; }

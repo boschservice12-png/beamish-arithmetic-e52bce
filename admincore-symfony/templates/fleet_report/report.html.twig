@@ -95,6 +95,40 @@ tr { page-break-inside: avoid; }
 </div>
 </td></tr></table>
 
+{% if r.monthly %}
+<div class="card"><h2>Pe luni · {{ r.period.label }}</h2>
+<table class="t"><tr><th>Luna</th><th class="r">Admin</th><th class="r">Funcționare</th><th class="r">Combustibil</th><th class="r">Total</th><th class="r">km</th><th class="r">lei/km</th><th class="r">vs buget lunar</th></tr>
+{% for m in r.monthly %}{% set t = m.totals %}{% set mb = r.budget / (r.monthly|length) %}
+<tr><td>{{ m.label }}</td><td class="r mono">{{ t.admin|lei }}</td><td class="r mono">{{ t.oper|lei }}</td><td class="r mono">{{ t.fuel|lei }}</td><td class="r mono"><b>{{ t.total|lei }}</b></td><td class="r mono">{{ t.km|num }}</td><td class="r mono">{{ t.perKm|num(2) }}</td><td class="r{{ t.total > mb ? ' warn' : '' }}">{{ (100 * t.total / mb)|num }}%</td></tr>
+{% endfor %}</table>
+{% if r.sameLastYear %}<div class="mute" style="font-size: 7.4pt">Aceeași perioadă anul trecut: {{ r.sameLastYear.total|lei }} → <span class="{{ c.total|trend_of(r.sameLastYear.total) }}">{{ c.total|pct_of(r.sameLastYear.total) }}</span>.</div>{% endif %}
+</div>
+{% endif %}
+
+{% set f = r.forecast %}
+{% if f %}
+<div class="card{{ f.remainingMonths and not f.partialYear and f.level != 'ok' ? ' bad' : '' }}"><h2>{{ f.remainingMonths ? 'Prognoză final de an ' ~ f.year : 'Anul ' ~ f.year ~ ' · închis' }}</h2>
+{% if f.partialYear %}<div class="warn" style="padding: 4px 6px; margin-bottom: 6px">Date în sistem doar pentru {{ f.closedMonths }} din {{ f.closedMonthsInYear }} luni ale anului {{ f.year }} — totalul anului nu este complet{{ f.remainingMonths ? ', prognoza este orientativă' : '' }}.</div>{% endif %}
+<table class="kpis"><tr>
+  <td><div class="kv">{{ f.ytd|lei }}</div><div class="kl">realizat ian → {{ r.period.last|slice(5, 2) == '12' ? 'dec' : (f.months|filter(m => not m.forecast)|last).label }} ({{ f.closedMonths }} luni)</div></td>
+  {% if f.remainingMonths %}
+  <td><div class="kv {{ f.partialYear ? '' : f.level }}">{{ f.expected|lei }}</div><div class="kl">estimat la 31.12 · {{ f.expectedPct|num }}% din bugetul anual</div></td>
+  <td><div class="kv">{{ f.low|lei }}</div><div class="kl">… până la {{ f.high|lei }} (interval)</div></td>
+  <td><div class="kv">{{ f.budgetYear|lei }}</div><div class="kl">buget anual {{ f.year }}</div></td>
+  {% else %}
+  <td><div class="kv">{{ f.budgetYear|lei }}</div><div class="kl">buget anual {{ f.year }} · {{ (100 * f.ytd / f.budgetYear)|num }}% consumat</div></td>
+  <td colspan="2"><div class="kv">{{ f.nextYearProposal is not null ? f.nextYearProposal|lei : '—' }}</div><div class="kl">{{ f.nextYearProposal is not null ? 'propunere buget ' ~ (f.year + 1) : 'propunerea apare după 6 luni complete de date' }}</div></td>
+  {% endif %}
+</tr></table>
+{% if f.remainingMonths %}
+{% set fmax = max(f.months|map(m => m.total)|merge([1])) %}
+<table class="bars"><tr>{% for m in f.months %}{% set h = max(2, (56 * m.total / fmax)|round) %}<td><div style="height: {{ 56 - h }}px"></div><div class="bar" style="width: 18px; height: {{ h }}px; background: {{ m.forecast ? '#e3a03a' : '#646a75' }}"></div></td>{% endfor %}</tr>
+<tr class="bl">{% for m in f.months %}<td>{{ m.label|split(' ')|first }}</td>{% endfor %}</tr></table>
+<div class="mute" style="font-size: 7.2pt">Gri = realizat, portocaliu = estimat. Metoda: funcționare + combustibil = media ultimelor 3 luni ({{ f.runRate|lei }} / lună cu admin); administrativ = aceeași lună de anul trecut (RCA, impozit, ITP revin anual); + anvelope planificate {{ f.planned|lei }}. Intervalul: cea mai ieftină / cea mai scumpă lună din ultimele 6.</div>
+{% endif %}
+</div>
+{% endif %}
+
 <div class="card"><h2>Pe vehicul · {{ r.period.label }}</h2>
 <table class="t"><tr><th>Vehicul</th><th class="r">Admin</th><th class="r">Funcț.</th><th class="r">Comb.</th><th class="r">Total</th><th class="r">km</th><th class="r">lei/km</th><th class="r">l/100</th><th class="r">% buget</th><th class="r">vs 6 l.</th></tr>
 {% for v in r.vehicles %}{% set t = v.totals %}
