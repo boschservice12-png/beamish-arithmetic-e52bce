@@ -174,61 +174,9 @@ Mind a szerveren, gitben soha. Részletek: `ops/secrets/README.md`.
 
 | Titok | Hol | Ki fér hozzá |
 |---|---|---|
-| `APP_SECRET`, Supabase-kulcsok, `METRICS_TOKEN`, `ASM_API_TOKEN`, `MAILER_DSN` (SMTP-jelszó) | `.env.prod` | szerver (root) |
+| `APP_SECRET`, Supabase-kulcsok, `METRICS_TOKEN`, `ASM_API_TOKEN` | `.env.prod` | szerver (root) |
 | `metrics_token`, `grafana_admin_password`, `smtp_password` | `ops/secrets/` | szerver (root) |
 | `backup_db_url` (DB-jelszó!) | `ops/secrets/` | szerver (root) |
 | `age_recipient` (nyilvános kulcs) | `ops/secrets/` | nem titok |
 | age **titkos** kulcs | offline | csak Ferenc |
 | `DEPLOY_SSH_KEY` | GitHub Secrets | CI |
-
----
-
-## 8. Flotta-riport e-mailben (`app:fleet-report:send`)
-
-Havi (negyedéves, éves) vezetői riport a flottának: **PDF + CSV** csatolva, rövid összefoglaló és döntési lista a levélben.
-Bemenet: a flotta pillanatképe a `tyrefleet.fleet-report/1` szerződés szerint (`src/FleetReport/FleetSnapshot.php`) —
-ma a flotta-demó „Raport lunar → Date JSON (server)” gombja adja, később a flotta-adatbázis ugyanezt.
-
-**Bekapcsolás (egyszer):**
-1. `.env.prod`: `MAILER_DSN=smtp://felhasznalo:jelszo@smtp.szolgaltato.ro:587`, `FLEET_REPORT_FROM`, `FLEET_REPORT_TO`
-   (+ `FLEET_REPORT_CC`), `FLEET_REPORT_INPUT=var/share/fleet-report/in/flota.json`, `FLEET_REPORT_DAY`, `FLEET_REPORT_HOUR`.
-   A feladó domainjén SPF és DKIM legyen beállítva, különben a levél spambe megy.
-2. Próba küldés nélkül: `docker compose run --rm app php bin/console app:fleet-report:send --dry-run` → a PDF/CSV/HTML a
-   `var/share/fleet-report/out` mappába kerül; nézd meg.
-3. Egy próbalevél magadnak: `… app:fleet-report:send --to=te@cegem.ro` (ez beíródik a naplóba — élesítés előtt töröld:
-   `var/share/fleet-report/ledger.json`).
-4. Ütemező: `docker compose --profile fleet-report --env-file .env.prod up -d` — óránként megnézi, esedékes-e.
-
-**Szabályok:** időszakonként **pontosan egyszer** megy ki (`ledger.json`: címzettek, időpont, a PDF és a CSV SHA-256-ja);
-ha a szerver a küldés napján állt, a következő órában pótolja; ha a pillanatkép az időszak vége előtt készült, **nem küld**
-(hiányos hónapot nem riportolunk) — friss export kell. Újraküldés: `--force` (a naplóban `forced: true`).
-Minden küldés az auditnaplóban: `fleet_report.sent`.
-
-| Tünet | Teendő |
-|---|---|
-| „Már kiment” | Rendben — ha mégis újra kell: `--force`. |
-| „a … még nem teljes” | Friss export a demóból / adatbázisból az időszak lezárása után. |
-| „Nincs feladó / Nincs címzett” | `FLEET_REPORT_FROM` / `FLEET_REPORT_TO` a `.env.prod`-ban. |
-| SMTP-hiba a logban | `MAILER_DSN` (host, port 587, jelszó); az ütemező egy óra múlva újrapróbálja. |
-
-### B2B riport a flotta-ügyfélnek (`--variant=client`)
-
-Ugyanabból a pillanatképből a **szerviz arculatával**: műveletek, gumiállapot járművenként, depó, ajánlások. Az ügyfél
-**nem** kapja meg a belső keretet, az üzemanyag-gyanút és a sofőrneveket (teszt őrzi: `FleetReportSendTest`).
-1. Arculat: `config/fleet-report/brand.json` (név, cégnév, CUI, cím, telefon, e-mail = válaszcím, web, szín, logó,
-   `services`). Csak a felsorolt szolgáltatást ajánlja a riport — **ITP csak RAR-engedéllyel** kerüljön be.
-2. `.env.prod`: `FLEET_REPORT_CLIENT_TO` (+ `_CC`); üresen a B2B riport egyszerűen kimarad.
-3. Próba: `… app:fleet-report:send --variant=client --dry-run`. Az ütemező mindkét változatot futtatja; a napló külön
-   vezeti őket (`<flotta>|<időszak>|internal` és `…|client`).
-
-### Negyedéves és éves riport, év végi előrejelzés
-
-- Időszak: `--period=2026-10` (hónap) · `2026-Q3` (negyedév) · `2025` (lezárt év) · `2026-YTD-10` (év eleje óta).
-  Ütemezve: `FLEET_REPORT_KINDS=month,quarter,year` — a negyedéves a negyedév utáni hónap, az éves január
-  `FLEET_REPORT_DAY`-adik napján megy; mindegyik pontosan egyszer (`ledger.json`).
-- Több hónapos riport: havi bontás + ugyanaz az időszak tavaly (csak ha minden hónapjára van adat).
-- **Előrejelzés** minden riportban (az időszak évére): eddigi tény + hátralévő hónaponként működés/üzemanyag =
-  utolsó 3 hónap átlaga, admin = ugyanaz a hónap tavaly (különben 12 havi átlag) + tervezett gumirendelés; sáv = az
-  utolsó 6 hónap legolcsóbb / legdrágább hónapja. Ha a várható év vége az éves keret fölött van, a döntési lista
-  első helyeire kerül. Lezárt évre (december) keretjavaslat a következő évre — csak 6 teljes hónap adatból.
-- Ha az év elejéről hiányzik adat (a rendszer év közben indult), a riport kiírja, és nem állít keret-túllépést.

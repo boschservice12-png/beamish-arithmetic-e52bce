@@ -1,7 +1,4 @@
 {
-    "phpstan/phpstan": {
-        "version": "2.2.16"
-    },
     "phpunit/phpunit": {
         "version": "12.5",
         "recipe": {
@@ -72,18 +69,6 @@
         },
         "files": [
             "config/packages/lock.yaml"
-        ]
-    },
-    "symfony/mailer": {
-        "version": "7.4",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "main",
-            "version": "4.3",
-            "ref": "710cae90ab3e5d3f4a747e9ce6ae33299d7ae83b"
-        },
-        "files": [
-            "config/packages/mailer.yaml"
         ]
     },
     "symfony/monolog-bundle": {
